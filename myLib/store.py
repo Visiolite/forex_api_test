@@ -58,6 +58,7 @@ class Store:
                                 if mode == "once" : 
                                     break
                             else : break
+                            time.sleep(2)
                         else: break
                 if delay == 0: break; 
                 time.sleep(delay)
