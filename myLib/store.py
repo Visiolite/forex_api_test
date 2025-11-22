@@ -36,7 +36,7 @@ class Store:
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
         output = model_output()
         #-------------- Display
-        params = {"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
+        params = {"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
         print(utils.format_dict_block("Store", params))
         #-------------- Action
         try:
@@ -46,6 +46,7 @@ class Store:
                     end = dateto
                     while(True):
                         if end > start:
+                            time.sleep(3) 
                             history:model_output = self.forex.history(instrument, timeframe, datefrom=start, dateto=end, count=count)
                             if history.status:
                                 if save : self.data.save(instrument=instrument, timeframe=timeframe, data=history.data, bulk=bulk)
