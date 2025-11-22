@@ -29,7 +29,15 @@ Auto-trading robots
 # Install
 [Python](https://github.com/kashanimorteza/python_document/blob/main/doc/install.md)  
 [Postgres](https://github.com/kashanimorteza/postgresql_documents/blob/main/install.md)
-
+```bash
+sudo -u postgres psql
+```
+```sql
+ALTER USER postgres WITH PASSWORD '123456';
+CREATE ROLE forex WITH LOGIN CREATEDB PASSWORD '123456';
+CREATE DATABASE forex;
+CREATE DATABASE log;
+```
 
 
 <!--------------------------------------------------------------------------------- Source --->
@@ -37,8 +45,8 @@ Auto-trading robots
 
 # Source
 ```bash
-git clone git@github.com:kashanimorteza/forex_download.git
-cd forex_download
+git clone https://github.com/kashanimorteza/forex_api.git
+cd forex_api
 ```
 pyenv
 ```bash
@@ -66,18 +74,12 @@ pip list
 <!-------------------------- Config -->
 Config
 ```bash
-vim ./config.yaml
-```
-<!-------------------------- Permission -->
-Permission
-```bash
-chmod +x ./implement.py
-chmod +x ./download.py
+vim config.yaml
 ```
 <!-------------------------- Implement databases and tables -->
 Implement databases and tables
 ```bash
-python ./implement.py
+python implement.py
 ```
 
 
@@ -103,10 +105,10 @@ dateto         = 2025-01-01 00:00:00
 <!-------------------------- Parameters -->
 Download
 ```bash
-./.env/bin/python ./download.py instrument=EUR/USD timeframe=t1 mode=complete bulk=True
-./.env/bin/python ./download.py instrument=EUR/USD timeframe=t1 mode=update bulk=False
-./.env/bin/python ./download.py instrument=EUR/USD timeframe=W1,D1 mode=complete bulk=True
-./.env/bin/python ./download.py instrument=EUR/USD,EUR/GBP timeframe=W1,D1 mode=complete bulk=True
+python download.py instrument=EUR/USD timeframe=t1 mode=complete bulk=True
+python download.py instrument=EUR/USD timeframe=t1 mode=update bulk=False
+python download.py instrument=EUR/USD timeframe=W1,D1 mode=complete bulk=True
+python download.py instrument=EUR/USD,EUR/GBP timeframe=W1,D1 mode=complete bulk=True
 ```
 <!-------------------------- Schedule -->
 Schedule
