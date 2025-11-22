@@ -90,8 +90,8 @@ python ./implement.py
 Parameters
 ```
 account        = acc-download | acc-trade
-instrument     = EUR/USD | EUR/USD,EUR/JPY | all
-timeframe      = W1 | D1 | H8 | H6 | H4 | H3 | H2 | H1 | m30 | m15 | m5 | m1 | t1 | H1,H2,H3,H4 | all
+instrument     = all | EUR/USD,EUR/JPY | EUR/USD
+timeframe      = all | m1,H1,H2,H3,H4  | W1 | D1 | H8 | H6 | H4 | H3 | H2 | H1 | m30 | m15 | m5 | m1 | t1
 mode           = complete | up | down| once
 count          = 1 - ~
 repeat         = 1 - ~
