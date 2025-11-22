@@ -127,6 +127,10 @@ Ctrl + A  then  D
 screen -ls
 screen -r forex_api
 du -sh History
+
+tar -czvf History.tar.gz ./
+cp -fr ./History.tar.gz /var/www/html
+
 ```
 
 
@@ -533,6 +537,7 @@ Instal
 ```bash
 sudo apt update
 sudo apt install nginx -y
+sudo chmod -R 755 /var/www/html
 ```
 <!-------------------------- Config -->
 Config
@@ -558,7 +563,7 @@ server {
 Service
 ```bash
 sudo systemctl enable nginx
-sudo systemctl start nginx
+sudo systemctl restart nginx
 sudo systemctl status nginx
 ```
 
