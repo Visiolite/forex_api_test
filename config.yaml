@@ -1,0 +1,86 @@
+#--------------------------------------------------------------------------------- General
+general:
+  name: forex_download
+
+#--------------------------------------------------------------------------------- Database
+database:
+  main:
+    host: 127.0.0.1
+    port: 5432
+    user: postgres
+    pass: 123456
+    name: forex
+
+#--------------------------------------------------------------------------------- Log
+log:
+  #---------------------------------Database
+  database:
+    host: 127.0.0.1
+    port: 5432
+    user: postgres
+    pass: 123456
+    name: log
+  #---------------------------------General
+  general:
+    table: forex
+    file: log.txt
+  #---------------------------------Error
+  error:
+    verbose: True
+    file: False
+    database: False
+  #---------------------------------Report
+  report:
+    verbose: True
+    file: False
+    database: False
+  #---------------------------------Notification
+  notification:
+    verbose: True
+    file: False
+    database: False
+
+#--------------------------------------------------------------------------------- FXCM
+forex_connect:
+  default: acc-download
+  acc-download:
+    server    : 'Demo'
+    username  : '52030299'
+    password  : '2idfycj'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : '490f6c2c2d2f9d20e83acee0d1fe90cc470771ea'
+  acc-trade:
+    server    : 'Demo'
+    username  : '52032860'
+    password  : 'aq8iwnf'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : '490f6c2c2d2f9d20e83acee0d1fe90cc470771ea'
+
+#--------------------------------------------------------------------------------- Download
+download:
+  instrument: XAU/USD
+  timeframe: t1
+  mode: down
+  count: 100000
+  repeat: 1
+  delay: 0
+  bulk: True
+  datefrom: '1900-01-01 00:00:00'
+  dateto: '2030-01-01 00:00:00'
+  
+#--------------------------------------------------------------------------------- instrument
+instrument:
+  table: instrument
+  useDefaultSymbols: True
+  defaultSymbols: [
+      "EUR/USD", "EUR/GBP", "EUR/CHF", "EUR/JPY", "EUR/AUD", "EUR/CAD", "EUR/NZD",
+      "GBP/USD", "GBP/JPY", "GBP/CHF", "GBP/NZD", "GBP/AUD", "GBP/CAD",
+      "AUD/USD", "AUD/CAD", "AUD/JPY", "AUD/NZD", "AUD/CHF",
+      "NZD/USD", "NZD/JPY", "NZD/CHF", "NZD/CAD",
+      "USD/JPY", "USD/CHF", "USD/CAD",
+      "CAD/JPY", "CAD/CHF",
+      "CHF/JPY",
+      "USOil", "UKOil", "XAU/USD", "XAG/USD"]
+
+#--------------------------------------------------------------------------------- timeframe
+timeframe: ["W1", "D1", "H8", "H6", "H4", "H3", "H2", "H1", "m30", "m15", "m5", "m1", "t1"]
