@@ -109,28 +109,7 @@ python download.py instrument=EUR/USD timeframe=t1 mode=complete bulk=True
 python download.py instrument=EUR/USD timeframe=t1 mode=update bulk=False
 python download.py instrument=EUR/USD timeframe=W1,D1 mode=complete bulk=True
 python download.py instrument=EUR/USD,EUR/GBP timeframe=W1,D1 mode=complete bulk=True
-
 python download.py instrument=XAU/USD timeframe=all mode=complete save =False bulk=True
-
-```
-<!-------------------------- Parameters -->
-Download
-```bash
-screen -S forex_api
-
-cd forex_api
-source .env/bin/activate
-rm -fr ./History
-python download.py instrument=XAU/USD timeframe=all mode=complete save=True bulk=True
-
-Ctrl + A  then  D
-screen -ls
-screen -r forex_api
-du -sh History
-
-tar -czvf History.tar.gz ./
-cp -fr ./History.tar.gz /var/www/html
-
 ```
 
 
@@ -172,6 +151,15 @@ General
 sudo apt update
 sudo apt upgrade
 sudo timedatectl set-timezone UTC
+```
+<!-------------------------- Screen -->
+Screen
+```bash
+screen -S forex_api
+Ctrl + A  then  D
+screen -ls
+screen -r forex_api
+du -sh History
 ```
 <!-------------------------- Git -->
 Git
