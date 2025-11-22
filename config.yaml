@@ -59,12 +59,12 @@ forex_connect:
 #--------------------------------------------------------------------------------- Download
 download:
   instrument: XAU/USD
-  timeframe: H1
-  mode: down
+  timeframe: W1,D1,H8,H6,H4,H3,H2,H1,m30,m15,m5,m1,t1
+  mode: complete
   count: 100000
   repeat: 1
   delay: 0
-  save: True
+  save: False
   bulk: True
   datefrom: '1900-01-01 00:00:00'
   dateto: '2030-01-01 00:00:00'
