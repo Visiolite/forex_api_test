@@ -14,7 +14,6 @@ from myLib.forexconnect_api import Forex
 fx = Forex(account="acc-trade")
 fx.login()
 fx.info = fx.account_info().data
-
 open = fx.trade_open(symbol="EUR/USD", buy_sell="B", amount=2000)
-order_info = fx.trade_close_all()
+close = fx.trade_close_all()
 fx.logout()
