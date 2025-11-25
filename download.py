@@ -36,7 +36,7 @@ processes = {}
 
 #--------------------------------------------------------------------------------- Args
 args = utils.parse_cli_args(sys.argv[1:])
-account = args.get("account") if args.get("server") not in (None, "") else config['forex_connect']['default']
+account = args.get("account") if args.get("account") not in (None, "") else config['forex_connect']['default']
 instrument = args.get("instrument") if args.get("instrument") not in (None, "") else config['download']['instrument']
 timeframe = args.get("timeframe") if args.get("timeframe") not in (None, "") else config['download']['timeframe']
 mode = args.get("mode") if args.get("mode") not in (None, "") else config['download']['mode']
