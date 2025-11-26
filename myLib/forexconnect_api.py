@@ -54,6 +54,7 @@ class Forex:
             #--------------Action
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", f"Trying to connect({self.account})...")
             self.fx.login(self.username, self.password, self.url, self.server, self.session_status_changed)
+            self.account = self.account_info().data
             #--------------Output
             output.message = {
                 "Time": utils.sort(int(time.time() - start_time), 3),
@@ -127,8 +128,8 @@ class Forex:
             #--------------Action
             for offer in offers_table:
                 instrument_name = getattr(offer, "instrument", None) or getattr(offer, "symbol", None)
-                offer_id = getattr(offer, "offer_id", None)
-                if instrument_name and offer_id : instruments[instrument_name] = offer_id
+                symbol = getattr(offer, "symbol", None)
+                if instrument_name and symbol : instruments[instrument_name] = symbol
             #--------------Output
             output.data = instruments
             output.message = {
@@ -289,7 +290,7 @@ class Forex:
         return output
     
     #--------------------------------------------- trade_open
-    def trade_open(self, OFFER_ID, buy_sell, amount):
+    def trade_open(self, action, symbol, amount):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -306,20 +307,24 @@ class Forex:
             #--------------Variable
             command = fxcorepy.Constants.Commands.CREATE_ORDER
             order_type = fxcorepy.Constants.Orders.TRUE_MARKET_OPEN
+            if action is "buy" : 
+                buy_sell=fxcorepy.Constants.BUY
+            elif action=="sell":
+                buy_sell=fxcorepy.Constants.SELL
             #--------------Order
             request = self.fx.create_order_request(
+                ACCOUNT_ID=self.account["id"],
                 command=command, 
                 order_type=order_type,
-                ACCOUNT_ID=self.info["id"],
                 BUY_SELL= buy_sell,
-                OFFER_ID= OFFER_ID,
+                SYMBOL = symbol,
                 AMOUNT= amount
             )
             response = self.fx.send_request(request)
             response_details = {
                 "order_id": getattr(response, "order_id", None) if response else None,
                 "trade_id": getattr(response, "trade_id", None) if response else None,
-                "OFFER_ID": OFFER_ID,
+                "symbol": symbol,
                 "buy_sell": buy_sell,
                 "amount": amount
             }
@@ -327,7 +332,7 @@ class Forex:
             output.data = response_details
             output.message = {
                 "Time": utils.sort(int(time.time() - start_time), 3),
-                "Items": f"{OFFER_ID} | {buy_sell} | {amount}",
+                "Items": f"{symbol} | {buy_sell} | {amount}",
             }
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
@@ -343,7 +348,7 @@ class Forex:
         return output
 
     #--------------------------------------------- trade_close
-    def trade_close(self, order_id, symbol, trade_id, buy_sell, amount):
+    def trade_close(self, order_id, trade_id, symbol, buy_sell, amount):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -360,11 +365,15 @@ class Forex:
             #--------------Variable
             command = fxcorepy.Constants.Commands.CREATE_ORDER
             order_type = fxcorepy.Constants.Orders.TRUE_MARKET_CLOSE
+            if buy_sell is "B" : 
+                buy_sell=fxcorepy.Constants.SELL
+            elif buy_sell=="S":
+                buy_sell=fxcorepy.Constants.BUY
             #--------------Request
             request = self.fx.create_order_request(
                 command=command, 
                 order_type=order_type,
-                ACCOUNT_ID=self.info["id"],
+                ACCOUNT_ID=self.account["id"],
                 ORDER_ID=order_id,
                 SYMBOL=symbol,
                 TRADE_ID=trade_id,
@@ -419,9 +428,9 @@ class Forex:
                     order_id = item['open_order_id']
                     trade_id = item['trade_id']
                     symbol = item['instrument']
-                    buy_sell = "B" if item['buy_sell'] == "S" else "S"
+                    buy_sell = item['buy_sell']
                     amount = item['amount']
-                    self.trade_close(order_id=order_id, symbol=symbol, trade_id=trade_id, buy_sell=buy_sell, amount=amount)
+                    self.trade_close(order_id=order_id, trade_id=trade_id, symbol=symbol, buy_sell=buy_sell, amount=amount)
             #--------------Output
             output.message = {
                 "Time": utils.sort(int(time.time() - start_time), 3),
