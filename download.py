@@ -74,6 +74,8 @@ try:
     for timeframe in timeframes:
         for instrument in instruments:
 
+            os.rmdir(f"{root_dir}/History")
+            
             datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
             dateto = args.get("dateto") if args.get("dateto") not in (None, "") else datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")

@@ -289,7 +289,7 @@ class Forex:
         return output
     
     #--------------------------------------------- trade_open
-    def trade_open(self, symbol, buy_sell, amount):
+    def trade_open(self, OFFER_ID, buy_sell, amount):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -312,14 +312,14 @@ class Forex:
                 order_type=order_type,
                 ACCOUNT_ID=self.info["id"],
                 BUY_SELL= buy_sell,
-                SYMBOL= symbol,
+                OFFER_ID= OFFER_ID,
                 AMOUNT= amount
             )
             response = self.fx.send_request(request)
             response_details = {
                 "order_id": getattr(response, "order_id", None) if response else None,
                 "trade_id": getattr(response, "trade_id", None) if response else None,
-                "symbol": symbol,
+                "OFFER_ID": OFFER_ID,
                 "buy_sell": buy_sell,
                 "amount": amount
             }
@@ -327,7 +327,7 @@ class Forex:
             output.data = response_details
             output.message = {
                 "Time": utils.sort(int(time.time() - start_time), 3),
-                "Items": f"{symbol} | {buy_sell} | {amount}",
+                "Items": f"{OFFER_ID} | {buy_sell} | {amount}",
             }
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
