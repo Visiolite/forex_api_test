@@ -61,10 +61,6 @@ print(utils.format_dict_block("Download", params))
 
 #------------------------------------------------------------------- [ Action ]
 try:
-    #--------------Connection
-    forex = Forex(account=account)
-    db.open()
-    store = Store(log=log_ins, data=data, forex=forex)
     #--------------instrument
     instruments = config["instrument"]["defaultSymbols"] if instrument == "all" else instrument.split(",")
     #--------------timeframe
@@ -72,6 +68,9 @@ try:
     #--------------params
     for timeframe in timeframes:
         for instrument in instruments:
+            forex = Forex(account=account)
+            store = Store(log=log_ins, data=data, forex=forex)
+            db.open()
             forex.login()
             time.sleep(5)
             datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
@@ -93,9 +92,7 @@ try:
             time.sleep(5)
             if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
             time.sleep(5)
-
-    #--------------Connection
-    db.close()
+            db.close()
     #--------------Verbose
     if verbose : log_ins.verbose("rep", f"{this_class}  | {this_method}", output.message)
     #--------------Log
