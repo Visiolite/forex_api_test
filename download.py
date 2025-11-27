@@ -70,12 +70,11 @@ try:
     #--------------timeframe
     timeframes = config["timeframe"] if timeframe == "all" else timeframe.split(",")
     #--------------params
-    forex.login()
     for timeframe in timeframes:
         for instrument in instruments:
             if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
+            forex.login()
             time.sleep(5)
-            
             datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
             dateto = args.get("dateto") if args.get("dateto") not in (None, "") else datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")
@@ -91,7 +90,7 @@ try:
                     dateto = d.data
                     dateto = utils.timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
             store.run(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
-    forex.logout()
+            forex.logout()
     #--------------Connection
     forex.logout()
     db.close()
