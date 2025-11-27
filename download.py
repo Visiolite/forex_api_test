@@ -68,11 +68,11 @@ try:
     #--------------params
     for timeframe in timeframes:
         for instrument in instruments:
+            if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
             forex = Forex(account=account)
             store = Store(log=log_ins, data=data, forex=forex)
             db.open()
             forex.login()
-            #time.sleep(0)
             datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
             dateto = args.get("dateto") if args.get("dateto") not in (None, "") else datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")
@@ -89,9 +89,6 @@ try:
                     dateto = utils.timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
             store.run(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
             forex.logout()
-            #time.sleep(1)
-            if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
-            #time.sleep(1)
             db.close()
     #--------------Verbose
     if verbose : log_ins.verbose("rep", f"{this_class}  | {this_method}", output.message)
