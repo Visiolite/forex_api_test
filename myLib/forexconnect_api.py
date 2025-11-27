@@ -176,9 +176,9 @@ class Forex:
                         break
                     except Exception as e:
                         self.log.verbose("err", f"{self.this_class} | {this_method}", f"{instrument} | {timeframe} | {datefrom.strftime('%Y-%m-%d %H:%M:%S')} | {dateto.strftime('%Y-%m-%d %H:%M:%S')}")
-                        attempt += 5
+                        attempt += 1
                         print(f"Error (attempt {attempt}/10): {e}")
-                        if attempt >= 1: 
+                        if attempt > 1: 
                             self.logout()
                             time.sleep(1)
                             self.login()
