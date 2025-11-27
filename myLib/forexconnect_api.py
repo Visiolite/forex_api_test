@@ -5,7 +5,7 @@
 # forex
 
 #--------------------------------------------------------------------------------- Import
-import inspect, time
+import os, inspect, time
 import pandas as pd
 import utils as utils
 from model import model_output
@@ -176,10 +176,13 @@ class Forex:
                         break
                     except Exception as e:
                         self.log.verbose("err", f"{self.this_class} | {this_method}", f"{instrument} | {timeframe} | {datefrom.strftime('%Y-%m-%d %H:%M:%S')} | {dateto.strftime('%Y-%m-%d %H:%M:%S')}")
-                        attempt += 1
+                        attempt += 5
                         print(f"Error (attempt {attempt}/10): {e}")
-                        if attempt >= 10:
-                            raise
+                        if attempt >= 1: 
+                            self.fx.logout()
+                            time.sleep(1)
+                            self.fx.login()
+                        if attempt >= 10: raise
                         time.sleep(1)
                 #-----Check
                 if len(data)>0:
