@@ -42,7 +42,7 @@ log:
 
 #--------------------------------------------------------------------------------- FXCM
 forex_connect:
-  default: acc-download
+  default: acc-history1
   acc-history1:
     server    : 'Demo'
     username  : '52030299'
