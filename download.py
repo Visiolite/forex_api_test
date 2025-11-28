@@ -64,13 +64,11 @@ try:
     for timeframe in timeframes:
         for instrument in instruments:
             if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
-
             forex_api = Forex_Api(account="acc-history1")
-            forex_api.login()
             forex = Forex(api=forex_api)
+            forex.fx.login()
             store = Store(data=data, forex=forex)
             db.open()
-
             datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
             dateto = args.get("dateto") if args.get("dateto") not in (None, "") else datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")
@@ -85,10 +83,8 @@ try:
                 if d.status and d.data : 
                     dateto = d.data
                     dateto = timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
-
             store.run(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
-
-            forex_api.logout()
+            forex.fx.logout()
             db.close()
 except Exception as e:
     #--------------Error

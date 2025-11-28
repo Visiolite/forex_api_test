@@ -135,9 +135,11 @@ class Forex:
                         attempt += 1
                         print(f"Error (attempt {attempt}/10): {e}")
                         if attempt > 1: 
-                            self.logout()
+                            self.fx.logout()
+                            forex_api = Forex_Api(account="acc-history1")
+                            self.fx = forex_api.fx
+                            forex_api.login()
                             time.sleep(1)
-                            self.login()
                         if attempt >= 10: raise
                         time.sleep(1)
                 #-----Check
@@ -164,8 +166,6 @@ class Forex:
         #--------------Return
         return output
 
-    
-    
     #--------------------------------------------- trade_list
     def trade_list(self):
         #-------------- Description
