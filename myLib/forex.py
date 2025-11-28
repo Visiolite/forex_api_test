@@ -22,6 +22,7 @@ class Forex:
         self.this_class = self.__class__.__name__
         #--------------------Instance
         self.log = Log()
+        self.api = api
         self.fx = api.fx
 
     #--------------------------------------------- account_info

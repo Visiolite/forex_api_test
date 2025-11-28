@@ -66,7 +66,7 @@ try:
             if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
             forex_api = Forex_Api(account="acc-history1")
             forex = Forex(api=forex_api)
-            forex.fx.login()
+            forex.api.login()
             store = Store(data=data, forex=forex)
             db.open()
             datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
@@ -84,7 +84,7 @@ try:
                     dateto = d.data
                     dateto = timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
             store.run(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
-            forex.fx.logout()
+            forex.api.logout()
             db.close()
 except Exception as e:
     #--------------Error
