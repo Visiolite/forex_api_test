@@ -5,10 +5,14 @@ debug = {
         "set_symbol_category":{"log":False, "verbose":False, "model":"Implementation"},
         "create_symbol_timeframe_table":{"log":False, "verbose":False, "model":"Implementation"},
     },
-    "Forex" : 
+    "Forex_Api" : 
     {
         "login":{"log":False, "verbose":True, "model":"Forex"},
         "logout":{"log":False, "verbose":True, "model":"Forex"},
+    },
+    "Forex" : 
+    {
+        "store":{"log":False, "verbose":True, "model":"Forex"},
         "symbol":{"log":False, "verbose":True, "model":"Forex"},
         "history":{"log":False, "verbose":True, "model":"Forex"},
         "account_info":{"log":False, "verbose":True, "model":"Forex"},
