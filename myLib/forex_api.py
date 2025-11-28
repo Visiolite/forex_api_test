@@ -48,7 +48,6 @@ class Forex_Api:
 
         try:
             #--------------Action
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", f"Trying to connect({self.account})...")
             self.fx.login(self.username, self.password, self.url, self.server, self.session_status_changed)
             #--------------Output
             output.message = {
