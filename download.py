@@ -1,21 +1,19 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/store.py
+# download.py
 
 #--------------------------------------------------------------------------------- Description
-# Store
+# Download
 
 #--------------------------------------------------------------------------------- Import
-import os, sys, time, shutil
+import os, sys, shutil
+from datetime import datetime
+
 root_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, f"{root_dir}/myLib")
-from datetime import datetime
+
 from myLib.model import model_output
 from myLib.forex import Forex
-from myLib.store import Store
-from myLib.data import Data
-from myLib.database import Database
-from myLib.forex_api import Forex_Api
-from myLib.utils import config, debug, sort, parse_cli_args, format_dict_block, timeframe_nex_date, to_bool
+from myLib.utils import config, parse_cli_args, format_dict_block, to_bool
 from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Debug
@@ -24,10 +22,6 @@ this_method = "Download"
 
 #--------------------------------------------------------------------------------- Variable
 output = model_output()
-db = Database.instance()
-data = Data(log=Log(), db=db)
-params = []
-processes = {}
 
 #--------------------------------------------------------------------------------- Args
 args = parse_cli_args(sys.argv[1:])
@@ -56,7 +50,6 @@ print(format_dict_block("Download", params))
 
 #------------------------------------------------------------------- [ Action ]
 try:
-    db.open()
     #--------------instrument
     instruments = config["instrument"]["defaultSymbols"] if instrument == "all" else instrument.split(",")
     #--------------timeframe
@@ -65,29 +58,10 @@ try:
     for timeframe in timeframes:
         for instrument in instruments:
             if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
-            forex_api = Forex_Api(account="acc-history1")
-            forex = Forex(api=forex_api)
-            forex.api.login()
-            store = Store(data=data, forex=forex)
-            
-            datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
-            dateto = args.get("dateto") if args.get("dateto") not in (None, "") else datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-            datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")
-            dateto = datetime.strptime(dateto, "%Y-%m-%d %H:%M:%S")
-            if mode == "up":
-                d = data.get_max_min(instrument=instrument, timeframe=timeframe, mode="max", filed="Date")
-                if d.status and d.data: 
-                    datefrom = d.data
-                    datefrom = timeframe_nex_date(mode=mode, date=datefrom, timeframe=timeframe)
-            elif mode == "down":
-                d = data.get_max_min(instrument=instrument, timeframe=timeframe, mode="min", filed="Date")
-                if d.status and d.data : 
-                    dateto = d.data
-                    dateto = timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
-            store.run(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
-            forex.api.logout()
-    db.close()
+            forex = Forex(account=account)
+            forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
 except Exception as e:
     #--------------Error
     output.status = False
     output.message = {"class":this_class, "method":this_method, "error": str(e)}
+    print(output)
