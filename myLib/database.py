@@ -108,7 +108,7 @@ class Database:
             #---Close            
             if self.status:
                 if localDatabase:
-                    self.close()                        
+                    self.close()
         except Exception as e:
             res = False
             error = str(e).replace('\n', ' ')

@@ -9,10 +9,11 @@ import re
 from datetime import datetime as dt
 from database import Database
 import utils as utils
+from utils import config, sort
 
 #--------------------------------------------------------------------------------- Variable
 dbData = {}
-dbCfg = utils.config.get("log", {}).get("database", {})
+dbCfg = config.get("log", {}).get("database", {})
 dbData["host"] = dbCfg.get("host", "127.0.0.1")
 dbData["port"] = dbCfg.get("port", "5432")
 dbData["user"] = dbCfg.get("user", "forex")
@@ -25,21 +26,21 @@ class Log:
     def __init__(self):
         self.className = "Log"
         #--------------------------------- General
-        generalCfg = utils.config.get("log", {}).get("general", {})
+        generalCfg = config.get("log", {}).get("general", {})
         self.fileName = generalCfg.get("file", "n")
         self.tblName = generalCfg.get("table", "n")
         #--------------------------------- Error
-        errorCfg = utils.config.get("log", {}).get("error", {})
+        errorCfg = config.get("log", {}).get("error", {})
         self.err_verbose = errorCfg.get("verbose", "False")
         self.err_toFile = errorCfg.get("file", "False")
         self.err_toDatabase = errorCfg.get("database", "False")
         #--------------------------------- Notification
-        notificationCfg = utils.config.get("log", {}).get("notification", {})
+        notificationCfg = config.get("log", {}).get("notification", {})
         self.not_verbose = notificationCfg.get("verbose", "False")
         self.not_toFile = notificationCfg.get("file", "False")
         self.not_toDatabase = notificationCfg.get("database", "False")
         #--------------------------------- Report
-        reportCfg = utils.config.get("log", {}).get("report", {})
+        reportCfg = config.get("log", {}).get("report", {})
         self.rep_verbose = reportCfg.get("verbose", "False")
         self.rep_toFile = reportCfg.get("file", "False")
         self.rep_toDatabase = reportCfg.get("database", "False")
@@ -143,7 +144,7 @@ class Log:
         res = False
         #--------------------------------- execution        
         try:
-            msg = f"{dt.now():%Y-%m-%d %H:%M:%S} | {utils.sort(model, 3)} | {utils.sort(subject, 30)} | {data}"
+            msg = f"{dt.now():%Y-%m-%d %H:%M:%S} | {sort(model, 3)} | {sort(subject, 30)} | {data}"
             if model=='err' and self.err_verbose: print(msg, flush=True)
             if model=='not' and self.not_verbose: print(msg, flush=True)
             if model=='rep' and self.rep_verbose: print(msg, flush=True)

@@ -18,7 +18,6 @@ start_time = time.time()
 #--------------------------------------------------------------------------------- Log
 log = Log()
 log.fileClear()
-log.database(drop=False, create=True, add=True)
 log.table(drop=True, create=True, add=True)
 
 #--------------------------------------------------------------------------------- Implementation

@@ -409,6 +409,10 @@ Permission
 ```bash
 sudo -u postgres psql
 \c forex
+GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
+GRANT USAGE ON SCHEMA public TO forex;
+GRANT CREATE ON SCHEMA public TO forex;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO forex;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO forex;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
 GRANT pg_read_server_files TO forex;

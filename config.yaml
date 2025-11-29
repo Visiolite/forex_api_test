@@ -7,7 +7,7 @@ database:
   main:
     host: 127.0.0.1
     port: 5432
-    user: postgres
+    user: forex
     pass: 123456
     name: forex
 
@@ -17,7 +17,7 @@ log:
   database:
     host: 127.0.0.1
     port: 5432
-    user: postgres
+    user: forex
     pass: 123456
     name: log
   #---------------------------------General
