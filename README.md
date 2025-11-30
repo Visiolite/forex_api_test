@@ -702,6 +702,14 @@ sudo systemctl enable nginx
 sudo systemctl restart nginx
 sudo systemctl status nginx
 ```
+```bash
+tar -czf  History.tar.gz /root/forex_api/History/
+cp -fr History.tar.gz /var/www/html
+```
+```bash
+
+
+```
 
 
 
