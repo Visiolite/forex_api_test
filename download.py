@@ -39,6 +39,8 @@ bulk = args.get("bulk") if args.get("bulk") not in (None, "") else config['downl
 bulk = to_bool(bulk)
 save = args.get("save") if args.get("save") not in (None, "") else config['download']['save']
 save = to_bool(save)
+clear = args.get("clear") if args.get("clear") not in (None, "") else config['download']['clear']
+clear = to_bool(clear)
 datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
 dateto = args.get("dateto") if args.get("dateto") not in (None, "") else datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")
@@ -57,7 +59,8 @@ try:
     #--------------params
     for timeframe in timeframes:
         for instrument in instruments:
-            if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
+            if clear : 
+                if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
             forex = Forex(account=account)
             forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
 except Exception as e:
