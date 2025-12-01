@@ -182,6 +182,7 @@ General
 sudo apt update
 sudo apt upgrade
 sudo timedatectl set-timezone UTC
+apt install aria2 -y
 ```
 <!-------------------------- Screen -->
 Screen
@@ -718,14 +719,19 @@ sudo systemctl restart nginx
 sudo systemctl status nginx
 ```
 
-```bash
-apt install aria2 -y
-```
+
+
+<!--------------------------------------------------------------------------------- Download --->
+<br><br>
+
+# Download
+Server 
 ```bash
 cd /root/forex_api
 tar -czf  history_wd_2025-11-28.tar.gz History
 mv history_wd_2025-11-28.tar.gz /var/www/html/
 ```
+Client
 ```bash
 cd /root/forex_api
 aria2c -x 16 http://91.107.245.66/history_wd_2025-11-28.tar.gz
