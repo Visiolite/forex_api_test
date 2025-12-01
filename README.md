@@ -126,7 +126,15 @@ dateto         = 2025-01-01 00:00:00
 <!-------------------------- Parameters -->
 Download
 ```bash
-.env/bin/python ./download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1 mode=down save=False bulk=True dedicate=False clear=False count=100000
+python download.py account=acc-history1 instrument=all timeframe=W1,D1 mode=down save=False bulk=False dedicate=False clear=False count=100000
+python download.py account=acc-history1 instrument=all timeframe=H8,H6,H4,H3,H2,H1 mode=down save=False bulk=True dedicate=False clear=False count=100000
+python download.py account=acc-history1 instrument=all timeframe=m30 mode=down save=False bulk=False dedicate=False clear=False count=100000
+python download.py account=acc-history1 instrument=all timeframe=m15 mode=down save=False bulk=False dedicate=False clear=False count=100000
+python download.py account=acc-history1 instrument=all timeframe=m5 mode=down save=False bulk=False dedicate=False clear=False count=100000
+python download.py account=acc-history1 instrument=all timeframe=m1 mode=down save=False bulk=False dedicate=False clear=False count=100000
+python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=False bulk=False dedicate=False clear=False count=100000
+
+
 python download.py account=acc-trade instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1 mode=down save=True bulk=True count=100000
 python download.py instrument=EUR/USD timeframe=t1 mode=complete bulk=True
 python download.py instrument=EUR/USD timeframe=t1 mode=update bulk=False
@@ -709,13 +717,19 @@ sudo systemctl enable nginx
 sudo systemctl restart nginx
 sudo systemctl status nginx
 ```
+
 ```bash
-tar -czf  History.tar.gz /root/forex_api/History/
-cp -fr History.tar.gz /var/www/html
+apt install aria2 -y
 ```
 ```bash
-wget http://91.107.191.227/History.tar.gz
-
+cd /root/forex_api
+tar -czf  history_wd_2025-11-28.tar.gz History
+mv history_wd_2025-11-28.tar.gz /var/www/html/
+```
+```bash
+cd /root/forex_api
+aria2c -x 16 http://91.107.245.66/history_wd_2025-11-28.tar.gz
+tar -zxvf history_wd_2025-11-28.tar.gz
 ```
 
 
