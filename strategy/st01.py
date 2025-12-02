@@ -9,7 +9,7 @@ import inspect, time, os,sys
 root_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, f"{root_dir}/myLib")
 from myLib.model import model_output
-from myLib.utils import config, debug, sort
+from myLib.utils import debug, sort
 from myLib.log import Log
 from myLib.forex import Forex
 

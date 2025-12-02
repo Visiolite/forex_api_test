@@ -459,7 +459,7 @@ SELECT pg_size_pretty( pg_total_relation_size('xauusd_t1'));
 Backup
 ```bash
 sudo -i -u postgres
-pg_dump --dbname=forex --verbose --no-owner | pigz > forex.gz
+pg_dump --dbname=forex --verbose --no-owner | pigz > backup_2025-11-28.tar.gz
 pg_dump --dbname=forex --table public.xauusd_t1 --verbose --no-owner | gzip > xauusd_t1.gz
 cp -fr /var/lib/postgresql/*.gz /var/www/html/
 ```
@@ -467,8 +467,8 @@ cp -fr /var/lib/postgresql/*.gz /var/www/html/
 Restore
 ```bash
 sudo -i -u postgres
-pigz -dc forex.gz | psql -U postgres -d forex
-pigz -dc xauusd_t1.gz | psql -U postgres -d forex
+pigz -dc backup_2025-11-28.tar.gz | psql -U postgres -d forex
+pigz -dc xauusd_t1.gz | psql -U forex -d forex
 ```
 <!-------------------------- Download Backup -->
 Download Backup
