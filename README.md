@@ -32,8 +32,8 @@ sudo -u postgres psql
 ```
 user
 ```sql
-ALTER USER postgres WITH PASSWORD '123456';
-CREATE ROLE forex WITH LOGIN CREATEDB PASSWORD '123456';
+ALTER USER postgres WITH PASSWORD '&WnA8v!(THG%)czK';
+CREATE ROLE forex WITH LOGIN CREATEDB PASSWORD '&WnA8v!(THG%)czK';
 ```
 forex
 ```sql
@@ -424,7 +424,7 @@ UUID=d7273f09-ca3d-4d88-9cb7-1fa64106aab8  /media/data3  ext4  defaults,nofail  
 <!-------------------------- Role -->
 Role
 ```bash
-CREATE ROLE forex WITH LOGIN CREATEDB PASSWORD '123456';
+CREATE ROLE forex WITH LOGIN CREATEDB PASSWORD '&WnA8v!(THG%)czK';
 ```
 <!-------------------------- Database -->
 Database

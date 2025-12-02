@@ -15,7 +15,7 @@ dbCfg = config.get("database", {}).get("main", {})
 dbData["host"] = dbCfg.get("host", "127.0.0.1")
 dbData["port"] = dbCfg.get("port", "5432")
 dbData["user"] = dbCfg.get("user", "forex")
-dbData["pass"] = dbCfg.get("pass", "123456")
+dbData["pass"] = dbCfg.get("pass", "&WnA8v!(THG%)czK")
 dbData["name"] = dbCfg.get("name", "forex")
 
 #--------------------------------------------------------------------------------- Action
