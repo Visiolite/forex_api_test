@@ -8,7 +8,7 @@ database:
     host: 127.0.0.1
     port: 5432
     user: forex
-    pass: &WnA8v!(THG%)czK
+    pass: "&WnA8v!(THG%)czK"
     name: forex
 
 #--------------------------------------------------------------------------------- Log
@@ -18,7 +18,7 @@ log:
     host: 127.0.0.1
     port: 5432
     user: forex
-    pass: &WnA8v!(THG%)czK
+    pass: "&WnA8v!(THG%)czK"
     name: log
   #---------------------------------General
   general:
