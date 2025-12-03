@@ -8,7 +8,7 @@
 from __future__ import annotations
 import os, yaml
 from datetime import timedelta
-from debug import debug
+from myLib.debug import debug
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- load_config

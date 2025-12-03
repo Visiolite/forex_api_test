@@ -43,19 +43,21 @@ class Forex_Api:
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        #-------------- Output
         output = model_output()
-        start_time = time.time()
+        output.class_name = self.this_class
+        output.method_name = this_method
 
         try:
+            #--------------Variable
+            start_time = time.time()
             #--------------Action
             self.fx.login(self.username, self.password, self.url, self.server, self.session_status_changed)
             #--------------Output
-            output.message = {
-                "Time": sort(int(time.time() - start_time), 3),
-                "account": self.account,
-            }
+            output.time = sort(int(time.time() - start_time), 3)
+            output.message = self.account
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -78,19 +80,21 @@ class Forex_Api:
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        #-------------- Output
         output = model_output()
-        start_time = time.time()
-        
+        output.class_name = self.this_class
+        output.method_name = this_method
+
         try:
+            #--------------Variable
+            start_time = time.time()
             #--------------Action
             self.fx.logout()
             #--------------Output
-            output.message = {
-                "Time": sort(int(time.time() - start_time), 3),
-                "account": self.account,
-            }
+            output.time = sort(int(time.time() - start_time), 3)
+            output.message = self.account
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  

@@ -5,12 +5,16 @@
 # Store
 
 #--------------------------------------------------------------------------------- Import
-import os,sys
+import os,sys, ast
 root_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, f"{root_dir}/myLib")
-sys.path.insert(0, f"{root_dir}/strategy")
+sys.path.insert(0, f"{root_dir}/myModel")
+sys.path.insert(0, f"{root_dir}/myStrategy")
+from myLib.database_orm import database_orm
+from myLib.data_orm import data_orm
 from myLib.forex import Forex
-from strategy.st01 import ST01
+from myModel import *
+from myStrategy import *
 
 # #--------------------------------------------------------------------------------- Action
 # forex = Forex(account="acc-trade")
@@ -19,13 +23,31 @@ from strategy.st01 import ST01
 # print(result)
 # forex.api.logout()
 
+#--------------------------------------------------------------------------------- Database_orm
+# db = database_orm()
+# db.create_tables()
+data = data_orm()
+
+# obj = strategy_model_db(name="ST01", description="ST01", enable=True)
+# data.add(model=strategy_model_db, item=obj)
+
+# params = {
+#     "symbol": "EUR/USD",
+#     "amount": 10000,
+#     "tp_pips": 1,
+#     "st_pips": 10,
+# }
+# obj = strategy_item_model_db(strategy_id=1, name="ST01-EURUSD", description="ST01-EURUSD", enable=True, params=str(params))
+# data.add(model=strategy_item_model_db, item=obj)
+
 #--------------------------------------------------------------------------------- Action
 forex = Forex(account="acc-trade")
 forex.api.login()
 forex.account_info()
 
-
-st = ST01(forex=forex, symbol="EUR/USD", amount=10000, tp_pips=1, st_pips=5)
+obj = data.item(model=strategy_item_model_db, id=1)
+params = ast.literal_eval(obj.data[0].params)
+st = ST01(forex=forex, params=params)
 st.start()
 
 forex.api.logout()

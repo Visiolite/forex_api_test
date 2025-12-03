@@ -1,11 +1,10 @@
 #--------------------------------------------------------------------------------- Location
-# code/myLib/database.py
+# myLib/database.py
 
 #--------------------------------------------------------------------------------- Description
-# Database
+# database
 
 #--------------------------------------------------------------------------------- Import
-import re
 import psycopg2
 from myLib.utils import config, debug
 

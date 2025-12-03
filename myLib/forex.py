@@ -105,11 +105,14 @@ class Forex:
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        #-------------- Output
         output = model_output()
-        start_time = time.time()
+        output.class_name = self.this_class
+        output.method_name = this_method
 
         try:
-            #-------------- Variable
+            #--------------Variable
+            start_time = time.time()
             accounts_table = self.fx.get_table(ForexConnect.ACCOUNTS)
             #--------------Action
             for account in accounts_table:
@@ -120,9 +123,10 @@ class Forex:
                 output.data["equity"] = account.equity
                 break
             #--------------Output
-            output.message["Time"] = sort(int(time.time() - start_time), 3)
+            output.time = sort(int(time.time() - start_time), 3)
+            output.message = output.data
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -283,7 +287,7 @@ class Forex:
         return output
     
     #--------------------------------------------- trade_open
-    def trade_open(self, action, symbol, amount, tp_pips=0, sl_pips=0):
+    def trade_open(self, symbol, action, amount, tp_pips=0, sl_pips=0):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -293,17 +297,18 @@ class Forex:
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        #-------------- Output
         output = model_output()
-        start_time = time.time()
+        output.class_name = self.this_class
+        output.method_name = this_method
         
         try:
             #--------------Variable
+            start_time = time.time()
             command = fxcorepy.Constants.Commands.CREATE_ORDER
             order_type = fxcorepy.Constants.Orders.TRUE_MARKET_OPEN
-            if action is "buy" : 
-                buy_sell=fxcorepy.Constants.BUY
-            elif action=="sell":
-                buy_sell=fxcorepy.Constants.SELL
+            if action is "buy" : buy_sell=fxcorepy.Constants.BUY
+            elif action=="sell": buy_sell=fxcorepy.Constants.SELL
             ask = None
             bid = None
             spred = None
@@ -318,14 +323,17 @@ class Forex:
                         ask = offer.ask
                         bid = offer.bid
                         point_size = offer.point_size 
+                        digits = offer.digits
                         spread = (ask-bid) * point_size 
                         break
             #---TP/SL
             if tp_pips or sl_pips:
                 if action == "buy":
+                    price = ask
                     tp = ask + (tp_pips * point_size)
                     sl = bid - (sl_pips * point_size)
                 elif action == "sell":
+                    price = bid
                     tp = bid - (tp_pips * point_size)
                     sl = ask + (sl_pips * point_size)
             #--------------Order
@@ -359,13 +367,18 @@ class Forex:
                     "amount": amount
                 }
             #--------------Output
+            output.time = sort(int(time.time() - start_time), 3)
             output.data = response_details
             output.message = {
-                "Time": sort(int(time.time() - start_time), 3),
-                "Items": f"{symbol} | {buy_sell} | {amount}",
+                "symbol": f"{symbol}",
+                "action": f"{action}",
+                "amount": f"{amount}",
+                "price": f"{price:.{digits}f}",
+                "tp": f"{tp:.{digits}f}",
+                "sl": f"{sl:.{digits}f}"
             }
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  

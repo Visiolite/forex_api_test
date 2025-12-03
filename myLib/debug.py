@@ -26,4 +26,10 @@ debug = {
         "save":{"log":False, "verbose":True, "model":"Data"},
         "get_max_min":{"log":False, "verbose":False, "model":"Data"},
     },
+    "ST01" : 
+    {
+        "start":{"log":False, "verbose":True, "model":"Data"},
+        "next":{"log":False, "verbose":False, "model":"Data"},
+        "close":{"log":False, "verbose":False, "model":"Data"}
+    },
 }
