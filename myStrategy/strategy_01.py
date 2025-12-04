@@ -1,32 +1,33 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/listener.py
+# myStrategy/strategy_01.py
 
 #--------------------------------------------------------------------------------- Description
-# listener
+# strategy_01
 
 #--------------------------------------------------------------------------------- Import
-import ast
 import inspect, time
-from model import model_output
+from myLib.model import model_output
 from myLib.utils import debug, sort
-from myLib.data_orm import Data_Orm
-from myModel import *
-from myStrategy import *
 from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Action
-class Listener:
+class Strategy_01:
     #--------------------------------------------- init
-    def __init__(self, forex):
-        #--------------------Variable
+    def __init__(self, forex, params):
+        #--------------------Debug
         self.this_class = self.__class__.__name__
+        #--------------------Variable
+        self.id = 1
         self.forex = forex
+        self.symbol = params["symbol"]
+        self.amount = params["amount"]
+        self.tp_pips = params["tp_pips"]
+        self.st_pips = params["st_pips"]
         #--------------------Instance
         self.log = Log()
-        self.data_orm = data_orm()
 
-    #--------------------------------------------- trade_read
-    def read_trade(self):
+    #--------------------------------------------- action
+    def action(self, ac=False):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -36,20 +37,25 @@ class Listener:
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        #-------------- Output
         output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #--------------Variable
         start_time = time.time()
         
         try:
-            #--------------Variable
-            custom_id = 1
             #--------------Action
-            self.strategy_next(custom_id)
+            result_buy = self.forex.trade_open(action="buy", symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, strategy_id=self.id, ac=ac)
+            result_sell = self.forex.trade_open(action="sell", symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, strategy_id=self.id, ac=ac)
             #--------------Output
+            output.time = sort(int(time.time() - start_time), 3)
             output.message = {
-                "Time": sort(int(time.time() - start_time), 3),
+                "buy": result_buy.status,
+                "sell": result_sell.status
             }
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -61,8 +67,8 @@ class Listener:
         #--------------Return
         return output
 
-    #--------------------------------------------- strategy_next
-    def strategy_next(self, custom_id):
+    #--------------------------------------------- Next
+    def next(self, order_id):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -72,25 +78,23 @@ class Listener:
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        #-------------- Output
         output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #--------------Variable
         start_time = time.time()
-        
+
         try:
-            #--------------Variable
-            item = self.data_orm.item(model=strategy_item_model_db, id=int(custom_id)).data[0]
-            strategy_id = item.strategy_id
-            params = item.params
-            params = ast.literal_eval(item.params)
-            #--------------Data
-            if strategy_id ==1 : strategy = ST01(forex=self.forex, params=params)
             #--------------Action
-            strategy.next()
+            self.action(ac=True)
             #--------------Output
+            output.time = sort(int(time.time() - start_time), 3)
             output.message = {
-                "Time": sort(int(time.time() - start_time), 3),
+                "order_id": order_id,
             }
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  

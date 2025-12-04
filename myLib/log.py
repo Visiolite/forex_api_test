@@ -7,9 +7,8 @@
 #--------------------------------------------------------------------------------- Import
 import re
 from datetime import datetime as dt
-from database import Database
-import utils as utils
-from utils import config, sort
+from myLib.database import Database
+from myLib.utils import config, sort
 
 #--------------------------------------------------------------------------------- Variable
 dbData = {}

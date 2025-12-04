@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------- Location
-# models/strategy.py
+# models/model_strategy.py
 
 #--------------------------------------------------------------------------------- Description
-# strategy
+# model_strategy
 
 #--------------------------------------------------------------------------------- Import
 from sqlalchemy import Column, Integer, String, Boolean
@@ -12,7 +12,7 @@ from pydantic import BaseModel as BaseModel_py
 from typing import Optional
 
 #--------------------------------------------------------------------------------- Database
-class strategy_model_db(BaseModel_db):
+class model_strategy_db(BaseModel_db):
     #---Name
     __tablename__ = 'strategy'
     #---Items
@@ -26,7 +26,7 @@ class strategy_model_db(BaseModel_db):
     def toDict(self) : return {column.key: getattr(self, column.key) for column in inspect(self).mapper.column_attrs}
 
 #--------------------------------------------------------------------------------- Python
-class strategy_model_py(BaseModel_py):
+class model_strategy_py(BaseModel_py):
     id : int = 0
     name : str = ''
     description : Optional[str] = ''

@@ -12,7 +12,7 @@ from myLib.utils import debug, sort
 from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Class
-class data_orm:
+class Data_Orm:
     #-------------------------- [Init]
     def __init__(self, verbose: bool = False, log: bool = False):
         self.this_class = self.__class__.__name__
@@ -51,7 +51,7 @@ class data_orm:
         return output
 
     #--------------------------[Items]
-    def items(self, model) -> model_output:
+    def items(self, model, **filters) -> model_output:
         #--------------Description
         # IN     : 
         # OUT    : model_output
@@ -64,7 +64,7 @@ class data_orm:
             log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
             output = model_output()
             #--------------Action
-            output = self.db.items(model=model)
+            output = self.db.items(model=model, **filters)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
             #--------------Log

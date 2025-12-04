@@ -1,3 +1,3 @@
-from .strategy import strategy_model_db, strategy_model_py
-from .strategy_item import strategy_item_model_db, strategy_item_model_py
-from .strategy_item_trade import strategy_item_trade_model_db, strategy_item_trade_model_py
+from .model_strategy import model_strategy_db, model_strategy_py
+from .model_strategy_item import model_strategy_item_db, model_strategy_item_py
+from .model_strategy_item_trade import model_strategy_item_trade_db, model_strategy_item_trade_py
