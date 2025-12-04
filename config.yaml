@@ -71,16 +71,16 @@ forex_connect:
 #--------------------------------------------------------------------------------- Download
 download:
   instrument: EUR/USD
-  timeframe: W1
+  timeframe: t1
   mode: down
-  count: 1000
+  count: 50000
   repeat: 1
   delay: 0
   save: True
   bulk: True
   clear: False
   dedicate: False
-  datefrom: '1900-01-01 00:00:00'
+  datefrom: '2025-01-01 00:00:00'
   dateto: '2030-01-01 00:00:00'
   
 #--------------------------------------------------------------------------------- instrument

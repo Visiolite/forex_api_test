@@ -15,6 +15,7 @@ from myLib.model import model_output
 from myLib.forex import Forex
 from myLib.utils import config, parse_cli_args, format_dict_block, to_bool
 from myLib.log import Log
+from myLib.forex_api import Forex_Api
 
 #--------------------------------------------------------------------------------- Debug
 this_class = "Download"
@@ -64,24 +65,25 @@ try:
             for instrument in instruments:
                 if clear : 
                     if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
-                forex = Forex(account=account)
+                forex_api = Forex_Api(account="acc-trade")
+                forex_api.login()
+                forex = Forex(forex_api=forex_api)
                 forex.db.open()
-                forex.api.login()
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
                 forex.db.close()
-                forex.api.logout()
+                forex_api.logout()
     else :
-        forex = Forex(account=account)
+        forex_api = Forex_Api(account="acc-trade")
+        forex_api.login()
+        forex = Forex(forex_api=forex_api)
         forex.db.open()
-        forex.api.login()
         for timeframe in timeframes:
             for instrument in instruments:
                 if clear : 
                     if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)        
         forex.db.close()
-        forex.api.logout()
-
+        forex_api.logout()
 except Exception as e:
     #--------------Error
     output.status = False
