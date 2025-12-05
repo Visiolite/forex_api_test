@@ -116,16 +116,18 @@ class Data:
                         q = query + (f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']})")
                         iter += 1
                         if self.db.execute(q) : insert += 1
-            output.message = f"{utils.sort(f"{(time.time() - start_time):.3f}", 3)} | {instrument} | {timeframe} | {utils.sort(insert, 6)} |"
+            #--------------Output
+            output.time = utils.sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message =f"{instrument} | {timeframe} | {utils.sort(insert, 6)}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class}  | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
-            #--------------Output
-            return output
         except Exception as e:  
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
