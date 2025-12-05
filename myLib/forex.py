@@ -238,6 +238,9 @@ class Forex:
                 output.status = False
 
             output.message = f"{sort(f"{(time.time() - start_time):.3f}", 3)} | {instrument} | {timeframe} | {sort(len(data), 6)} | {start} | {end} |"
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message =f"{instrument} | {timeframe} | {sort(len(data), 6)} | {start} | {end}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
