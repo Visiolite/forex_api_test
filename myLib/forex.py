@@ -213,11 +213,11 @@ class Forex:
                         attempt += 1
                         print(f"Error (attempt {attempt}/3): {e}")
                         if attempt > 1: 
-                            self.fx.logout()
+                            self.api.logout()
                             forex_api = Forex_Api(account=self.account)
+                            self.api = forex_api
                             self.fx = forex_api.fx
-                            forex_api.login()
-                            time.sleep(1)
+                            self.api.login()
                         if attempt >= 3: raise
                         time.sleep(1)
                 #-----Check
