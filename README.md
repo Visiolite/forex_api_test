@@ -513,10 +513,13 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
 \q
 ```
 ```bash
-scp root@10.10.10.114:/extra/backup_2025-12-06.tar.gz /Volumes/data/forex/
+scp root@10.10.10.114:/extra/backup_2025-12-06 /Volumes/data/forex/
 ```
 ```bash
 pigz -dc /Volumes/data/forex/backup_2025-12-06.tar.gz | psql -d forex
+```
+```bash
+psql -d forex -f /Volumes/data/forex/backup_2025-12-06
 ```
 ```bash
 psql -d forex -f /Volumes/data/forex/backup_2025-12-06
