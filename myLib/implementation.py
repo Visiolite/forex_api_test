@@ -28,7 +28,7 @@ class Implementation:
         self.db = db
     
     #--------------------------------------------- instrument
-    def instrument(self, drop=None, create=None, add=None):
+    def instrument(self, drop=False, truncate=False,  create=True, add=True):
         #-------------- Description
         # IN     : 
         # OUT    : 

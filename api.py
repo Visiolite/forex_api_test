@@ -46,6 +46,5 @@ routes = [
 ]
 for router, prefix, tags in routes : app.include_router(router, prefix=prefix, tags=tags)
 
-
 #-------------------------- [Run]
 if __name__ == "__main__" : uvicorn.run(app, host=host, port=port)

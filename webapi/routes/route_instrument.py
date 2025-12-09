@@ -8,16 +8,17 @@
 from myLib.model import model_output
 from fastapi import APIRouter
 from webapi.services.service import Service
-from myModel.model_instrument import model_instrument_py as model
+from myModel.model_instrument import model_instrument_py as model_py
+from myModel.model_instrument import model_instrument_db as model_db
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
-service = Service(model=model)
+service = Service(model=model_db)
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
-def add(item:model) : 
+def add(item:model_py) : 
     return service.add(item=item)
 
 #-------------------------- [Items]
@@ -32,7 +33,7 @@ def item(id:int) :
 
 #-------------------------- [Update]
 @route.put("/update", description="update", response_model=model_output)
-def update(item: model): 
+def update(item: model_py): 
     return service.update(item=item)
 
 #-------------------------- [Delete]
