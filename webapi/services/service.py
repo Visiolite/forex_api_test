@@ -31,13 +31,6 @@ class Service:
             for item in output.data : data.append(item.toDict())
             output.data = data
         return output
-
-    #-------------------------- [Item]
-    def item(self,id:int) -> model_output:
-        output:model_output = self.logic.item(id=id)
-        if output.status : 
-            output.data = output.data[0].toDict()
-        return output
     
     #-------------------------- [Update]
     def update(self, item) -> model_output:

@@ -1,15 +1,15 @@
 #--------------------------------------------------------------------------------- location
-# webapi/routes/route_instrument.py
+# webapi/routes/route_strategy.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for instrument
+# This is route for strategy
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
 from fastapi import APIRouter, Request
 from webapi.services.service import Service
-from myModel.model_instrument import model_instrument_py as model_py
-from myModel.model_instrument import model_instrument_db as model_db
+from myModel.model_strategy import model_strategy_py as model_py
+from myModel.model_strategy import model_strategy_db as model_db
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
