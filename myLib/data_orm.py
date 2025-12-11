@@ -51,7 +51,7 @@ class Data_Orm:
             output:model_output = self.instance_db_orm.add(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model} | {item}"
+            output.message=f"Item added"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -123,7 +123,7 @@ class Data_Orm:
             output:model_output = self.instance_db_orm.update(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model} | {item}"
+            output.message=f"Item updated"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -159,7 +159,7 @@ class Data_Orm:
             output:model_output = self.instance_db_orm.delete(model=model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model}"
+            output.message=f"item deleted"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -192,10 +192,14 @@ class Data_Orm:
         
         try:
             #--------------Action
-            output:model_output = self.instance_db_orm.delete(model=model, id=id)
+            item = self.items(model=model, id=id)
+            if item.status:
+                item = item.data[0]
+                item.enable = True
+                output:model_output = self.instance_db_orm.update(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model}"
+            output.message=f"item enabled"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -228,10 +232,14 @@ class Data_Orm:
         
         try:
             #--------------Action
-            output:model_output = self.instance_db_orm.delete(model=model, id=id)
+            item = self.items(model=model, id=id)
+            if item.status:
+                item = item.data[0]
+                item.enable = False
+                output:model_output = self.instance_db_orm.update(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model}"
+            output.message=f"item disabled"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -244,9 +252,9 @@ class Data_Orm:
             self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
-    
-    #--------------------------[Dead]
-    def dead(self, model, id:int) -> model_output:
+
+    #--------------------------[Status]
+    def status(self, model, id:int) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -264,10 +272,14 @@ class Data_Orm:
         
         try:
             #--------------Action
-            output:model_output = self.instance_db_orm.delete(model=model, id=id)
+            item = self.items(model=model, id=id)
+            if item.status:
+                item = item.data[0]
+                item.enable = not item.enable
+                output:model_output = self.instance_db_orm.update(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model}"
+            output.message = f"item {'enabled' if item.enable else 'disabled'}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

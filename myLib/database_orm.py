@@ -74,10 +74,8 @@ class Database_Orm:
                 session.add(item)
                 session.commit()
                 output.status = True
-                output.data = {model.__name__: 'added'}
             else:
                 output.status = False
-                output.data = {model.__name__: 'exist'}
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
@@ -161,10 +159,8 @@ class Database_Orm:
                     if hasattr(source, key) : setattr(source, key, value)
                 session.commit()
                 output.status = True
-                output.data = {model.__name__: f'updated:{item.id}'}
             else:
                 output.status = False
-                output.data = {model.__name__: f'updated:{item.id}'}
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
@@ -205,10 +201,8 @@ class Database_Orm:
                 session.delete(item)
                 session.commit()
                 output.status = True
-                output.message = {model.__name__: f'deleted:{id}'}
             else:
                 output.status = False
-                output.message = {model.__name__: f'not-exist:{id}'}
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose

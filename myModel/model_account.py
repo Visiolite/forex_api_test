@@ -25,7 +25,7 @@ class model_account_db(BaseModel_db):
     username = Column(String, default='')
     password = Column(String, default='')
     description = Column(String, default='')
-    enable = Column(Boolean, default=False)
+    enable = Column(Boolean, default=True)
     #---Display
     def __repr__(self) : return f"{self.toDict()}"
     #---Json

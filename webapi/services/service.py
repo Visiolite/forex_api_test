@@ -48,6 +48,10 @@ class Service:
     def disable(self, id:int) -> model_output:
         return self.logic.disable(id=id)
 
+    #-------------------------- [Status]
+    def status(self, id:int) -> model_output:
+        return self.logic.status(id=id)
+    
     #-------------------------- [Dead]
     def dead(self, id:int) -> model_output:
         return self.logic.dead(id=id)

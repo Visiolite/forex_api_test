@@ -53,7 +53,6 @@ class Logic:
             output:model_output = self.instance_data.add(model=self.model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{self.model} | {item}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -125,7 +124,6 @@ class Logic:
             output:model_output = self.instance_data.update(model=self.model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{self.model} | {item}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -161,7 +159,6 @@ class Logic:
             output:model_output = self.instance_data.delete(model=self.model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{self.model}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -194,10 +191,9 @@ class Logic:
         
         try:
             #--------------Action
-            output:model_output = self.instance_data.delete(model=self.model, id=id)
+            output:model_output = self.instance_data.enable(model=self.model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{self.model}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -230,10 +226,44 @@ class Logic:
         
         try:
             #--------------Action
-            output:model_output = self.instance_data.delete(model=self.model, id=id)
+            output:model_output = self.instance_data.disable(model=self.model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{self.model}"
+            #--------------Verbose
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.instance_log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------[Status]
+    def status(self, id:int) -> model_output:
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        
+        try:
+            #--------------Action
+            output:model_output = self.instance_data.status(model=self.model, id=id)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -269,7 +299,6 @@ class Logic:
             output:model_output = self.instance_data.delete(model=self.model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{self.model}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
