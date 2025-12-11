@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------- Location
-# models/model_instrument.py
+# myModel/model_instrument.py
 
 #--------------------------------------------------------------------------------- Description
 # model_instrument
@@ -22,7 +22,7 @@ class model_instrument_db(BaseModel_db):
     category = Column(Integer, default=0)
     priority = Column(Integer, default=0)
     description = Column(String, default='')
-    enable = Column(Boolean, default=False)
+    enable = Column(Boolean, default=True)
     #---Display
     def __repr__(self) : return f"{self.toDict()}"
     #---Json

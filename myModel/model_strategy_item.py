@@ -21,7 +21,7 @@ class model_strategy_item_db(BaseModel_db):
     name = Column(String, default='')
     params = Column(String, default='')
     description = Column(String, default='')
-    enable = Column(Boolean, default=False)
+    enable = Column(Boolean, default=True)
     #---Display
     def __repr__(self) : return f"{self.toDict()}"
     #---Json
@@ -32,6 +32,6 @@ class model_strategy_item_py(BaseModel_py):
     id : int = 0
     strategy_id : int = 0
     name : str = ''
-    params : dict = {}
+    params : str = ''
     description : Optional[str] = ''
     enable : bool = True

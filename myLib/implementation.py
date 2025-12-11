@@ -6,6 +6,8 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
+
+from fastapi import params
 import myLib.utils as utils
 from myLib.debug import debug
 from myLib.model import model_output
@@ -133,6 +135,115 @@ class Implementation:
                 obj = model(name='acc-live', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035533', password='iaee0at', description="", enable=True)
                 self.data_orm.add(model=model, item=obj)
                 obj = model(name='acc-trade', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035534', password='fjf0tzq', description="", enable=True)
+                self.data_orm.add(model=model, item=obj)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- strategy
+    def strategy(self, drop=False, truncate=False,  create=True, add=True):
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Variable
+        model = model_strategy_db
+        #-------------- Data
+        try:
+            #-------------- Drop
+            if drop : self.data_orm.drop(model=model)
+            #-------------- Create
+            if create : self.data_orm.create(model=model)
+            #-------------- Truncate
+            if truncate : self.data_orm.truncate(model=model)
+            #-------------- Add
+            if add:
+                obj = model(name='strategy_01')
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='strategy_02')
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='strategy_03')
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='strategy_04')
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='strategy_05')
+                self.data_orm.add(model=model, item=obj)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- strategy_item
+    def strategy_item(self, drop=False, truncate=False,  create=True, add=True):
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Variable
+        model = model_strategy_item_db
+        #-------------- Data
+        try:
+            #-------------- Drop
+            if drop : self.data_orm.drop(model=model)
+            #-------------- Create
+            if create : self.data_orm.create(model=model)
+            #-------------- Truncate
+            if truncate : self.data_orm.truncate(model=model)
+            #-------------- Add
+            if add:
+                params = "{'symbol': 'EUR/USD','amount': 10000,'tp_pips': 1,'st_pips': 10}"
+                obj = model(name='st_01_itm_01', strategy_id=1, params=params)
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='st_02_itm_01', strategy_id=2, params=params)
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='st_03_itm_01', strategy_id=3, params=params)
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='st_04_itm_01', strategy_id=4, params=params)
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='st_05_itm_01', strategy_id=5, params=params)
                 self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)

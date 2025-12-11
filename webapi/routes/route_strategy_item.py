@@ -2,7 +2,7 @@
 # webapi/routes/route_strategy_item.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for strategy item
+# This is route for strategy_item
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
@@ -28,12 +28,12 @@ def items(request: Request) :
     return service.items(**filters)
 
 #-------------------------- [Update]
-@route.put("/update", description="update", response_model=model_output)
+@route.put("", description="update", response_model=model_output)
 def update(item: model_py): 
     return service.update(item=item)
 
 #-------------------------- [Delete]
-@route.delete("/delete/{id}", description="delete", response_model=model_output)
+@route.delete("/{id}", description="delete", response_model=model_output)
 def delete(id:int): 
     return service.delete(id=id)
 
@@ -46,6 +46,11 @@ def enable(id:int):
 @route.get("/disable/{id}", description="disable", response_model=model_output)
 def disable(id:int): 
     return service.disable(id=id)
+
+#-------------------------- [Status]
+@route.get("/status/{id}", description="status", response_model=model_output)
+def status(id:int): 
+    return service.status(id=id)
 
 #-------------------------- [Dead]
 @route.get("/dead/{id}", description="dead", response_model=model_output)
