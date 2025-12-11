@@ -17,32 +17,31 @@ from myLib.utils import debug, sort
 
 #--------------------------------------------------------------------------------- Variable
 BaseModel = declarative_base()
-cfg = config.get("database", {}).get("main", {})
-host = cfg.get("host")
-port = cfg.get("port")
-username = cfg.get("user")
-password= cfg.get("pass",)
-name = cfg.get("name")
-
-#--------------------------------------------------------------------------------- Instance
-engine = create_engine(f"postgresql://{username}:{password}@{host}:{port}/{name}", echo=False, pool_size=100, max_overflow=100)
-session = sessionmaker(bind=engine)()
 
 #--------------------------------------------------------------------------------- Class
 class Database_Orm:
     #-------------------------- [Init]
-    def __init__(self, verbose: bool = False, log: bool = False, instance_log : Log =None):
+    def __init__(self, database='main', verbose: bool = False, log: bool = False, instance_log : Log =None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.log = log
         self.verbose = verbose
         #--------------------Instance
         self.instance_log = instance_log if instance_log else Log()
+        #--------------------Engine
+        cfg = config.get("database", {}).get(database, {})
+        host = cfg.get("host")
+        port = cfg.get("port")
+        username = cfg.get("user")
+        password= cfg.get("pass",)
+        name = cfg.get("name")
+        self.engine = create_engine(f"postgresql://{username}:{password}@{host}:{port}/{name}", echo=False, pool_size=100, max_overflow=100)
+        self.session = sessionmaker(bind=self.engine)()
 
     #-------------------------- [Create tables]
     def create_tables(self) -> model_output:
         import myModel
-        BaseModel.metadata.create_all(engine)
+        BaseModel.metadata.create_all(self.engine)
 
     #-------------------------- [Add]
     def add(self, model, item, **filters) -> model_output:
@@ -63,7 +62,7 @@ class Database_Orm:
 
         try:
             #--------------Data
-            query = session.query(model)
+            query = self.session.query(model)
             if filters:
                 for attr, value in filters.items() : query = query.filter(getattr(model, attr) == value)
                 item_exist = query.first()
@@ -71,8 +70,8 @@ class Database_Orm:
                 item_exist = query.filter(model.id == item.id).first()
             #--------------Action
             if not item_exist:
-                session.add(item)
-                session.commit()
+                self.session.add(item)
+                self.session.commit()
                 output.status = True
             else:
                 output.status = False
@@ -110,7 +109,7 @@ class Database_Orm:
 
         try:
             #--------------Action
-            query = session.query(model)
+            query = self.session.query(model)
             if filters:
                 for attr, value in filters.items() : 
                     query = query.filter(getattr(model, attr) == value)
@@ -153,11 +152,11 @@ class Database_Orm:
 
         try:
             #--------------Action
-            source = session.query(model).filter(model.id == item.id).first()
+            source = self.session.query(model).filter(model.id == item.id).first()
             if source:
                 for key, value in item.toDict().items():
                     if hasattr(source, key) : setattr(source, key, value)
-                session.commit()
+                self.session.commit()
                 output.status = True
             else:
                 output.status = False
@@ -195,11 +194,11 @@ class Database_Orm:
 
         try:
             #--------------Data
-            item = session.query(model).filter(model.id == id).first()
+            item = self.session.query(model).filter(model.id == id).first()
             #--------------Action
             if item:
-                session.delete(item)
-                session.commit()
+                self.session.delete(item)
+                self.session.commit()
                 output.status = True
             else:
                 output.status = False
@@ -237,8 +236,8 @@ class Database_Orm:
 
         try:
             #--------------Action
-            session.execute(text(f"TRUNCATE TABLE {model.__tablename__} RESTART IDENTITY CASCADE"))
-            session.commit()
+            self.session.execute(text(f"TRUNCATE TABLE {model.__tablename__} RESTART IDENTITY CASCADE"))
+            self.session.commit()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)            
             output.message = f"Truncate table : {model.__tablename__}"
@@ -274,7 +273,7 @@ class Database_Orm:
 
         try:
             #--------------Action
-            model.__table__.create(engine, checkfirst=True)
+            model.__table__.create(self.engine, checkfirst=True)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message =f"Create table : {model.__tablename__}"
@@ -310,7 +309,7 @@ class Database_Orm:
 
         try:
             #--------------Action
-            model.__table__.drop(engine, checkfirst=True)
+            model.__table__.drop(self.engine, checkfirst=True)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message =f"Drop table : {model.__tablename__}"

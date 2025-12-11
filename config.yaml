@@ -1,6 +1,8 @@
 #--------------------------------------------------------------------------------- General
 general:
   name: forex_download
+  database_data: main
+  database_management: management
 
 #--------------------------------------------------------------------------------- Database
 database:
@@ -10,6 +12,12 @@ database:
     user: forex
     pass: "&WnA8v!(THG%)czK"
     name: forex
+  management:
+    host: 127.0.0.1
+    port: 5432
+    user: forex
+    pass: "&WnA8v!(THG%)czK"
+    name: management
 
 #--------------------------------------------------------------------------------- Api
 api:

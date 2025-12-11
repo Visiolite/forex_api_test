@@ -14,20 +14,14 @@ from myLib.log import Log
 #--------------------------------------------------------------------------------- Class
 class Data_Orm:
     #-------------------------- [Init]
-    def __init__(
-            self, 
-            verbose: bool = False, 
-            log: bool = False, 
-            instance_db_orm : Database_Orm = None, 
-            instance_log : Log =None
-        ):
+    def __init__(self, database=None, verbose:bool=False, log:bool=False, instance_db:Database_Orm=None, instance_log:Log=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.log = log
         self.verbose = verbose
         #--------------------Instance
         self.instance_log = instance_log if instance_log else Log()
-        self.instance_db_orm = instance_db_orm if instance_db_orm else Database_Orm(verbose=verbose, log=log)
+        self.instance_db = instance_db if instance_db else Database_Orm(database=database, verbose=verbose, log=log)
 
     #-------------------------- [Add]
     def add(self, model, item) -> model_output:
@@ -48,7 +42,7 @@ class Data_Orm:
 
         try:
             #--------------Action
-            output:model_output = self.instance_db_orm.add(model=model, item=item)
+            output:model_output = self.instance_db.add(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message=f"Item added"
@@ -84,7 +78,7 @@ class Data_Orm:
 
         try:
             #--------------Action
-            output:model_output = self.instance_db_orm.items(model=model, **filters)
+            output:model_output = self.instance_db.items(model=model, **filters)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message =f"{model}"
@@ -120,7 +114,7 @@ class Data_Orm:
 
         try:
             #--------------Action
-            output:model_output = self.instance_db_orm.update(model=model, item=item)
+            output:model_output = self.instance_db.update(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message=f"Item updated"
@@ -156,7 +150,7 @@ class Data_Orm:
 
         try:
             #--------------Action
-            output:model_output = self.instance_db_orm.delete(model=model, id=id)
+            output:model_output = self.instance_db.delete(model=model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message=f"item deleted"
@@ -196,7 +190,7 @@ class Data_Orm:
             if item.status:
                 item = item.data[0]
                 item.enable = True
-                output:model_output = self.instance_db_orm.update(model=model, item=item)
+                output:model_output = self.instance_db.update(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message=f"item enabled"
@@ -236,7 +230,7 @@ class Data_Orm:
             if item.status:
                 item = item.data[0]
                 item.enable = False
-                output:model_output = self.instance_db_orm.update(model=model, item=item)
+                output:model_output = self.instance_db.update(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message=f"item disabled"
@@ -276,7 +270,7 @@ class Data_Orm:
             if item.status:
                 item = item.data[0]
                 item.enable = not item.enable
-                output:model_output = self.instance_db_orm.update(model=model, item=item)
+                output:model_output = self.instance_db.update(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"item {'enabled' if item.enable else 'disabled'}"
@@ -312,7 +306,7 @@ class Data_Orm:
         
         try:
             #--------------Action
-            output:model_output = self.instance_db_orm.truncate(model=model)
+            output:model_output = self.instance_db.truncate(model=model)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"{model.__tablename__} table truncated"
@@ -348,7 +342,7 @@ class Data_Orm:
         
         try:
             #--------------Action
-            output:model_output = self.instance_db_orm.create(model=model)
+            output:model_output = self.instance_db.create(model=model)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"{model.__tablename__} table created"
@@ -384,7 +378,7 @@ class Data_Orm:
         
         try:
             #--------------Action
-            output:model_output = self.instance_db_orm.drop(model=model)
+            output:model_output = self.instance_db.drop(model=model)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"{model.__tablename__} table dropped"

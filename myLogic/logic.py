@@ -8,20 +8,16 @@
 import inspect, time
 from myLib.data_orm import Data_Orm
 from myLib.model import model_output
-from myLib.utils import debug, sort
+from myLib.utils import config, debug, sort
 from myLib.log import Log
+
+#--------------------------------------------------------------------------------- Variable
+database = config.get("general", {}).get("database_management", {})
 
 #--------------------------------------------------------------------------------- Class
 class Logic:
     #-------------------------- [Init]
-    def __init__(
-            self, 
-            verbose: bool = False, 
-            log: bool = False, 
-            instance_data : Data_Orm = None, 
-            instance_log : Log =None,
-            model = None
-        ):
+    def __init__(self, verbose: bool = False, log:bool=False, instance_data:Data_Orm=None, instance_log:Log=None, model=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.log = log
@@ -29,7 +25,7 @@ class Logic:
         self.model = model
         #--------------------Instance
         self.instance_log = instance_log if instance_log else Log()
-        self.instance_data = instance_data if instance_data else Data_Orm(verbose=verbose, log=log)
+        self.instance_data = instance_data if instance_data else Data_Orm(database=database, verbose=verbose, log=log)
 
     #-------------------------- [Add]
     def add(self, item) -> model_output:

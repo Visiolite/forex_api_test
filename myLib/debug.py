@@ -1,5 +1,5 @@
 debug = {
-    "Implementation" : 
+    "Implementation_Management" : 
     {
         "instrument":{"log":False, "verbose":True, "model":"Implementation"},
         "account":{"log":False, "verbose":True, "model":"Implementation"},
