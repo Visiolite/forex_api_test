@@ -33,7 +33,7 @@ class Logic_Test_Live:
     #--------------------------------------------- start
     def start(self, id:int) -> model_output:
         #-------------- Description
-        # IN     : 
+        # IN     : execute_id
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -48,27 +48,30 @@ class Logic_Test_Live:
         #--------------Variable
         start_time = time.time()
         #--------------Data
-        data = self.instance_data_orm.items(model=model_test_live_db, id=id)
+        data = self.instance_data_orm.items(model=model_live_execute_db, id=id)
+        from api import forex_apis
 
         try:
             #--------------Action
-            item = data.data[0]
+            #---execute
+            item:model_live_execute_db = data.data[0]
             status = item.status
             account_id = item.account_id
-            strategy_item = self.instance_data_orm.items(model=model_strategy_item_db, id=item.strategy_item_id).data[0]
-            strategy = self.instance_data_orm.items(model=model_strategy_db, id=strategy_item.strategy_id).data[0]
-            
-            account = self.instance_data_orm.items(model=model_account_db, id=account_id).data[0]
-            forex_api = Forex_Api(name=account.name, type=account.type, username=account.username, password=account.password, url=account.url, key=account.key)
-
+            strategy_item_id = item.strategy_item_id
+            #---strategy_item
+            strategy_item:model_strategy_item_db = self.instance_data_orm.items(model=model_strategy_item_db, id=strategy_item_id).data[0]
+            strategy_item_params =ast.literal_eval(strategy_item.params) 
+            strategy_id = strategy_item.strategy_id
+            #---strategy
+            strategy:model_strategy_db = self.instance_data_orm.items(model=model_strategy_db, id=strategy_id).data[0]
+            strategy_name = strategy.name
+            #---forex
+            forex_api = forex_apis[account_id]
             forex = Forex(forex_api = forex_api)
-            forex_api.login()
             forex.account_info()
-
-            strategy_instance = get_strategy_instance(strategy=strategy.name, forex=forex, params=ast.literal_eval(strategy_item.params))
-
-            if status != "start":
-                strategy_instance.start(code = item.id)
+            #---action
+            strategy_instance = get_strategy_instance(strategy=strategy_name, forex=forex, params=strategy_item_params)
+            if status != "start" : strategy_instance.start(execute_id = id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose

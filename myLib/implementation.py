@@ -158,11 +158,11 @@ class Implementation_Management:
             if truncate : self.data.truncate(model=model)
             #-------------- Add
             if add:
-                obj = model(name='acc-history1', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52030299', password='2idfycj', description="", enable=True)
+                obj = model(name='acc-history1', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52030299', password='2idfycj', description="", enable=False)
                 self.data.add(model=model, item=obj)
-                obj = model(name='acc-history2', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52032860', password='aq8iwnf', description="", enable=True)
+                obj = model(name='acc-history2', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52032860', password='aq8iwnf', description="", enable=False)
                 self.data.add(model=model, item=obj)
-                obj = model(name='acc-live', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035533', password='iaee0at', description="", enable=True)
+                obj = model(name='acc-live', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035533', password='iaee0at', description="", enable=False)
                 self.data.add(model=model, item=obj)
                 obj = model(name='acc-trade', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035534', password='fjf0tzq', description="", enable=True)
                 self.data.add(model=model, item=obj)

@@ -288,7 +288,7 @@ class Forex:
         return output
     
     #--------------------------------------------- trade_open
-    def trade_open(self,symbol, action, amount, tp_pips=0, sl_pips=0, code=1):
+    def trade_open(self,symbol, action, amount, tp_pips=0, sl_pips=0, execute_id=0):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -370,26 +370,28 @@ class Forex:
                 response = self.fx.send_request(request)
                 order_id = getattr(response, "order_id", None) if response else None
                 #--------------Database
-                obj = model_strategy_item_trade_db()
+                obj = model_live_order_db()
+                obj.execute_id = execute_id
                 obj.order_id = order_id
-                obj.code = code
                 obj.symbol = symbol
                 obj.action = action
                 obj.amount = amount
+                obj.ask = ask
+                obj.ask = bid
                 obj.tp = tp
                 obj.sl = sl
-                self.data_orm.add(model=model_strategy_item_trade_db, item=obj)
+                self.data_orm.add(model=model_live_order_db, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {
+                "execute_id": execute_id,
+                "order_id": order_id,
                 "symbol": f"{symbol}",
                 "action": f"{action}",
                 "amount": f"{amount}",
                 "price": price,
                 "tp": tp,
-                "sl": sl,
-                "order_id": order_id,
-                "code": code
+                "sl": sl
             }
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)

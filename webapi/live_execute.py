@@ -8,7 +8,7 @@
 from myLib.model import model_output
 from myLib.utils import config
 from myLib.data_orm import Data_Orm
-from myLib.logic_test_live import Logic_Test_Live
+from myLib.logic_live_execute import Logic_Test_Live
 from fastapi import APIRouter, Request
 from myModel.model_live_execute import model_live_execute_py as model_py
 from myModel.model_live_execute import model_live_execute_db as model_db

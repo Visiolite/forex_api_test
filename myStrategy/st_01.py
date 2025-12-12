@@ -29,7 +29,7 @@ class ST_01:
         self.log = Log()
 
     #--------------------------------------------- start
-    def start(self, code):
+    def start(self, execute_id):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -48,7 +48,7 @@ class ST_01:
         
         try:
             #--------------Action
-            result:model_output = self.forex.trade_open(action=self.action, symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, code=code)
+            result:model_output = self.forex.trade_open(action=self.action, symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, execute_id=execute_id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {

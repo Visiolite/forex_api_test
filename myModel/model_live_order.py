@@ -22,7 +22,8 @@ class model_live_order_db(BaseModel_db):
     symbol = Column(String, default='')
     action = Column(String, default='')
     amount = Column(Integer, default=0)
-    price = Column(Float, default=0.0)
+    bid = Column(Float, default=0.0)
+    ask = Column(Float, default=0.0)
     tp = Column(Float, default=0.0)
     sl = Column(Float, default=0.0)
     open = Column(Boolean, default=True)
@@ -41,7 +42,8 @@ class model_live_order_py(BaseModel_py):
     symbol : str = ''
     action : str = ''
     amount : int = 0
-    price : float = 0
+    bid : float = 0
+    ask : float = 0
     tp : float = 0
     sl : float = 0
     open : bool = True
