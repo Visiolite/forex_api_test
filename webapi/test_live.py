@@ -1,16 +1,16 @@
 #--------------------------------------------------------------------------------- location
-# webapi/routes/route_account.py
+# webapi/routes/test_live.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for account
+# This is route for test_live
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
 from myLib.utils import config
 from myLib.data_orm import Data_Orm
 from fastapi import APIRouter, Request
-from myModel.model_account import model_account_py as model_py
-from myModel.model_account import model_account_db as model_db
+from myModel.model_test_live import model_test_live_py as model_py
+from myModel.model_test_live import model_test_live_db as model_db
 
 #--------------------------------------------------------------------------------- Variable
 database = config.get("general", {}).get("database_management", {})
@@ -25,6 +25,7 @@ data_orm = Data_Orm(database=database)
 def add(item:model_py) : 
     item = item.dict()
     if 'id' in item : del item['id']
+    if 'date' in item : del item['date']
     output:model_output = data_orm.add(model=model_db, item=model_db(**item))
     return output
 

@@ -1,16 +1,16 @@
 #--------------------------------------------------------------------------------- location
-# webapi/routes/route_instrument.py
+# webapi/routes/strategy.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for instrument
+# This is route for strategy
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
 from myLib.utils import config
 from myLib.data_orm import Data_Orm
 from fastapi import APIRouter, Request
-from myModel.model_instrument import model_instrument_py as model_py
-from myModel.model_instrument import model_instrument_db as model_db
+from myModel.model_strategy import model_strategy_py as model_py
+from myModel.model_strategy import model_strategy_db as model_db
 
 #--------------------------------------------------------------------------------- Variable
 database = config.get("general", {}).get("database_management", {})

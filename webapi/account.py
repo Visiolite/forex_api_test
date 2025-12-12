@@ -1,16 +1,16 @@
 #--------------------------------------------------------------------------------- location
-# webapi/routes/route_strategy_item.py
+# webapi/routes/account.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for strategy_item
+# This is route for account
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
 from myLib.utils import config
 from myLib.data_orm import Data_Orm
 from fastapi import APIRouter, Request
-from myModel.model_strategy_item import model_strategy_item_py as model_py
-from myModel.model_strategy_item import model_strategy_item_db as model_db
+from myModel.model_account import model_account_py as model_py
+from myModel.model_account import model_account_db as model_db
 
 #--------------------------------------------------------------------------------- Variable
 database = config.get("general", {}).get("database_management", {})

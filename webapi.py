@@ -9,7 +9,7 @@ import uvicorn
 from myLib.utils import config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from webapi.route import *
+from webapi import *
 
 #-------------------------- [Variable]
 title = config.get("api", {}).get("title", {})
