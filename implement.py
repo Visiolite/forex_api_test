@@ -5,9 +5,6 @@
 # Implement
 
 #--------------------------------------------------------------------------------- Import
-import os, sys
-root_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, f"{root_dir}/myLib")
 from myLib.log import Log
 from myLib.implementation import Implementation_Management
 

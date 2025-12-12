@@ -6,14 +6,13 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from myLib.log import Log
-from myLib.utils import config, debug
 from myLib.model import model_output
+from myLib.log import Log
+from myLib.utils import config, debug, sort
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import or_, and_
-from myLib.utils import debug, sort
 
 #--------------------------------------------------------------------------------- Variable
 BaseModel = declarative_base()
@@ -21,7 +20,7 @@ BaseModel = declarative_base()
 #--------------------------------------------------------------------------------- Class
 class Database_Orm:
     #-------------------------- [Init]
-    def __init__(self, database='main', verbose: bool = False, log: bool = False, instance_log : Log =None):
+    def __init__(self, database='main', verbose: bool = False, log: bool = False, instance_log=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.log = log

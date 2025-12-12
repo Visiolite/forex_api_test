@@ -43,7 +43,7 @@ class CloseTradesListener(TableListener):
         action = row.buy_sell
         profit = row.gross_pl
 
-        strategy_item_id = data_orm.items(model=model_strategy_item_trade_db, order_id=order_id).data[0].strategy_item_id
+        strategy_item_id = data_orm.items(model=model_live_order_db, order_id=order_id).data[0].strategy_item_id
         strategy_id = data_orm.items(model=model_strategy_item_db, id=strategy_item_id).data[0].strategy_id
         params = data_orm.items(model=model_strategy_item_db, id=strategy_item_id).data[0].params
         params = ast.literal_eval(params)

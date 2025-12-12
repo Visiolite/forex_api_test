@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import uvicorn
-from myLib.utils import config
+from myLib.utils import config, load_forex_apis
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from webapi import *
@@ -50,6 +50,9 @@ routes = [
     (live_order, "/live_order", ["Live Order"]),
 ]
 for router, prefix, tags in routes : app.include_router(router, prefix=prefix, tags=tags)
+
+#--------------------------------------------------------------------------------- Forex
+load_forex_apis()
 
 #--------------------------------------------------------------------------------- Run
 if __name__ == "__main__" : uvicorn.run(app, host=host, port=port)

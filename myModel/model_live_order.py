@@ -18,7 +18,7 @@ class model_live_order_db(BaseModel_db):
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
     execute_id = Column(Integer, default=0)
-    order_id = Column(String, default='')
+    order_id = Column(Integer, default=0)
     symbol = Column(String, default='')
     action = Column(String, default='')
     amount = Column(Integer, default=0)
@@ -26,7 +26,8 @@ class model_live_order_db(BaseModel_db):
     ask = Column(Float, default=0.0)
     tp = Column(Float, default=0.0)
     sl = Column(Float, default=0.0)
-    open = Column(Boolean, default=True)
+    profit = Column(Float, default=0.0)
+    status = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
     #---Display
@@ -38,7 +39,7 @@ class model_live_order_db(BaseModel_db):
 class model_live_order_py(BaseModel_py):
     id : int = 0
     execute_id : int = 0
-    order_id : str = ''
+    order_id : int = ''
     symbol : str = ''
     action : str = ''
     amount : int = 0
@@ -46,6 +47,7 @@ class model_live_order_py(BaseModel_py):
     ask : float = 0
     tp : float = 0
     sl : float = 0
-    open : bool = True
+    profit : float = 0
+    status : str = ''
     description : Optional[str] = ''
     enable : bool = True

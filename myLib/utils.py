@@ -10,6 +10,8 @@ import os, yaml
 from datetime import timedelta
 from myLib.debug import debug
 
+forex_apis = {}
+
 #--------------------------------------------------------------------------------- Action
 #-------------------------- load_config
 def load_config():
@@ -26,13 +28,11 @@ def load_forex_apis():
 
     data_orm = Data_Orm()
 
-    forex_apis = {}
     forex_accounts = data_orm.items(model=model_account_db, enable=True)
     for acc in forex_accounts.data :
         forex_api = Forex_Api(name=acc.name, type=acc.type, username=acc.username, password=acc.password, url=acc.url, key=acc.key)
         forex_api.login()
         forex_apis[acc.id] = forex_api
-    return forex_apis
 
 #-------------------------- get_tbl_name
 def get_tbl_name(symbol, timeFrame):
@@ -143,4 +143,3 @@ def get_strategy_instance(strategy, forex, params):
 config = load_config()
 database_management = config.get("general", {}).get("database_management", {})
 database_data = config.get("general", {}).get("database_data", {})
-forex_apis = load_forex_apis()

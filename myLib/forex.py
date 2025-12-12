@@ -380,6 +380,7 @@ class Forex:
                 obj.ask = bid
                 obj.tp = tp
                 obj.sl = sl
+                obj.status = 'open'
                 self.data_orm.add(model=model_live_order_db, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -389,9 +390,11 @@ class Forex:
                 "symbol": f"{symbol}",
                 "action": f"{action}",
                 "amount": f"{amount}",
-                "price": price,
+                "bid": bid,
+                "ask": ask,
                 "tp": tp,
-                "sl": sl
+                "sl": sl,
+                "status": 'open'
             }
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)

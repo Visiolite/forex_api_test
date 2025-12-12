@@ -65,7 +65,7 @@ forex.account_info()
 strategy_item = data.item(model=model_strategy_item_db, id=2)
 strategy_params = ast.literal_eval(strategy_item.data[0].params)
 strategy_params["item_id"] = 2
-strategy_instance = Strategy_02(forex=forex, params=strategy_params)
+strategy_instance = ST_02(forex=forex, params=strategy_params)
 strategy_instance.start()
 
 forex.api.logout()
