@@ -24,6 +24,8 @@ class model_account_db(BaseModel_db):
     server = Column(String, default='FXCM-GBPReal01')
     username = Column(String, default='')
     password = Column(String, default='')
+    url = Column(String, default='http://www.fxcorporate.com/Hosts.jsp')
+    key = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
     #---Display
@@ -41,5 +43,7 @@ class model_account_py(BaseModel_py):
     server : str = 'FXCM-GBPReal01'
     username : str = ''
     password : str = ''
+    url : str = 'http://www.fxcorporate.com/Hosts.jsp'
+    key : str = ''
     description : Optional[str] = ''
     enable : bool = True

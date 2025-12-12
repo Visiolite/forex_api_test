@@ -1,35 +1,37 @@
 #--------------------------------------------------------------------------------- Location
-# myStrategy/st_01.py
+# myLib/logic_test_live.py
 
 #--------------------------------------------------------------------------------- Description
-# st_01
+# logic_test_live
 
 #--------------------------------------------------------------------------------- Import
-import inspect, time
+import inspect, time, ast
 from myLib.model import model_output
-from myLib.utils import debug, sort
+from myLib.utils import config
 from myLib.log import Log
+from myLib.utils import debug, sort, get_strategy_instance
+from myLib.data_orm import Data_Orm
+from myLib.forex_api import Forex_Api
 from myLib.forex import Forex
+from myModel import *
+
+#--------------------------------------------------------------------------------- Variable
+database = config.get("general", {}).get("database_management", {})
 
 #--------------------------------------------------------------------------------- Action
-class ST_01:
+class Logic_Test_Live:
     #--------------------------------------------- init
-    def __init__(self, forex:Forex=None, params=None):
-        #--------------------Debug
-        self.this_class = self.__class__.__name__
+    def __init__(self, verbose:bool=False, log:bool=False, instance_log:Log =None, instance_data_orm:Data_Orm =None):
         #--------------------Variable
-        self.id = 1
-        self.forex = forex
-        self.symbol = params["symbol"]
-        self.action = params["action"]
-        self.amount = params["amount"]
-        self.tp_pips = params["tp_pips"]
-        self.st_pips = params["st_pips"]
+        self.this_class = self.__class__.__name__
+        self.log = log
+        self.verbose = verbose
         #--------------------Instance
-        self.log = Log()
+        self.instance_log = instance_log if instance_log else Log()
+        self.instance_data_orm = instance_data_orm if instance_data_orm else Data_Orm(database=database)
 
     #--------------------------------------------- start
-    def start(self, code):
+    def start(self, id:int) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -45,30 +47,45 @@ class ST_01:
         output.method_name = this_method
         #--------------Variable
         start_time = time.time()
-        
+        #--------------Data
+        data = self.instance_data_orm.items(model=model_test_live_db, id=id)
+
         try:
             #--------------Action
-            result:model_output = self.forex.trade_open(action=self.action, symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, code=code)
+            item = data.data[0]
+            status = item.status
+            account_id = item.account_id
+            strategy_item = self.instance_data_orm.items(model=model_strategy_item_db, id=item.strategy_item_id).data[0]
+            strategy = self.instance_data_orm.items(model=model_strategy_db, id=strategy_item.strategy_id).data[0]
+            
+            account = self.instance_data_orm.items(model=model_account_db, id=account_id).data[0]
+            forex_api = Forex_Api(name=account.name, type=account.type, username=account.username, password=account.password, url=account.url, key=account.key)
+
+            forex = Forex(forex_api = forex_api)
+            forex_api.login()
+            forex.account_info()
+
+            strategy_instance = get_strategy_instance(strategy=strategy.name, forex=forex, params=ast.literal_eval(strategy_item.params))
+
+            if status != "start":
+                strategy_instance.start(code = item.id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = {
-                self.action: result.status,
-            }
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
-            if log : self.log.log(log_model, output)
+            if log : self.instance_log.log(log_model, output)
         except Exception as e:  
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
 
     #--------------------------------------------- end
-    def end(self, ac=False):
+    def end(self, id:int) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -84,30 +101,29 @@ class ST_01:
         output.method_name = this_method
         #--------------Variable
         start_time = time.time()
-        
+        #--------------Data
+        item = self.instance_data_orm.items(model=model_test_live_db, id=id)
+
         try:
             #--------------Action
-            pass
+            print(item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = {
-                "end": '',
-            }
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
-            if log : self.log.log(log_model, output)
+            if log : self.instance_log.log(log_model, output)
         except Exception as e:  
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
     
     #--------------------------------------------- order_close
-    def order_close(self, order_id):
+    def order_close(self, id:int) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -123,30 +139,29 @@ class ST_01:
         output.method_name = this_method
         #--------------Variable
         start_time = time.time()
+        #--------------Data
+        item = self.instance_data_orm.items(model=model_test_live_db, id=id)
 
         try:
             #--------------Action
-            result:model_output = self.start()
+            print(item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = {
-                "result": result.status,
-            }
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
-            if log : self.log.log(log_model, output)
+            if log : self.instance_log.log(log_model, output)
         except Exception as e:  
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
-
+    
     #--------------------------------------------- price_change
-    def price_change(self):
+    def price_change(self, id:int) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -162,24 +177,23 @@ class ST_01:
         output.method_name = this_method
         #--------------Variable
         start_time = time.time()
+        #--------------Data
+        item = self.instance_data_orm.items(model=model_test_live_db, id=id)
 
         try:
             #--------------Action
-            pass
+            print(item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = {
-                "price_change": '',
-            }
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
-            if log : self.log.log(log_model, output)
+            if log : self.instance_log.log(log_model, output)
         except Exception as e:  
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output

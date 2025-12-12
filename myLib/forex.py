@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 import pandas as pd
-from model import model_output
+from myLib.model import model_output
 from myLib.forex_api import Forex_Api
 from myLib.log import Log
 from myLib.database import Database
@@ -24,7 +24,7 @@ class Forex:
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.account_id = None
-        self.account = forex_api.account
+        self.account = forex_api.name
         #--------------------Instance
         self.log = Log()
         self.db = Database.instance()
@@ -288,7 +288,7 @@ class Forex:
         return output
     
     #--------------------------------------------- trade_open
-    def trade_open(self,symbol, action, amount, tp_pips=0, sl_pips=0, strategy_item_id=1):
+    def trade_open(self,symbol, action, amount, tp_pips=0, sl_pips=0, code=1):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -305,11 +305,12 @@ class Forex:
         
         try:
             #--------------Variable
+            buy_sell = None
             start_time = time.time()
             command = fxcorepy.Constants.Commands.CREATE_ORDER
             order_type = fxcorepy.Constants.Orders.TRUE_MARKET_OPEN
-            if action is "buy" : buy_sell=fxcorepy.Constants.BUY
-            elif action=="sell": buy_sell=fxcorepy.Constants.SELL
+            if action == "buy" : buy_sell=fxcorepy.Constants.BUY
+            elif action == "sell": buy_sell=fxcorepy.Constants.SELL
             ask = None
             bid = None
             spred = None
@@ -371,7 +372,7 @@ class Forex:
                 #--------------Database
                 obj = model_strategy_item_trade_db()
                 obj.order_id = order_id
-                obj.strategy_item_id = strategy_item_id
+                obj.code = code
                 obj.symbol = symbol
                 obj.action = action
                 obj.amount = amount
@@ -388,7 +389,7 @@ class Forex:
                 "tp": tp,
                 "sl": sl,
                 "order_id": order_id,
-                "strategy_item_id": strategy_item_id
+                "code": code
             }
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)

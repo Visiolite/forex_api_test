@@ -7,9 +7,9 @@
 #--------------------------------------------------------------------------------- Import
 from itertools import count
 import inspect, time
-import utils as utils
-from debug import debug
-from model import model_output
+import myLib.utils as utils
+from myLib.debug import debug
+from myLib.model import model_output
 
 #--------------------------------------------------------------------------------- Action
 class Data:

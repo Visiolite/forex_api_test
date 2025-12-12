@@ -1,16 +1,17 @@
 #--------------------------------------------------------------------------------- location
-# webapi/routes/test_live.py
+# webapi/routes/live_order.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for test_live
+# This is route for live_order
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
 from myLib.utils import config
 from myLib.data_orm import Data_Orm
+from myLib.logic_test_live import Logic_Test_Live
 from fastapi import APIRouter, Request
-from myModel.model_test_live import model_test_live_py as model_py
-from myModel.model_test_live import model_test_live_db as model_db
+from myModel.model_live_order import model_live_order_py as model_py
+from myModel.model_live_order import model_live_order_db as model_db
 
 #--------------------------------------------------------------------------------- Variable
 database = config.get("general", {}).get("database_management", {})
@@ -19,6 +20,7 @@ database = config.get("general", {}).get("database_management", {})
 #-------------------------- [Variable]
 route = APIRouter()
 data_orm = Data_Orm(database=database)
+logic_test_live = Logic_Test_Live(instance_data_orm=data_orm)
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
@@ -45,7 +47,6 @@ def items(request: Request) :
 def update(item: model_py): 
     return data_orm.update(model=model_db, item=model_db(**item.dict()))
 
-
 #-------------------------- [Delete]
 @route.delete("/{id}", description="delete", response_model=model_output)
 def delete(id:int): 
@@ -70,3 +71,23 @@ def status(id:int):
 @route.get("/dead/{id}", description="dead", response_model=model_output)
 def dead(id:int): 
     return data_orm.dead(model=model_db, id=id)
+
+#-------------------------- [start]
+@route.get("/start/{id}", description="start", response_model=model_output)
+def start(id:int):
+    return logic_test_live.start(id=id)
+
+#-------------------------- [end]
+@route.get("/end/{id}", description="end", response_model=model_output)
+def end(id:int):
+    return logic_test_live.end(id=id)
+
+#-------------------------- [order_close]
+@route.get("/order_close/{id}", description="order_close", response_model=model_output)
+def order_close(id:int):
+    return logic_test_live.order_close(id=id)
+
+#-------------------------- [price_change]
+@route.get("/price_change/{id}", description="price_change", response_model=model_output)
+def price_change(id:int):
+    return logic_test_live.price_change(id=id)

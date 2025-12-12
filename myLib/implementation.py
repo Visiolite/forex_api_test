@@ -6,8 +6,6 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from turtle import mode
-from fastapi import params
 import myLib.utils as utils
 from myLib.debug import debug
 from myLib.model import model_output
@@ -16,9 +14,7 @@ from myLib.data_orm import Data_Orm
 from myModel import *
 from myModel.model_instrument import model_instrument_db
 from myModel.model_account import model_account_db
-from myLib.forex import Forex
-from myLib.utils import debug, sort, format_dict_block, timeframe_nex_date
-from myModel.model_test_live import model_test_live_db
+from myLib.utils import debug, sort
 
 #--------------------------------------------------------------------------------- Managemnet
 class Implementation_Management:
@@ -295,8 +291,8 @@ class Implementation_Management:
         #--------------Return
         return output
 
-    #--------------------------------------------- test_live
-    def test_live(self, drop=False, truncate=False,  create=True, add=True):
+    #--------------------------------------------- live_execute
+    def live_execute(self, drop=False, truncate=False,  create=True, add=True):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -312,7 +308,7 @@ class Implementation_Management:
         output.class_name = self.this_class
         output.method_name = this_method
         #-------------- Variable
-        model = model_test_live_db
+        model = model_live_execute_db
         #-------------- Data
         try:
             #-------------- Drop

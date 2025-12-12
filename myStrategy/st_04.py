@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------- Location
-# myStrategy/st_01.py
+# myStrategy/st_04.py
 
 #--------------------------------------------------------------------------------- Description
-# st_01
+# st_04
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
@@ -12,13 +12,13 @@ from myLib.log import Log
 from myLib.forex import Forex
 
 #--------------------------------------------------------------------------------- Action
-class ST_01:
+class ST_04:
     #--------------------------------------------- init
-    def __init__(self, forex:Forex=None, params=None):
+    def __init__(self, forex:Forex, params):
         #--------------------Debug
         self.this_class = self.__class__.__name__
         #--------------------Variable
-        self.id = 1
+        self.id = 4
         self.forex = forex
         self.symbol = params["symbol"]
         self.action = params["action"]
@@ -29,7 +29,7 @@ class ST_01:
         self.log = Log()
 
     #--------------------------------------------- start
-    def start(self, code):
+    def start(self, ac=False):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -48,7 +48,7 @@ class ST_01:
         
         try:
             #--------------Action
-            result:model_output = self.forex.trade_open(action=self.action, symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, code=code)
+            result:model_output = self.forex.trade_open(action=self.action, symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, strategy_id=self.id, ac=ac)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {

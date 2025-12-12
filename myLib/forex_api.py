@@ -6,28 +6,27 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from model import model_output
-from utils import config, debug, sort
+from myLib.model import model_output
+from myLib.utils import debug, sort
 from forexconnect import ForexConnect, fxcorepy
 from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Action
 class Forex_Api:
     #--------------------------------------------- init
-    def __init__(self, account=None):
+    def __init__(self, name=None,type=None, username=None, password=None, url=None, key=None, instance_log:Log =None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        #--------------------Instance
-        self.log = Log()
-        self.fx = ForexConnect()
-        #--------------------Data
-        self.account = account
         self.id = None
-        self.server = config['forex_connect'][account]['server']
-        self.username = config['forex_connect'][account]['username']
-        self.password = config['forex_connect'][account]['password']
-        self.url = config['forex_connect'][account]['url']
-        self.key = config['forex_connect'][account]['key']
+        self.name = name
+        self.server = type
+        self.username = username
+        self.password = password
+        self.url = url
+        self.key = key
+        #--------------------Instance
+        self.instance_log = instance_log if instance_log else Log()
+        self.fx = ForexConnect()
 
     #--------------------------------------------- on_status_changed
     def session_status_changed(self, session: fxcorepy.O2GSession, status: fxcorepy.AO2GSessionStatus.O2GSessionStatus):
@@ -56,17 +55,17 @@ class Forex_Api:
             self.fx.login(self.username, self.password, self.url, self.server, self.session_status_changed)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = self.account
+            output.message = self.name
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
-            if log : self.log.log(log_model, output)
+            if log : self.instance_log.log(log_model, output)
         except Exception as e:  
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
 
@@ -93,16 +92,16 @@ class Forex_Api:
             self.fx.logout()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = self.account
+            output.message = self.name
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
-            if log : self.log.log(log_model, output)
+            if log : self.instance_log.log(log_model, output)
         except Exception as e:  
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output

@@ -50,9 +50,9 @@ class CloseTradesListener(TableListener):
         params["item_id"] = strategy_item_id
 
         if strategy_id == 1:
-            strategy = Strategy_01(forex=forex, params=params)
+            strategy = st_01(forex=forex, params=params)
         if strategy_id == 2:
-            strategy = Strategy_02(forex=forex, params=params)
+            strategy = st_02(forex=forex, params=params)
         
         log.verbose("rep", f"Listen | {action}", profit)
 

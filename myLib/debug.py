@@ -5,7 +5,7 @@ debug = {
         "account":{"log":False, "verbose":True, "model":"Implementation"},
         "strategy":{"log":False, "verbose":True, "model":"Implementation"},
         "strategy_item":{"log":False, "verbose":True, "model":"Implementation"},
-        "test_live":{"log":False, "verbose":True, "model":"Implementation"},
+        "live_execute":{"log":False, "verbose":True, "model":"Implementation"},
     },
     "Forex_Api" : 
     {

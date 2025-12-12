@@ -1,16 +1,17 @@
 #--------------------------------------------------------------------------------- location
-# webapi/routes/strategy_item_trade.py
+# webapi/routes/live_execute.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for strategy_item_trade
+# This is route for live_execute
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
 from myLib.utils import config
 from myLib.data_orm import Data_Orm
+from myLib.logic_test_live import Logic_Test_Live
 from fastapi import APIRouter, Request
-from myModel.model_strategy_item_trade import model_strategy_item_trade_py as model_py
-from myModel.model_strategy_item_trade import model_strategy_item_trade_db as model_db
+from myModel.model_live_execute import model_live_execute_py as model_py
+from myModel.model_live_execute import model_live_execute_db as model_db
 
 #--------------------------------------------------------------------------------- Variable
 database = config.get("general", {}).get("database_management", {})
@@ -19,12 +20,14 @@ database = config.get("general", {}).get("database_management", {})
 #-------------------------- [Variable]
 route = APIRouter()
 data_orm = Data_Orm(database=database)
+logic_test_live = Logic_Test_Live(instance_data_orm=data_orm)
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
 def add(item:model_py) : 
     item = item.dict()
     if 'id' in item : del item['id']
+    if 'date' in item : del item['date']
     output:model_output = data_orm.add(model=model_db, item=model_db(**item))
     return output
 
@@ -43,7 +46,6 @@ def items(request: Request) :
 @route.put("", description="update", response_model=model_output)
 def update(item: model_py): 
     return data_orm.update(model=model_db, item=model_db(**item.dict()))
-
 
 #-------------------------- [Delete]
 @route.delete("/{id}", description="delete", response_model=model_output)
@@ -69,3 +71,23 @@ def status(id:int):
 @route.get("/dead/{id}", description="dead", response_model=model_output)
 def dead(id:int): 
     return data_orm.dead(model=model_db, id=id)
+
+#-------------------------- [start]
+@route.get("/start/{id}", description="start", response_model=model_output)
+def start(id:int):
+    return logic_test_live.start(id=id)
+
+#-------------------------- [end]
+@route.get("/end/{id}", description="end", response_model=model_output)
+def end(id:int):
+    return logic_test_live.end(id=id)
+
+#-------------------------- [order_close]
+@route.get("/order_close/{id}", description="order_close", response_model=model_output)
+def order_close(id:int):
+    return logic_test_live.order_close(id=id)
+
+#-------------------------- [price_change]
+@route.get("/price_change/{id}", description="price_change", response_model=model_output)
+def price_change(id:int):
+    return logic_test_live.price_change(id=id)

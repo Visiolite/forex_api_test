@@ -1,49 +1,46 @@
 #--------------------------------------------------------------------------------- Location
-# models/model_strategy_item_trade.py
+# models/model_live_execute.py
 
 #--------------------------------------------------------------------------------- Description
-# model_strategy_item_trade
+# model_live_execute
 
 #--------------------------------------------------------------------------------- Import
-from sqlalchemy import Column, Integer, String, Boolean,Float
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from sqlalchemy.inspection import inspect
+from sqlalchemy.sql import func
 from myLib.database_orm import BaseModel as BaseModel_db
 from pydantic import BaseModel as BaseModel_py
 from typing import Optional
+from datetime import datetime
 
 #--------------------------------------------------------------------------------- Database
-class model_strategy_item_trade_db(BaseModel_db):
+class model_live_execute_db(BaseModel_db):
     #---Name
-    __tablename__ = 'strategy_item_trade'
+    __tablename__ = 'live_execute'
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
-    order_id = Column(String, default='')
+    date = Column(DateTime, default=func.now(), server_default=func.now())
+    name = Column(String, default='')
     strategy_item_id = Column(Integer, default=0)
-    symbol = Column(String, default='')
-    action = Column(String, default='')
-    amount = Column(Integer, default=0)
-    price = Column(Float, default=0.0)
-    tp = Column(Float, default=0.0)
-    sl = Column(Float, default=0.0)
-    open = Column(Boolean, default=True)
+    account_id = Column(Integer, default=0)
+    status = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
     #---Display
     def __repr__(self) : return f"{self.toDict()}"
     #---Json
-    def toDict(self) : return {column.key: getattr(self, column.key) for column in inspect(self).mapper.column_attrs}
+    def toDict(self):
+        data = {column.key: getattr(self, column.key) for column in inspect(self).mapper.column_attrs}
+        if data.get('date') and isinstance(data['date'], datetime) : data['date'] = data['date'].strftime('%Y-%m-%d %H:%M:%S')
+        return data
 
 #--------------------------------------------------------------------------------- Python
-class model_strategy_item_trade_py(BaseModel_py):
+class model_live_execute_py(BaseModel_py):
     id : int = 0
-    order_id : str = ''
+    date : Optional[str] = ''
+    name : str = ''
     strategy_item_id : int = 0
-    symbol : str = ''
-    action : str = ''
-    amount : int = 0
-    price : float = 0
-    tp : float = 0
-    sl : float = 0
-    open : bool = True
+    account_id : int = 0
+    status : str = ''
     description : Optional[str] = ''
     enable : bool = True
