@@ -9,7 +9,10 @@ import inspect, time
 from myLib.model import model_output
 from myLib.utils import debug, sort
 from myLib.log import Log
+from myLib.data_orm import Data_Orm
 from myLib.forex import Forex
+from myModel.model_live_execute import model_live_execute_db
+from myModel.model_live_order import model_live_order_db
 
 #--------------------------------------------------------------------------------- Action
 class ST_01:
@@ -27,6 +30,7 @@ class ST_01:
         self.st_pips = int(params["st_pips"])
         #--------------------Instance
         self.log = Log()
+        self.data_orm = Data_Orm()
 
     #--------------------------------------------- start
     def start(self, execute_id:int):
@@ -68,7 +72,7 @@ class ST_01:
         return output
 
     #--------------------------------------------- end
-    def end(self, ac=False):
+    def end(self, execute_id:int):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -84,14 +88,25 @@ class ST_01:
         output.method_name = this_method
         #--------------Variable
         start_time = time.time()
-        
+        order_ids = []
+
         try:
+            #--------------Data
+            orders:list[model_live_order_db] = self.data_orm.items(model=model_live_order_db, execute_id=execute_id, status='open').data
+            for order in orders:
+                order_ids.append(order.order_id)
             #--------------Action
-            pass
+            result:model_output = self.forex.order_close_all(order_ids=order_ids)
+            #--------------Update
+            if result.status:
+                for order in orders:
+                    order.status = 'close'
+                    self.data_orm.update(model=model_live_order_db, item=order)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {
-                "end": '',
+                "Orders": len(order_ids),
+                "Close": result.message["Close"]
             }
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)

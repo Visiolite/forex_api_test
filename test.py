@@ -6,19 +6,34 @@
 
 #--------------------------------------------------------------------------------- Import
 import os,sys, ast
-
-from myStrategy.st_01 import Strategy_01
 root_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, f"{root_dir}/myLib")
 sys.path.insert(0, f"{root_dir}/myModel")
 sys.path.insert(0, f"{root_dir}/myStrategy")
-from myLib.database_orm import database_orm
 from myLib.data_orm import Data_Orm
 from myLib.forex import Forex
-from myLib.listener import Listener
 from myLib.forex_api import Forex_Api
 from myModel import *
 from myStrategy import *
+
+
+#--------------------------------------------------------------------------------- Action
+data_orm = Data_Orm()
+forex_api = None
+forex_accounts = data_orm.items(model=model_account_db, enable=True)
+for acc in forex_accounts.data :
+    forex_api = Forex_Api(name=acc.name, type=acc.type, username=acc.username, password=acc.password, url=acc.url, key=acc.key)
+    forex_api.login()
+forex = Forex(forex_api = forex_api)
+forex.account_info()
+
+strategy_item = data_orm.items(model=model_strategy_item_db, id=1)
+strategy_params = ast.literal_eval(strategy_item.data[0].params)
+strategy_instance = ST_01(forex=forex, params=strategy_params)
+strategy_instance.end(execute_id=1)
+
+
+
 
 # #--------------------------------------------------------------------------------- Action
 # forex = Forex(account="acc-trade")

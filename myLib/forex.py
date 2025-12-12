@@ -417,12 +417,12 @@ class Forex:
         #--------------Return
         return output
 
-    #--------------------------------------------- trade_close
-    def trade_close(self, order_id, trade_id, symbol, buy_sell, amount):
+    #--------------------------------------------- order_close
+    def order_close(self, order_id, trade_id, symbol, buy_sell, amount):
         #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
+        # IN     : order_id, trade_id, symbol, buy_sell, amount
+        # OUT    : model_output
+        # Action : close order
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
@@ -430,16 +430,15 @@ class Forex:
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
         output = model_output()
         start_time = time.time()
+        #--------------Variable
+        command = fxcorepy.Constants.Commands.CREATE_ORDER
+        order_type = fxcorepy.Constants.Orders.TRUE_MARKET_CLOSE
         
         try:
-            #--------------Variable
-            command = fxcorepy.Constants.Commands.CREATE_ORDER
-            order_type = fxcorepy.Constants.Orders.TRUE_MARKET_CLOSE
-            if buy_sell is "B" : 
-                buy_sell=fxcorepy.Constants.SELL
-            elif buy_sell=="S":
-                buy_sell=fxcorepy.Constants.BUY
-            #--------------Request
+            #--------------Data
+            if buy_sell == "B" : buy_sell=fxcorepy.Constants.SELL
+            if buy_sell == "S" : buy_sell=fxcorepy.Constants.BUY
+            #--------------Action
             request = self.fx.create_order_request(
                 command=command, 
                 order_type=order_type,
@@ -457,13 +456,11 @@ class Forex:
                 "order_id": getattr(response, "order_id", None) if response else None,
             }
             #--------------Output
-            output.data = response_details["order_id"]
-            output.message = {
-                "Time": sort(int(time.time() - start_time), 3),
-                "Items": f"{order_id} | {symbol} | {trade_id} | {buy_sell} | {amount}",
-            }
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = response_details
+            output.message = {"order_id" : order_id, "trade_id" : trade_id, "symbol" : symbol, "buy_sell" : buy_sell, "amount" : amount}
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -475,12 +472,12 @@ class Forex:
         #--------------Return
         return output
 
-    #--------------------------------------------- trade_close
-    def trade_close_all(self):
+    #--------------------------------------------- order_close_all
+    def order_close_all(self, order_ids=None):
         #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
+        # IN     : order_ids
+        # OUT    : model_output
+        # Action : close all orders
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
@@ -488,9 +485,11 @@ class Forex:
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
         output = model_output()
         start_time = time.time()
+        #-------------- Variable
+        count_close= 0
         
         try:
-            #--------------Variable
+            #--------------Data
             items = self.trade_list()
             #--------------Action
             if items.status:
@@ -500,14 +499,18 @@ class Forex:
                     symbol = item['instrument']
                     buy_sell = item['buy_sell']
                     amount = item['amount']
-                    self.trade_close(order_id=order_id, trade_id=trade_id, symbol=symbol, buy_sell=buy_sell, amount=amount)
+                    if order_ids:
+                        if order_id in order_ids:
+                            result:model_output = self.order_close(order_id=order_id, trade_id=trade_id, symbol=symbol, buy_sell=buy_sell, amount=amount)
+                            if result.status : count_close +=1
+                    else:
+                        result:model_output = self.order_close(order_id=order_id, trade_id=trade_id, symbol=symbol, buy_sell=buy_sell, amount=amount)
+                        if result.status : count_close +=1
             #--------------Output
-            output.message = {
-                "Time": sort(int(time.time() - start_time), 3),
-                "Items": len(items.data),
-            }
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = {"Order": len(items.data), "Close": count_close, "order_ids": order_ids}
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  

@@ -20,8 +20,8 @@ debug = {
         "account_info":{"log":False, "verbose":True, "model":"Forex"},
         "trade_list":{"log":False, "verbose":True, "model":"Forex"},
         "trade_open":{"log":False, "verbose":True, "model":"Forex"},
-        "trade_close":{"log":False, "verbose":True, "model":"Forex"},
-        "trade_close_all":{"log":False, "verbose":True, "model":"Forex"},
+        "order_close":{"log":False, "verbose":True, "model":"Forex"},
+        "order_close_all":{"log":False, "verbose":True, "model":"Forex"},
     },
     "Data" : 
     {
