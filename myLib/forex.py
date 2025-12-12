@@ -288,7 +288,7 @@ class Forex:
         return output
     
     #--------------------------------------------- trade_open
-    def trade_open(self,symbol, action, amount, tp_pips=0, sl_pips=0, execute_id=0):
+    def trade_open(self, symbol:str, action:str, amount:int, tp_pips:int=0, sl_pips:int=0, execute_id:int=0):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -322,10 +322,14 @@ class Forex:
             for offer in offers:
                 if offer.instrument == symbol:
                     if offer.subscription_status == fxcorepy.Constants.SubscriptionStatuses.TRADABLE:
-                        ask = offer.ask
-                        bid = offer.bid
                         point_size = offer.point_size 
                         digits = offer.digits
+                        ask = offer.ask
+                        ask = f"{ask:.{digits}f}"
+                        ask = float(ask)
+                        bid = offer.bid
+                        bid = f"{bid:.{digits}f}"
+                        bid = float(bid)
                         spread = (ask-bid) * point_size 
                         break
             #---TP/SL
@@ -335,15 +339,19 @@ class Forex:
                     price = f"{price:.{digits}f}"
                     tp = ask + (tp_pips * point_size)
                     tp = f"{tp:.{digits}f}"
+                    tp = float(tp)
                     sl = bid - (sl_pips * point_size)
                     sl = f"{sl:.{digits}f}"
+                    sl = float(sl)
                 elif action == "sell":
                     price = bid
                     price = f"{price:.{digits}f}"
                     tp = bid - (tp_pips * point_size)
                     tp = f"{tp:.{digits}f}"
+                    tp = float(tp)
                     sl = ask + (sl_pips * point_size)
                     sl = f"{sl:.{digits}f}"
+                    sl = float(sl)
 
             #--------------Order
             if ask and bid :
@@ -376,8 +384,8 @@ class Forex:
                 obj.symbol = symbol
                 obj.action = action
                 obj.amount = amount
+                obj.bid = bid
                 obj.ask = ask
-                obj.ask = bid
                 obj.tp = tp
                 obj.sl = sl
                 obj.status = 'open'
@@ -387,9 +395,9 @@ class Forex:
             output.message = {
                 "execute_id": execute_id,
                 "order_id": order_id,
-                "symbol": f"{symbol}",
-                "action": f"{action}",
-                "amount": f"{amount}",
+                "symbol": symbol,
+                "action": action,
+                "amount": amount,
                 "bid": bid,
                 "ask": ask,
                 "tp": tp,

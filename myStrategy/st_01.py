@@ -22,14 +22,14 @@ class ST_01:
         self.forex = forex
         self.symbol = params["symbol"]
         self.action = params["action"]
-        self.amount = params["amount"]
-        self.tp_pips = params["tp_pips"]
-        self.st_pips = params["st_pips"]
+        self.amount = int(params["amount"])
+        self.tp_pips = int(params["tp_pips"])
+        self.st_pips = int(params["st_pips"])
         #--------------------Instance
         self.log = Log()
 
     #--------------------------------------------- start
-    def start(self, execute_id):
+    def start(self, execute_id:int):
         #-------------- Description
         # IN     : 
         # OUT    : 

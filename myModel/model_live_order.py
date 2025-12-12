@@ -5,11 +5,13 @@
 # model_live_order
 
 #--------------------------------------------------------------------------------- Import
-from sqlalchemy import Column, Integer, String, Boolean,Float
+from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime
 from sqlalchemy.inspection import inspect
+from sqlalchemy.sql import func
 from myLib.database_orm import BaseModel as BaseModel_db
 from pydantic import BaseModel as BaseModel_py
 from typing import Optional
+from datetime import datetime
 
 #--------------------------------------------------------------------------------- Database
 class model_live_order_db(BaseModel_db):
@@ -17,8 +19,9 @@ class model_live_order_db(BaseModel_db):
     __tablename__ = 'live_order'
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
+    date = Column(DateTime, default=func.now(), server_default=func.now())
     execute_id = Column(Integer, default=0)
-    order_id = Column(Integer, default=0)
+    order_id = Column(String, default='')
     symbol = Column(String, default='')
     action = Column(String, default='')
     amount = Column(Integer, default=0)
@@ -33,13 +36,17 @@ class model_live_order_db(BaseModel_db):
     #---Display
     def __repr__(self) : return f"{self.toDict()}"
     #---Json
-    def toDict(self) : return {column.key: getattr(self, column.key) for column in inspect(self).mapper.column_attrs}
+    def toDict(self):
+        data = {column.key: getattr(self, column.key) for column in inspect(self).mapper.column_attrs}
+        if data.get('date') and isinstance(data['date'], datetime) : data['date'] = data['date'].strftime('%Y-%m-%d %H:%M:%S')
+        return data
 
 #--------------------------------------------------------------------------------- Python
 class model_live_order_py(BaseModel_py):
     id : int = 0
+    date : Optional[str] = ''
     execute_id : int = 0
-    order_id : int = ''
+    order_id : str = ''
     symbol : str = ''
     action : str = ''
     amount : int = 0
