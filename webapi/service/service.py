@@ -1,12 +1,12 @@
 #--------------------------------------------------------------------------------- location
-# webapi/services/service.py
+# webapi/service/service.py
 
 #--------------------------------------------------------------------------------- Description
-# Service
+# service
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
-from myLogic.logic import Logic
+from webapi.logic.logic import Logic
 
 #--------------------------------------------------------------------------------- service
 class Service:
@@ -19,9 +19,7 @@ class Service:
     def add(self, item) -> model_output:
         item = item.dict()
         del item['id']
-        # Remove date if it's None or empty string to use database default
-        if 'date' in item and (item['date'] is None or item['date'] == ''):
-            del item['date']
+        del item['date']
         item = self.model(**item)
         output:model_output = self.logic.add(item=item)
         return output

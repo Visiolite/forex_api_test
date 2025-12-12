@@ -1,15 +1,15 @@
 #--------------------------------------------------------------------------------- location
-# webapi/routes/route_instrument.py
+# webapi/routes/route_test_live.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for instrument
+# This is route for test_live
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
 from fastapi import APIRouter, Request
-from webapi.services.service import Service
-from myModel.model_instrument import model_instrument_py as model_py
-from myModel.model_instrument import model_instrument_db as model_db
+from webapi.service.service import Service
+from myModel.model_test_live import model_test_live_py as model_py
+from myModel.model_test_live import model_test_live_db as model_db
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
@@ -55,4 +55,9 @@ def status(id:int):
 #-------------------------- [Dead]
 @route.get("/dead/{id}", description="dead", response_model=model_output)
 def dead(id:int): 
+    return service.dead(id=id)
+
+#-------------------------- [Start]
+@route.get("/start/{id}", description="start", response_model=model_output)
+def start(id:int): 
     return service.dead(id=id)

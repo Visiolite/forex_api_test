@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
 from fastapi import APIRouter, Request
-from webapi.services.service import Service
+from webapi.service.service import Service
 from myModel.model_strategy_item import model_strategy_item_py as model_py
 from myModel.model_strategy_item import model_strategy_item_db as model_db
 

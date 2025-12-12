@@ -5,7 +5,7 @@
 # model_test_live
 
 #--------------------------------------------------------------------------------- Import
-from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from sqlalchemy.inspection import inspect
 from sqlalchemy.sql import func
 from myLib.database_orm import BaseModel as BaseModel_db
@@ -31,14 +31,13 @@ class model_test_live_db(BaseModel_db):
     #---Json
     def toDict(self):
         data = {column.key: getattr(self, column.key) for column in inspect(self).mapper.column_attrs}
-        if data.get('date') and isinstance(data['date'], datetime):
-            data['date'] = data['date'].strftime('%Y-%m-%d %H:%M:%S')
+        if data.get('date') and isinstance(data['date'], datetime) : data['date'] = data['date'].strftime('%Y-%m-%d %H:%M:%S')
         return data
 
 #--------------------------------------------------------------------------------- Python
 class model_test_live_py(BaseModel_py):
     id : int = 0
-    date : Optional[str] = None
+    date : Optional[str] = ''
     name : str = ''
     strategy_item_id : int = 0
     account_id : int = 0
