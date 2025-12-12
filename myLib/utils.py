@@ -141,6 +141,6 @@ def get_strategy_instance(strategy, forex, params):
 
 #--------------------------------------------------------------------------------- Variable
 config = load_config()
-forex_apis = load_forex_apis()
 database_management = config.get("general", {}).get("database_management", {})
 database_data = config.get("general", {}).get("database_data", {})
+forex_apis = load_forex_apis()

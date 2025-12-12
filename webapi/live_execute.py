@@ -16,7 +16,7 @@ from myLib.logic_live_execute import Logic_Test_Live
 #-------------------------- [Variable]
 route = APIRouter()
 data_orm = Data_Orm()
-logic_test_live = Logic_Test_Live(instance_data_orm=data_orm)
+logic_test_live = Logic_Test_Live()
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)

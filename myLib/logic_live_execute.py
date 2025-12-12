@@ -7,16 +7,12 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
 from myLib.model import model_output
-from myLib.utils import config, forex_apis
+from myLib.utils import forex_apis
 from myLib.log import Log
 from myLib.utils import debug, sort, get_strategy_instance
 from myLib.data_orm import Data_Orm
-from myLib.forex_api import Forex_Api
 from myLib.forex import Forex
 from myModel import *
-
-#--------------------------------------------------------------------------------- Variable
-database = config.get("general", {}).get("database_management", {})
 
 #--------------------------------------------------------------------------------- Action
 class Logic_Test_Live:
@@ -28,7 +24,7 @@ class Logic_Test_Live:
         self.verbose = verbose
         #--------------------Instance
         self.instance_log = instance_log if instance_log else Log()
-        self.instance_data_orm = instance_data_orm if instance_data_orm else Data_Orm(database=database)
+        self.instance_data_orm = instance_data_orm if instance_data_orm else Data_Orm()
 
     #--------------------------------------------- start
     def start(self, id:int) -> model_output:
