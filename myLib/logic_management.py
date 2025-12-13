@@ -13,6 +13,7 @@ from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
 from myLib.forex import Forex
+from myLib.forex_api import Forex_Api
 from myModel import *
 from myStrategy import *
 
@@ -98,17 +99,18 @@ class Logic_Management:
                 detaile["strategy_id"] = result.data[0][0]
                 detaile["strategy_item_id"] = result.data[0][1]
                 detaile["live_execute_id"] = result.data[0][2]
-                detaile["account_id"] = result.data[0][3]
-                detaile["date"] = result.data[0][4]
-                detaile["symbol"] = result.data[0][5]
-                detaile["action"] = result.data[0][6]
-                detaile["amount"] = result.data[0][7]
-                detaile["bid"] = result.data[0][8]
-                detaile["ask"] = result.data[0][9]
-                detaile["tp"] = result.data[0][10]
-                detaile["sl"] = result.data[0][11]
-                detaile["profit"] = result.data[0][12]
-                detaile["status"] = result.data[0][13]
+                detaile["live_order_id"] = result.data[0][3]
+                detaile["account_id"] = result.data[0][4]
+                detaile["date"] = result.data[0][5]
+                detaile["symbol"] = result.data[0][6]
+                detaile["action"] = result.data[0][7]
+                detaile["amount"] = result.data[0][8]
+                detaile["bid"] = result.data[0][9]
+                detaile["ask"] = result.data[0][10]
+                detaile["tp"] = result.data[0][11]
+                detaile["sl"] = result.data[0][12]
+                detaile["profit"] = result.data[0][13]
+                detaile["status"] = result.data[0][14]
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile
@@ -148,10 +150,9 @@ class Logic_Management:
         try:
             #--------------Data
             item_params = ast.literal_eval(self.data_orm.items(model=model_strategy_item_db, id=order_detail.get("strategy_item_id")).data[0].params)
-            strategy_name = self.data_orm.items(model=model_strategy, id=order_detail.get("strategy_id")).data[0].name
+            strategy_name = self.data_orm.items(model=model_strategy_db, id=order_detail.get("strategy_id")).data[0].name
             forex_api = forex_apis[order_detail.get("account_id")]
             forex = Forex(forex_api=forex_api)
-
             #--------------Action
             if strategy_name == "st_01" : strategy = ST_01(forex=forex, params=item_params)
             if strategy_name == "st_02" : strategy = ST_02(forex=forex, params=item_params)

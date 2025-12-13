@@ -6,6 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
+from myLib.logic_global import database_management
 from fastapi import APIRouter, Request
 from myModel.model_live_execute import model_live_execute_py as model_py
 from myModel.model_live_execute import model_live_execute_db as model_db
@@ -15,7 +16,7 @@ from myLib.logic_live_execute import Logic_Test_Live
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
-data_orm = Data_Orm()
+data_orm = Data_Orm(database=database_management)
 logic_test_live = Logic_Test_Live()
 
 #-------------------------- [Add]

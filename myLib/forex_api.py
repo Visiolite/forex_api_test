@@ -12,8 +12,6 @@ from myLib.utils import sort
 from myLib.log import Log
 from forexconnect import ForexConnect, fxcorepy
 
-from webapi import account
-
 #--------------------------------------------------------------------------------- Action
 class Forex_Api:
     #--------------------------------------------- init

@@ -7,9 +7,10 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
 from myLib.model import model_output
-from myLib.utils import forex_apis
+from myLib.logic_global import debug, forex_apis
+from myLib.utils import sort, get_strategy_instance
 from myLib.log import Log
-from myLib.utils import debug, sort, get_strategy_instance
+from myLib.logic_global import forex_apis
 from myLib.data_orm import Data_Orm
 from myLib.forex import Forex
 from myModel import *
