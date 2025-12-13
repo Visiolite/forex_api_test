@@ -122,3 +122,91 @@ instrument:
 
 #--------------------------------------------------------------------------------- timeframe
 timeframe: ["W1", "D1", "H8", "H6", "H4", "H3", "H2", "H1", "m30", "m15", "m5", "m1", "t1"]
+
+#--------------------------------------------------------------------------------- Debug
+debug:
+  Database_Orm:
+    add: {log: false, verbose: false, model: "Database_Orm"}
+    items: {log: false, verbose: false, model: "Database_Orm"}
+    update: {log: false, verbose: false, model: "Database_Orm"}
+    delete: {log: false, verbose: false, model: "Database_Orm"}
+    create_all_tables: {log: false, verbose: false, model: "Database_Orm"}
+    create: {log: false, verbose: false, model: "Database_Orm"}
+    truncate: {log: false, verbose: false, model: "Database_Orm"}
+    drop: {log: false, verbose: false, model: "Database_Orm"}
+  Database_SQL:
+    add: {log: false, verbose: false, model: "Database_Orm"}
+    items: {log: false, verbose: false, model: "Database_Orm"}
+    update: {log: false, verbose: false, model: "Database_Orm"}
+    delete: {log: false, verbose: false, model: "Database_Orm"}
+    create_all_tables: {log: false, verbose: false, model: "Database_Orm"}
+    create: {log: false, verbose: false, model: "Database_Orm"}
+    truncate: {log: false, verbose: false, model: "Database_Orm"}
+    drop: {log: false, verbose: false, model: "Database_Orm"}
+  Data_Orm:
+    add: {log: false, verbose: false, model: "Database_Orm"}
+    items: {log: false, verbose: false, model: "Database_Orm"}
+    update: {log: false, verbose: false, model: "Database_Orm"}
+    delete: {log: false, verbose: false, model: "Database_Orm"}
+    create_all_tables: {log: false, verbose: false, model: "Database_Orm"}
+    create: {log: false, verbose: false, model: "Database_Orm"}
+    truncate: {log: false, verbose: false, model: "Database_Orm"}
+    drop: {log: false, verbose: false, model: "Database_Orm"}
+  Data_SQL:
+    add: {log: false, verbose: false, model: "Database_Orm"}
+    items: {log: false, verbose: false, model: "Database_Orm"}
+    update: {log: false, verbose: false, model: "Database_Orm"}
+    delete: {log: false, verbose: false, model: "Database_Orm"}
+    create_all_tables: {log: false, verbose: false, model: "Database_Orm"}
+    create: {log: false, verbose: false, model: "Database_Orm"}
+    truncate: {log: false, verbose: false, model: "Database_Orm"}
+    drop: {log: false, verbose: false, model: "Database_Orm"}
+  Implementation_Management:
+    instrument: {log: false, verbose: true, model: "Implementation"}
+    account: {log: false, verbose: true, model: "Implementation"}
+    strategy: {log: false, verbose: true, model: "Implementation"}
+    strategy_item: {log: false, verbose: true, model: "Implementation"}
+    live_execute: {log: false, verbose: true, model: "Implementation"}
+  Logic_Management:
+    order_close: {log: false, verbose: false, model: "Logic_Management"}
+    order_detaile: {log: false, verbose: false, model: "Logic_Management"}
+  Forex_Api:
+    login: {log: false, verbose: true, model: "Forex"}
+    logout: {log: false, verbose: true, model: "Forex"}
+  Forex:
+    store: {log: false, verbose: true, model: "Forex"}
+    symbol: {log: false, verbose: true, model: "Forex"}
+    history: {log: false, verbose: true, model: "Forex"}
+    account_info: {log: false, verbose: true, model: "Forex"}
+    trade_list: {log: false, verbose: true, model: "Forex"}
+    trade_open: {log: false, verbose: true, model: "Forex"}
+    order_close: {log: false, verbose: true, model: "Forex"}
+    order_close_all: {log: false, verbose: true, model: "Forex"}
+  Data:
+    save: {log: false, verbose: true, model: "Data"}
+    get_max_min: {log: false, verbose: false, model: "Data"}
+  ST_01:
+    start: {log: false, verbose: true, model: "Data"}
+    order_close: {log: false, verbose: true, model: "Data"}
+    price_change: {log: false, verbose: true, model: "Data"}
+    end: {log: false, verbose: true, model: "Data"}
+  ST_02:
+    start: {log: false, verbose: true, model: "Data"}
+    order_close: {log: false, verbose: true, model: "Data"}
+    price_change: {log: false, verbose: true, model: "Data"}
+    end: {log: false, verbose: true, model: "Data"}
+  ST_03:
+    start: {log: false, verbose: true, model: "Data"}
+    order_close: {log: false, verbose: true, model: "Data"}
+    price_change: {log: false, verbose: true, model: "Data"}
+    end: {log: false, verbose: true, model: "Data"}
+  ST_04:
+    start: {log: false, verbose: true, model: "Data"}
+    order_close: {log: false, verbose: true, model: "Data"}
+    price_change: {log: false, verbose: true, model: "Data"}
+    end: {log: false, verbose: true, model: "Data"}
+  ST_05:
+    start: {log: false, verbose: true, model: "Data"}
+    order_close: {log: false, verbose: true, model: "Data"}
+    price_change: {log: false, verbose: true, model: "Data"}
+    end: {log: false, verbose: true, model: "Data"}
