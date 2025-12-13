@@ -7,7 +7,8 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 from myLib.model import model_output
-from myLib.utils import debug, log_instance, sort
+from myLib.logic_global import debug, log_instance
+from myLib.utils import sort
 from myLib.log import Log
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
@@ -17,7 +18,7 @@ from sqlalchemy import or_, and_
 #--------------------------------------------------------------------------------- Variable
 BaseModel = declarative_base()
 
-#--------------------------------------------------------------------------------- Class
+#--------------------------------------------------------------------------------- Action
 class Database_Orm:
     #-------------------------- [Init]
     def __init__(self, server, host, port, username, password, database, log=log_instance):

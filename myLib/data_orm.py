@@ -7,7 +7,8 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 from myLib.model import model_output
-from myLib.utils import config, debug, log_instance, sort
+from myLib.logic_global import config, debug, log_instance
+from myLib.utils import sort
 from myLib.log import Log
 from myLib.database_orm import Database_Orm
 
@@ -19,15 +20,17 @@ class Data_Orm:
         self.this_class = self.__class__.__name__
         self.log:Log = log
         #--------------------Data
-        cfg = config.get("database", {}).get(database, {})
-        self.server = cfg.get("server")
-        self.host = cfg.get("host")
-        self.port = cfg.get("port")
-        self.username = cfg.get("username")
-        self.password = cfg.get("password")
-        self.database = cfg.get("database")
+        database_cfg = config.get("database", {}).get(database, {})
         #--------------------Instance
-        self.db = Database_Orm(server=self.server, host=self.host, port=self.port, username=self.username, password=self.password, database=self.database, log=self.log)
+        self.db = Database_Orm(
+            server=database_cfg.get("server"), 
+            host=database_cfg.get("host"), 
+            port=database_cfg.get("port"), 
+            username=database_cfg.get("username"), 
+            password=database_cfg.get("password"), 
+            database=database_cfg.get("database"), 
+            log=self.log
+        )
 
     #-------------------------- [Add]
     def add(self, model, item) -> model_output:

@@ -5,168 +5,220 @@
 # database_sql
 
 #--------------------------------------------------------------------------------- Import
+import inspect, time
 import psycopg2
-from myLib.utils import config, debug
-
-#--------------------------------------------------------------------------------- Variable
-dbData = {}
-dbCfg = config.get("database", {}).get("main", {})
-dbData["host"] = dbCfg.get("host", "127.0.0.1")
-dbData["port"] = dbCfg.get("port", "5432")
-dbData["user"] = dbCfg.get("user", "forex")
-dbData["pass"] = dbCfg.get("pass", "&WnA8v!(THG%)czK")
-dbData["name"] = dbCfg.get("name", "forex")
+from myLib.model import model_output
+from myLib.logic_global import debug, log_instance
+from myLib.utils import sort
+from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Action
 class Database_SQL:
-    #-------------------------- Constructor
-    def __init__(self, dbHost=None, dbUser=None, dbPass=None, dbName=None, log=None): 
-        self.className = "Database_SQL"
-        methodName = "Init"
+    #-------------------------- [Init]
+    def __init__(self, server, host, port, username, password, database, log=log_instance):
+        #--------------------Variable
+        self.this_class = self.__class__.__name__
+        self.log:Log = log
+        self.server = server
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+        self.database = database
+        self.connection = None
+        self.cursor = None
+        self.status = False
 
-        if dbHost:
-            self.dbHost=dbHost
-            self.dbUser=dbUser
-            self.dbPass=dbPass
-            self.dbName=dbName
-            self.dbConn = None
-            self.dbCursor = None
-            self.status = False
-        else:
-            self.dbHost=dbData["host"]
-            self.dbUser=dbData["user"]
-            self.dbPass=dbData["pass"]
-            self.dbName=dbData["name"]
-            self.dbConn = None
-            self.dbCursor = None
-            self.status = False
+    #-------------------------- [Open]
+    def open(self) -> model_output:
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
 
-    #-------------------------- instance
-    @classmethod
-    def instance(cls):
-        return cls()
-    
-    #-------------------------- open
-    def open(self, connFree=None, name=None):
-        """ open connection database """
-
-        #----------------------------- Variable                
-        methodName = "Open"
-        #----------------------------- Execute        
         try:
-            if self.status is False :
-                if connFree: 
-                    self.dbConn = psycopg2.connect(host=self.dbHost, user=self.dbUser, password=self.dbPass)
+            #--------------Action
+            if not self.status:
+                if self.database is None:
+                    if self.server == "postgresql" : self.connection = psycopg2.connect(host=self.host, user=self.username, password=self.password)
                 else:
-                    self.dbConn = psycopg2.connect(host=self.dbHost, user=self.dbUser, password=self.dbPass, database=self.dbName)
-                self.dbConn.set_isolation_level(0)
-                self.dbConn.autocommit = True                
-                self.dbCursor = self.dbConn.cursor()
+                    if self.server == "postgresql" : self.connection = psycopg2.connect(host=self.host, user=self.username, password=self.password, database=self.database)
+                self.connection.set_isolation_level(0)
+                self.connection.autocommit = True
+                self.cursor = self.connection.cursor()
                 self.status = True
-                # if self.log is not None : 
-                #     self.log.log('not',f'{self.className}({methodName}) ', name)            
-        except Exception as e:
-            self.status = False
-            # if self.log is not None :
-            #     self.log.log('err',f'{self.className}({methodName}) ', f"Host({self.dbHost}) | User({self.dbUser}) | Database({self.dbName}) | Error({re.sub(r'W+', ' ', str(e))})")
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #-------------------------- [Close]
+    def close(self) -> model_output:
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Action
+            if self.status:
+                if self.server == "postgresql" : 
+                    self.cursor.close()
+                    self.connection.close()
+                    self.status = False
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #-------------------------- [Execute]
+    def execute(self, cmd) -> model_output:
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Action
+            result = self.cursor.execute(cmd)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = result
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
     
-    #-------------------------- close
-    def close(self, name=None):
-        """ close connection database """
+    #-------------------------- [Items]
+    def items(self, cmd) -> model_output:
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
 
-        #----------------------------- Variable                
-        methodName = "Close"
-        #----------------------------- Execute        
         try:
-            if self.status :
-                self.dbCursor.close()
-                self.dbConn.close()
-                self.status = False
-                if self.log is not None : self.log.log('not',f'{self.className}({methodName})', name)
-        except Exception as e:
-            self.status = True
-            # if self.log is not None :
-            #     self.log.log('err',f'{self.className}({methodName})', f"Host({self.dbHost}) | User({self.dbUser}) | Database({self.dbName}) | Error({re.sub(r'W+', ' ', str(e))})")
+            #--------------Action
+            self.cursor.execute(cmd)
+            result = self.cursor.fetchall()
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = result
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
 
-    #-------------------------- execute
-    def execute(self, cmd) :
-        """ execute command """
+    #-------------------------- [Item]
+    def item(self, cmd) -> model_output:
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
 
-        #----------------------------- Variable                
-        methodName = "Execute"
-        localDatabase =  False
-        #----------------------------- Execute        
         try:
-            #---Open
-            if self.status is False:
-                self.open()
-                localDatabase =  True
-            #---Execute
-            self.dbCursor.execute(cmd)
-            res = True
-            #---Close            
-            if self.status:
-                if localDatabase:
-                    self.close()
-        except Exception as e:
-            res = False
-            error = str(e).replace('\n', ' ')
-            # if self.log is not None :
-            #     self.log.log('err', f'{self.className}({methodName})', f"cmd({cmd[:100]}) | Error({re.sub(r'W+', ' ', str(error))})") 
-        return res
-
-   #-------------------------- getData
-    def getData(self, cmd):
-        """ get list data """
-
-        #----------------------------- Variable                
-        methodName = "getData"
-        localDatabase =  False   
-        #----------------------------- Execute        
-        try :
-            #---Open
-            if self.status is False:
-                self.open()
-                localDatabase =  True
-            #---Execute
-            self.dbCursor.execute(cmd)                           
-            res = self.dbCursor.fetchall()
-            #---Close            
-            if self.status:
-                if localDatabase:
-                    self.close() 
-        except Exception as e :
-            res = False               
-            # if self.log is not None :
-            #     self.log.log('err',f'{self.className}({methodName})', f"Cmd({cmd[:100]}) | Error({re.sub(r'W+', ' ', str(e))})")
-            
-        return res
-
-    #-------------------------- getDataOne
-    def getDataOne(self, cmd):
-        """ get single data """
-
-        #----------------------------- Variable
-        methodName = "getDataOne"
-        localDatabase =  False
-        #----------------------------- Execute
-        try:
-            #---Open
-            if self.status is False:
-                self.open()
-                localDatabase =  True
-            #---Execute
-            self.dbCursor.execute(cmd)                                
-            res = self.dbCursor.fetchone()
-            if res is not None :
-                res = res[0]
-            #---Close            
-            if self.status:
-                if localDatabase:
-                    self.close()                 
-        except Exception as e:
-            res = False
-            # if self.log is not None :
-            #     self.log.log('err',f'{self.className}({methodName})', f"Cmd({cmd[:100]}) | Error({re.sub(r'W+', ' ', str(e))})")
-
-        return res
+            #--------------Action
+            self.cursor.execute(cmd)
+            result = self.cursor.fetchone()
+            if result is not None :
+                result = result[0]
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = result
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
