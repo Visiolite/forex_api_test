@@ -10,8 +10,8 @@ import pandas as pd
 from myLib.model import model_output
 from myLib.forex_api import Forex_Api
 from myLib.log import Log
-from myLib.database import Database
-from myLib.data import Data
+from myLib.database_sql import Database_SQL
+from myLib.data_sql import Data_SQL
 from myLib.utils import debug, sort, format_dict_block, timeframe_nex_date
 from forexconnect import ForexConnect, fxcorepy
 from myLib.data_orm import Data_Orm
@@ -27,8 +27,8 @@ class Forex:
         self.account = forex_api.name
         #--------------------Instance
         self.log = Log()
-        self.db = Database.instance()
-        self.data = Data(log=self.log, db=self.db)
+        self.db = Database_SQL.instance()
+        self.data = Data_SQL(log=self.log, db=self.db)
         self.api = forex_api
         self.fx = self.api.fx
         self.data_orm = Data_Orm()

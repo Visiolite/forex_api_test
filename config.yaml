@@ -1,23 +1,25 @@
 #--------------------------------------------------------------------------------- General
 general:
   name: forex_download
-  database_data: main
+  database_data: data
   database_management: management
 
 #--------------------------------------------------------------------------------- Database
 database:
-  main:
+  data:
+    server: postgresql
     host: 127.0.0.1
     port: 5432
-    user: forex
-    pass: "&WnA8v!(THG%)czK"
-    name: forex
+    username: forex
+    password: "&WnA8v!(THG%)czK"
+    database: forex
   management:
+    server: postgresql
     host: 127.0.0.1
     port: 5432
-    user: forex
-    pass: "&WnA8v!(THG%)czK"
-    name: management
+    username: forex
+    password: "&WnA8v!(THG%)czK"
+    database: management
 
 #--------------------------------------------------------------------------------- Api
 api:

@@ -10,6 +10,7 @@ root_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, f"{root_dir}/myLib")
 sys.path.insert(0, f"{root_dir}/myModel")
 sys.path.insert(0, f"{root_dir}/myStrategy")
+from myLib.utils import database_management
 from myLib.data_orm import Data_Orm
 from myLib.forex import Forex
 from myLib.forex_api import Forex_Api
@@ -18,7 +19,10 @@ from myStrategy import *
 
 
 #--------------------------------------------------------------------------------- Action
-data_orm = Data_Orm()
+data_orm = Data_Orm(database=database_management)
+forex_accounts = data_orm.items(model=model_account_db)
+
+
 forex_api = None
 forex_accounts = data_orm.items(model=model_account_db, enable=True)
 for acc in forex_accounts.data :

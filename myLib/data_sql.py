@@ -1,18 +1,18 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/data.py
+# myLib/data_sql.py
 
 #--------------------------------------------------------------------------------- Description
-# data
+# data_sql
 
 #--------------------------------------------------------------------------------- Import
-from itertools import count
 import inspect, time
+from myLib.model import model_output
+from myLib.utils import config, debug, log_instance, sort, get_tbl_name
 import myLib.utils as utils
-from myLib.debug import debug
 from myLib.model import model_output
 
 #--------------------------------------------------------------------------------- Action
-class Data:
+class Data_SQL:
     #--------------------------------------------- init
     def __init__(self, log, db):
         #--------------------Variable

@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 import re
 from datetime import datetime as dt
-from myLib.database import Database
+from myLib.database_sql import Database_SQL
 from myLib.utils import config, sort
 
 #--------------------------------------------------------------------------------- Variable
@@ -50,7 +50,7 @@ class Log:
         self.dbPass = dbData["pass"]
         self.dbName = dbData["name"]
         #--------------------------------- Object
-        self.db = Database(self.dbHost, self.dbUser, self.dbPass, self.dbName, log=None)
+        self.db = Database_SQL(self.dbHost, self.dbUser, self.dbPass, self.dbName, log=None)
         self.db.open(name=self.className)
         self.fileOpen()
     
@@ -65,7 +65,7 @@ class Log:
         #--------------------------------- variable
         methodName = "Database"
         res = False
-        db = Database(self.dbHost, self.dbUser, self.dbPass, self.dbName)
+        db = Database_SQL(self.dbHost, self.dbUser, self.dbPass, self.dbName)
         #--------------------------------- execution
         try:            
             db.open(connFree=True)

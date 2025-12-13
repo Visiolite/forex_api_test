@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/database.py
+# myLib/database_sql.py
 
 #--------------------------------------------------------------------------------- Description
-# database
+# database_sql
 
 #--------------------------------------------------------------------------------- Import
 import psycopg2
@@ -18,10 +18,10 @@ dbData["pass"] = dbCfg.get("pass", "&WnA8v!(THG%)czK")
 dbData["name"] = dbCfg.get("name", "forex")
 
 #--------------------------------------------------------------------------------- Action
-class Database:
+class Database_SQL:
     #-------------------------- Constructor
     def __init__(self, dbHost=None, dbUser=None, dbPass=None, dbName=None, log=None): 
-        self.className = "Database"
+        self.className = "Database_SQL"
         methodName = "Init"
 
         if dbHost:
