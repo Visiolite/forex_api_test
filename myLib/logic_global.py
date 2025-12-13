@@ -22,15 +22,23 @@ def load_log():
 def load_data():
     from myLib.data_orm import Data_Orm
     from myLib.data_sql import Data_SQL
+
     data_instance = {}
+   
     database_management = config.get("general", {}).get("database_management", {})
     database_data = config.get("general", {}).get("database_data", {})
-    data_instance['management_orm'] = Data_Orm(database=database_management)
 
-    data_sql = Data_SQL(database=database_management)
-    data_sql.db.open()
-    data_instance['management_sql'] = data_sql
+    data_instance['management_orm'] = Data_Orm(database=database_management)
+    data_instance['data_orm'] = Data_Orm(database=database_data)
+
+    management_sql = Data_SQL(database=database_management)
+    management_sql.db.open()
+    data_instance['management_sql'] = management_sql
     
+    data_sql = Data_SQL(database=database_data)
+    data_sql.db.open()
+    data_instance['data_sql'] = data_sql
+
     return data_instance
 
 #-------------------------- load_forex

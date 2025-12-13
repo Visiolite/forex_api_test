@@ -7,12 +7,14 @@
 #--------------------------------------------------------------------------------- Import
 from myLib.logic_management import Logic_Management
 
-#--------------------------------------------------------------------------------- Action
-logic_management = Logic_Management()
+#--------------------------------------------------------------------------------- Action  : Order cloese
+lm = Logic_Management()
 order_id = '1826677525'
-logic_management.order_close(order_id=order_id)
-detaile = logic_management.order_detaile(order_id='1826677525')
-print(detaile)
+lm.order_close(order_id=order_id)
+order_detail = lm.order_detaile(order_id='1826677525').data
+strategy = lm.get_strategy(order_detail=order_detail).data
+result = strategy.order_close(order_detail=order_detail)
+print(result)
 
 
 

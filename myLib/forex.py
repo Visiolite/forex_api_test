@@ -8,35 +8,37 @@
 import inspect, time
 import pandas as pd
 from myLib.model import model_output
-from myLib.forex_api import Forex_Api
+from myLib.logic_global import debug, log_instance, data_instance
+from myLib.utils import sort, format_dict_block, timeframe_nex_date
 from myLib.log import Log
-from myLib.database_sql import Database_SQL
-from myLib.data_sql import Data_SQL
-from myLib.utils import debug, sort, format_dict_block, timeframe_nex_date
-from forexconnect import ForexConnect, fxcorepy
 from myLib.data_orm import Data_Orm
+from myLib.data_sql import Data_SQL
+from myLib.forex_api import Forex_Api
+from forexconnect import ForexConnect, fxcorepy
 from myModel import *
 
 #--------------------------------------------------------------------------------- Action
 class Forex:
     #--------------------------------------------- init
-    def __init__(self, forex_api):
+    def __init__(self,
+            forex_api:Forex_Api,
+            data_orm:Data_Orm=None,
+            data_sql:Data_SQL=None,
+            log:Log=None
+        ):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.account_id = None
-        self.account = forex_api.name
-        #--------------------Instance
-        self.log = Log()
-        self.db = Database_SQL.instance()
-        self.data = Data_SQL(log=self.log, db=self.db)
         self.api = forex_api
         self.fx = self.api.fx
-        self.data_orm = Data_Orm()
+        #--------------------Instance
+        self.log:Log = log if log else log_instance
+        self.data_orm = data_orm if data_orm else data_instance["management_orm"]
+        self.data_sql = data_sql if data_sql else data_instance["management_sql"]
 
     #--------------------------------------------- run
     def store(self, instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto):
         #-------------- Description
-        # IN     : 
+        # IN     : order_id
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -44,6 +46,7 @@ class Forex:
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
         #-------------- Output
         output = model_output()
         output.class_name = self.this_class
@@ -81,51 +84,7 @@ class Forex:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-
-    #--------------------------------------------- account_info
-    def account_info(self):
-        #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-
-        try:
-            #--------------Variable
-            start_time = time.time()
-            accounts_table = self.fx.get_table(ForexConnect.ACCOUNTS)
-            #--------------Action
-            for account in accounts_table:
-                self.account_id = account.account_id
-                output.data["id"] = account.account_id
-                output.data["name"] = account.account_name
-                output.data["balance"] = account.balance
-                output.data["equity"] = account.equity
-                break
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = output.data
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -140,16 +99,19 @@ class Forex:
     #--------------------------------------------- instruments
     def instruments(self):
         #-------------- Description
-        # IN     : 
-        # OUT    : output object with instruments dictionary
-        # Action : Get all available instruments with their offer IDs
+        # IN     : order_id
+        # OUT    : 
+        # Action :
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        output = model_output()
         start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
 
         try:
             #--------------Variable
@@ -163,11 +125,9 @@ class Forex:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = instruments
-            output.message = {
-                "count": len(instruments)
-            }
+            output.message = {"count": len(instruments)}
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -182,7 +142,7 @@ class Forex:
     #--------------------------------------------- history
     def history(self, instrument, timeframe, datefrom=None, dateto=None, count=None):
         #-------------- Description
-        # IN     : 
+        # IN     : order_id
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -190,14 +150,18 @@ class Forex:
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        output = model_output()
         start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
         #-------------- Variable
         attempt = 0
         start = ''
         end = ''
-        #--------------Action
+        
         try:
+            #--------------Action
             if dateto > datefrom:
                 #-----Get
                 while attempt < 3:
@@ -245,16 +209,19 @@ class Forex:
     #--------------------------------------------- trade_list
     def trade_list(self):
         #-------------- Description
-        # IN     : 
-        # OUT    :
-        # Action : Get all trade
+        # IN     : order_id
+        # OUT    : 
+        # Action :
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        output = model_output()
         start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
         
         try:
             #--------------Variable
@@ -275,7 +242,7 @@ class Forex:
                 "count": len(items),
             }
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -290,7 +257,7 @@ class Forex:
     #--------------------------------------------- trade_open
     def trade_open(self, symbol:str, action:str, amount:int, tp_pips:int=0, sl_pips:int=0, execute_id:int=0):
         #-------------- Description
-        # IN     : 
+        # IN     : order_id
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -298,6 +265,7 @@ class Forex:
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
         #-------------- Output
         output = model_output()
         output.class_name = self.this_class
@@ -405,7 +373,7 @@ class Forex:
                 "status": 'open'
             }
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -420,16 +388,19 @@ class Forex:
     #--------------------------------------------- order_close
     def order_close(self, order_id, trade_id, symbol, buy_sell, amount):
         #-------------- Description
-        # IN     : order_id, trade_id, symbol, buy_sell, amount
-        # OUT    : model_output
-        # Action : close order
+        # IN     : order_id
+        # OUT    : 
+        # Action :
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        output = model_output()
         start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
         #--------------Variable
         command = fxcorepy.Constants.Commands.CREATE_ORDER
         order_type = fxcorepy.Constants.Orders.TRUE_MARKET_CLOSE
@@ -460,7 +431,7 @@ class Forex:
             output.data = response_details
             output.message = {"order_id" : order_id, "trade_id" : trade_id, "symbol" : symbol, "buy_sell" : buy_sell, "amount" : amount}
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -475,16 +446,19 @@ class Forex:
     #--------------------------------------------- order_close_all
     def order_close_all(self, order_ids=None):
         #-------------- Description
-        # IN     : order_ids
-        # OUT    : model_output
-        # Action : close all orders
+        # IN     : order_id
+        # OUT    : 
+        # Action :
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        output = model_output()
         start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
         #-------------- Variable
         count_close= 0
         
@@ -510,7 +484,7 @@ class Forex:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {"Order": len(items.data), "Close": count_close, "order_ids": order_ids}
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -521,4 +495,3 @@ class Forex:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
-    
