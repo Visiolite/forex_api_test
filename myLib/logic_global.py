@@ -4,6 +4,8 @@
 #--------------------------------------------------------------------------------- Description
 # logic_global
 
+forex_apis = {}
+
 #--------------------------------------------------------------------------------- Method
 #-------------------------- load_config
 def load_config():
@@ -33,20 +35,18 @@ def load_data():
     data_instance['data_sql'] = data_sql
     return data_instance
 
-#-------------------------- load_forex
-def load_forex():
+#-------------------------- load_forex_api
+def load_forex_api():
     from myLib.forex_api import Forex_Api
     from myModel.model_account import model_account_db
     from myLib.data_orm import Data_Orm
     from myLib.data_sql import Data_SQL
-    forex_apis = {}
     data_orm = Data_Orm(database=database_management)
     forex_accounts = data_orm.items(model=model_account_db, enable=True)
     for acc in forex_accounts.data :
         forex_api = Forex_Api(name=acc.name, type=acc.type, username=acc.username, password=acc.password, url=acc.url, key=acc.key)
         #forex_api.login()
         forex_apis[acc.id] = forex_api
-    return forex_apis
 
 #--------------------------------------------------------------------------------- Action
 config = load_config()
@@ -55,4 +55,3 @@ database_data = config.get("general", {}).get("database_data", {})
 debug = config.get("debug", {})
 log_instance = load_log()
 data_instance = load_data()
-forex_apis = load_forex()

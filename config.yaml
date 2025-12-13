@@ -186,10 +186,10 @@ debug:
     save: {log: false, verbose: true, model: "Data"}
     get_max_min: {log: false, verbose: false, model: "Data"}
   ST_01:
-    start: {log: false, verbose: true, model: "Data"}
-    order_close: {log: false, verbose: true, model: "Data"}
-    price_change: {log: false, verbose: true, model: "Data"}
-    end: {log: false, verbose: true, model: "Data"}
+    start: {log: false, verbose: false, model: "Data"}
+    order_close: {log: false, verbose: false, model: "Data"}
+    price_change: {log: false, verbose: false, model: "Data"}
+    end: {log: false, verbose: false, model: "Data"}
   ST_02:
     start: {log: false, verbose: true, model: "Data"}
     order_close: {log: false, verbose: true, model: "Data"}

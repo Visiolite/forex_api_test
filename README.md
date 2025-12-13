@@ -829,3 +829,16 @@ python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,
     Strategy_Item
     Strategy_Item_Trade
     Test_Live
+
+<!--------------------------------------------------------------------------------- Task --->
+<br><br>
+
+# Task
+    kamlekardane test forex
+
+    Gui : Execute : Start |  End | Clear | Show order | Show Detail    
+
+    Sakhte group of instrument for price change hasasiat and add to item
+    API : Price_Change : Strategy | sakhte madule hasasiat price hange baraye strategy_item
+
+    Listener : order close | price change | run az thread
