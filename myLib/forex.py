@@ -335,7 +335,7 @@ class Forex:
                             if attempt >= 3: raise
                             time.sleep(1)
                 #-----Check   
-                if data !=None: 
+                if not data is None: 
                     if data.size>0:
                         df = pd.DataFrame(data)
                         output.data = df
@@ -359,8 +359,8 @@ class Forex:
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            #self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            #self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
 
