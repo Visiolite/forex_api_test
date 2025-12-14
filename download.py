@@ -5,14 +5,12 @@
 # Download
 
 #--------------------------------------------------------------------------------- Import
-import os, sys, shutil
+import sys
 from datetime import datetime
-root_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, f"{root_dir}/myLib")
-from myLib.logic_global import config, log_instance, data_instance
 from myLib.model import model_output
-from myLib.forex import Forex
+from myLib.logic_global import config
 from myLib.utils import parse_cli_args, format_dict_block, to_bool
+from myLib.forex import Forex
 from myLib.forex_api import Forex_Api
 
 #--------------------------------------------------------------------------------- Debug
@@ -43,7 +41,7 @@ clear = to_bool(clear)
 dedicate = args.get("dedicate") if args.get("dedicate") not in (None, "") else config['download']['dedicate']
 dedicate = to_bool(dedicate)
 datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
-dateto = args.get("dateto") if args.get("dateto") not in (None, "") else datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+dateto = args.get("dateto") if args.get("dateto") not in (None, "") else config['download']['dateto']
 datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")
 dateto = datetime.strptime(dateto, "%Y-%m-%d %H:%M:%S")
 
@@ -61,11 +59,9 @@ try:
     if dedicate :
         for timeframe in timeframes:
             for instrument in instruments:
-                if clear : 
-                    if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
                 account_cfg = config.get("forex_connect", {}).get(account, {})
                 forex_api = Forex_Api(
-                    name=account_cfg.get("name"), 
+                    name=account, 
                     type=account_cfg.get("type"), 
                     username=account_cfg.get("username"), 
                     password=account_cfg.get("password"), 
@@ -79,7 +75,7 @@ try:
     else :
         account_cfg = config.get("forex_connect", {}).get(account, {})
         forex_api = Forex_Api(
-            name=account_cfg.get("name"), 
+            name=account, 
             type=account_cfg.get("type"), 
             username=account_cfg.get("username"), 
             password=account_cfg.get("password"), 
@@ -90,8 +86,6 @@ try:
         forex = Forex(forex_api=forex_api)
         for timeframe in timeframes:
             for instrument in instruments:
-                if clear : 
-                    if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)        
         forex_api.logout()
 except Exception as e:
@@ -99,3 +93,6 @@ except Exception as e:
     output.status = False
     output.message = {"class":this_class, "method":this_method, "error": str(e)}
     print(output)
+
+
+#if clear : if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")

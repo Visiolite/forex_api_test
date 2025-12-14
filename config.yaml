@@ -97,17 +97,17 @@ forex_connect:
 
 #--------------------------------------------------------------------------------- Download
 download:
-  instrument: XAU/USD
+  instrument: EUR/USD
   timeframe: t1
-  mode: up
+  mode: complete
   count: 1000
   repeat: 1
   delay: 0
   save: True
-  bulk: True
+  bulk: False
   clear: False
   dedicate: False
-  datefrom: '2000-01-01 00:00:00'
+  datefrom: '2025-12-10 00:00:00'
   dateto: '2030-01-01 00:00:00'
   
 #--------------------------------------------------------------------------------- instrument
@@ -179,13 +179,15 @@ debug:
     logout: {log: false, verbose: true, model: "Forex"}
   Forex:
     store: {log: false, verbose: true, model: "Forex"}
-    symbol: {log: false, verbose: true, model: "Forex"}
     history: {log: false, verbose: true, model: "Forex"}
+    save: {log: false, verbose: true, model: "Forex"}
+    symbol: {log: false, verbose: true, model: "Forex"}
     account_info: {log: false, verbose: true, model: "Forex"}
     trade_list: {log: false, verbose: true, model: "Forex"}
     trade_open: {log: false, verbose: true, model: "Forex"}
     order_close: {log: false, verbose: true, model: "Forex"}
     order_close_all: {log: false, verbose: true, model: "Forex"}
+    
   Data:
     save: {log: false, verbose: true, model: "Data"}
     get_max_min: {log: false, verbose: false, model: "Data"}

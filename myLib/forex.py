@@ -136,51 +136,50 @@ class Forex:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
+        #-------------- Variable
+        start_time = time.time()
+        iter = 0 
+        insert = 0
 
         try:
             #-------------- Data
             tblName = get_tbl_name(instrument, timeframe)
-            if timeframe == "t1":
-                query = f'INSERT INTO {tblName} (date, bid, ask) VALUES '
-            else:
-                query = f'INSERT INTO {tblName} (date, bidopen, bidclose, bidhigh, bidlow, askopen, askclose, askhigh, asklow) VALUES '
+            if timeframe == "t1" : query = f'INSERT INTO {tblName} (date, bid, ask) VALUES '
+            if timeframe != "t1" : query = f'INSERT INTO {tblName} (date, bidopen, bidclose, bidhigh, bidlow, askopen, askclose, askhigh, asklow) VALUES '
             #--------------Action
             if timeframe == "t1":
                 if bulk :
                     data = data.drop_duplicates(subset=["Date"], keep="first")
                     for index, row in data.iloc[::-1].iterrows(): 
-                        query += f"('{row['Date']}',{row['Bid']},{row['Ask']}),"
                         iter += 1
                         insert += 1
+                        query += f"('{row['Date']}',{row['Bid']},{row['Ask']}),"
                     if iter > 0 : query = query[:-1]
-                    output.status = self.data_sql.db.execute(query)
-                    if not output.status : insert = 0
+                    result = self.data_sql.db.execute(query)
+                    if not result.status : insert = 0
                 else:
-                    for index, row in data.iloc[::-1].iterrows(): 
-                        q = query + (f"('{row['Date']}',{row['Bid']},{row['Ask']})")
+                    for index, row in data.iloc[::-1].iterrows():
                         iter += 1
-                        if self.data_sql.db.execute(q) : 
-                            insert += 1
-                        else:
-                            pass
+                        q = query + (f"('{row['Date']}',{row['Bid']},{row['Ask']})")
+                        if self.data_sql.db.execute(q).status : insert += 1
             else:
                 if bulk :
                     for index, row in data.iloc[::-1].iterrows(): 
-                        query += f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']}),"
                         iter += 1
                         insert += 1
+                        query += f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']}),"
                     if iter > 0 : query = query[:-1]
-                    output.status = self.data_sql.db.execute(query)
-                    if not output.status : insert = 0
+                    result = self.data_sql.db.execute(query)
+                    if not result.status : insert = 0
                 else:
                     for index, row in data.iloc[::-1].iterrows(): 
-                        q = query + (f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']})")
                         iter += 1
-                        if self.data_sql.db.execute(q) : insert += 1
+                        q = query + (f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']})")
+                        if self.data_sql.db.execute(q).status : insert += 1
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = None
-            output.message==f"{instrument} | {timeframe} | {sort(insert, 6)}"
+            output.data = insert
+            output.message = f"{instrument} | {timeframe} | {sort(insert, 6)} |"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -220,7 +219,7 @@ class Forex:
                 d = self.get_max_min(instrument=instrument, timeframe=timeframe, mode="min", filed="Date")
                 if d.status and d.data : dateto = self.timeframe_nex_date(date=d.data, timeframe=timeframe)
             #--------------Display
-            params = {"account": self.api.id,"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
+            params = {"account": self.api.name,"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
             print(format_dict_block("Store", params))
             #--------------Action
             while(True):
@@ -241,7 +240,7 @@ class Forex:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None
-            output.message=None
+            output.message = f"{instrument} | {timeframe} |"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
