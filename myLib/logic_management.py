@@ -33,17 +33,44 @@ class Logic_Management:
         self.data_sql:Data_SQL = data_sql if data_sql else data_instance["management_sql"]
 
     #--------------------------------------------- get_strategy_instance
-    def get_strategy_instance(self, name):
+    def get_strategy_instance(self, name)-> model_output:
         #-------------- Description
-        # IN     : 
+        # IN     : order_id
         # OUT    : 
         # Action :
-        #--------------Action
-        if name == "st_01" : return ST_01()
-        if name == "st_02" : return ST_02()
-        if name == "st_03" : return ST_03()
-        if name == "st_04" : return ST_04()
-        if name == "st_05" : return ST_05()
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Action
+            strategy_class = globals().get(name)
+            if strategy_class and callable(strategy_class):
+                output.data = strategy_class()
+            else:
+                output.status = False
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message=name
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
 
     #--------------------------------------------- get_strategy_item_instance
     def get_strategy_item_instance(self, strategy_name, params, account_id) -> model_output:
@@ -68,7 +95,7 @@ class Logic_Management:
             #--------------Action
             forex_api = forex_apis[account_id]
             forex = Forex(forex_api=forex_api)
-            strategy = self.get_strategy_instance(strategy_name)
+            strategy = self.get_strategy_instance(strategy_name).data
             strategy.forex = forex
             strategy.params = params
             #--------------Output

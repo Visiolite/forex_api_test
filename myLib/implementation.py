@@ -214,15 +214,15 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                obj = model(name='st_01')
+                obj = model(name='ST_01')
                 self.data_orm.add(model=model, item=obj)
-                obj = model(name='st_02')
+                obj = model(name='ST_02')
                 self.data_orm.add(model=model, item=obj)
-                obj = model(name='st_03')
+                obj = model(name='ST_03')
                 self.data_orm.add(model=model, item=obj)
-                obj = model(name='st_04')
+                obj = model(name='ST_04')
                 self.data_orm.add(model=model, item=obj)
-                obj = model(name='st_05')
+                obj = model(name='ST_05')
                 self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
