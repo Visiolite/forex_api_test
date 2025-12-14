@@ -7,7 +7,7 @@
 <br><br>
 
 ## Install 
-[Here](https://github.com/kashanimorteza/postgresql_documents/blob/main/install.md)
+[Postgres](https://github.com/kashanimorteza/postgresql_documents/blob/main/install.md)
 
 
 
@@ -179,48 +179,6 @@ pigz
 sudo -i -u postgres
 pigz -dc backup_2025-12-14.tar.gz | psql -U postgres -d forex
 pigz -dc backup_xauusd_t1_2025-12-14.tar.gz | psql -U forex -d forex
-```
-
-
-
-<!--------------------------------------------------------------------------------- Config --->
-<br><br>
-
-## Config 
-```bash
-SELECT version();
-SELECT count(*) FROM pg_stat_activity;
-show max_connections;
-show shared_buffers;
-show max_locks_per_transaction;
-show fsync;
-show synchronous_commit;
-show max_wal_size;
-```
-
-
-
-<!--------------------------------------------------------------------------------- Tune --->
-<br><br>
-
-## Tune 
-```bash
-ALTER SYSTEM SET shared_buffers TO '10240MB';
-ALTER SYSTEM SET max_connections TO '1024';
-ALTER SYSTEM SET max_locks_per_transaction TO '1024';
-ALTER SYSTEM SET fsync TO 'off';
-ALTER SYSTEM SET synchronous_commit TO 'off';
-ALTER SYSTEM SET max_wal_size TO '1024';
-VACUUM FULL VERBOSE;
-```
-
-<!--------------------------------------------------------------------------------- Download --->
-<br><br>
-
-## Download 
-```bash
-scp root@10.10.10.114:/var/lib/postgresql/forex.gz ./
-scp root@10.10.10.114:/var/lib/postgresql/xauusd_t1.gz ./
 ```
 
 
@@ -449,4 +407,76 @@ BEGIN
     END LOOP;
 END $$;
 SELECT * FROM temp_date_range;
+```
+
+
+<!--------------------------------------------------------------------------------- Config --->
+<br><br>
+
+## Config 
+```bash
+SELECT version();
+SELECT count(*) FROM pg_stat_activity;
+show max_connections;
+show shared_buffers;
+show max_locks_per_transaction;
+show fsync;
+show synchronous_commit;
+show max_wal_size;
+```
+
+
+
+<!--------------------------------------------------------------------------------- Tune --->
+<br><br>
+
+## Tune 
+```bash
+ALTER SYSTEM SET shared_buffers TO '10240MB';
+ALTER SYSTEM SET max_connections TO '1024';
+ALTER SYSTEM SET max_locks_per_transaction TO '1024';
+ALTER SYSTEM SET fsync TO 'off';
+ALTER SYSTEM SET synchronous_commit TO 'off';
+ALTER SYSTEM SET max_wal_size TO '1024';
+VACUUM FULL VERBOSE;
+```
+Log
+```bash
+sudo sed -i 's/^[#[:space:]]*fsync.*/fsync = off/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*synchronous_commit.*/synchronous_commit = off/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*full_page_writes.*/full_page_writes = off/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*wal_level.*/wal_level = minimal/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*archive_mode.*/archive_mode = off/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*max_wal_senders.*/max_wal_senders = 0/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*autovacuum.*/autovacuum = on/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*log_statement.*/log_statement = none/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*log_min_duration_statement.*/log_min_duration_statement = -1/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*log_min_error_statement.*/log_min_error_statement = panic/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*logging_collector.*/logging_collector = off/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*log_destination.*/log_destination = stderr/' /etc/postgresql/18/main/postgresql.conf
+```
+Ram Cpu
+```bash
+sudo sed -i 's/^[#[:space:]]*shared_buffers.*/shared_buffers = 8GB/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*effective_cache_size.*/effective_cache_size = 24GB/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*work_mem.*/work_mem = 64MB/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*maintenance_work_mem.*/maintenance_work_mem = 1GB/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*max_worker_processes.*/max_worker_processes = 16/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*max_parallel_workers.*/max_parallel_workers = 16/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*max_parallel_workers_per_gather.*/max_parallel_workers_per_gather = 8/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*checkpoint_timeout.*/checkpoint_timeout = 30min/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*checkpoint_completion_target.*/checkpoint_completion_target = 0.9/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*max_wal_size.*/max_wal_size = 8GB/' /etc/postgresql/18/main/postgresql.conf
+sudo sed -i 's/^[#[:space:]]*min_wal_size.*/min_wal_size = 2GB/' /etc/postgresql/18/main/postgresql.conf
+```
+
+
+
+<!--------------------------------------------------------------------------------- Download --->
+<br><br>
+
+## Download 
+```bash
+scp root@10.10.10.114:/var/lib/postgresql/forex.gz ./
+scp root@10.10.10.114:/var/lib/postgresql/xauusd_t1.gz ./
 ```
