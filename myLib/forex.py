@@ -227,7 +227,7 @@ class Forex:
                     start = datefrom
                     end = dateto
                     while(True):
-                        if end > start:
+                        if (end - start).total_seconds() > 1:
                             history:model_output = self.history(instrument, timeframe, datefrom=start, dateto=end, count=count)
                             if history.status:
                                 if save : self.save(instrument=instrument, timeframe=timeframe, data=history.data, bulk=bulk)

@@ -480,7 +480,6 @@ python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,
 <br><br>
 
 # Task
-    kamlekardane test forex ba system jadid
     Gui : Execute : Start |  End | Clear | Show order | Show Detail 
     Listener close order
     --------------------------------
