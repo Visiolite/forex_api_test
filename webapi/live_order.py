@@ -35,7 +35,10 @@ def items(request: Request) :
     output:model_output = data_orm.items(model=model_db, **filters)
     if output.status : 
         data = []
-        for item in output.data : data.append(item.toDict())
+        for item in output.data : 
+            i = item.toDict()
+            i["amount"] = i["amount"]/ 100000 
+            data.append(i)
         output.data = data
     return output
 
