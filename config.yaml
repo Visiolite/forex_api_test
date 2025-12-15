@@ -166,6 +166,8 @@ debug:
     truncate: {log: false, verbose: false, model: "Database_Orm"}
     drop: {log: false, verbose: false, model: "Database_Orm"}
   Implementation_Management:
+    create_all_table: {log: false, verbose: true, model: "Implementation"}
+    truncate_all_table: {log: false, verbose: true, model: "Implementation"}
     instrument: {log: false, verbose: true, model: "Implementation"}
     account: {log: false, verbose: true, model: "Implementation"}
     strategy: {log: false, verbose: true, model: "Implementation"}
@@ -186,7 +188,7 @@ debug:
     trade_list: {log: false, verbose: true, model: "Forex"}
     order_open: {log: false, verbose: true, model: "Forex"}
     order_close: {log: false, verbose: true, model: "Forex"}
-    order_close_all: {log: false, verbose: true, model: "Forex"}
+    order_close_all: {log: false, verbose: false, model: "Forex"}
     
   Data:
     save: {log: false, verbose: true, model: "Data"}

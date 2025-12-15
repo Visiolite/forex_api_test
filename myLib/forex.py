@@ -22,19 +22,19 @@ from myModel import *
 class Forex:
     #--------------------------------------------- init
     def __init__(self,
-            forex_api,
-            data_orm=None,
-            data_sql=None,
-            log=None
+            forex_api:Forex_Api,
+            data_orm:Data_Orm=None,
+            data_sql:Data_SQL=None,
+            log:Log=None
         ):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.api:Forex_Api = forex_api
+        self.api = forex_api
         self.fx:ForexConnect = self.api.fx
         #--------------------Instance
-        self.log:Log = log if log else log_instance
-        self.data_orm:Data_Orm = data_orm if data_orm else data_instance["management_orm"]
-        self.data_sql:Data_SQL = data_sql if data_sql else data_instance["data_sql"]
+        self.data_orm = data_orm if data_orm else data_instance["management_orm"]
+        self.data_sql = data_sql if data_sql else data_instance["data_sql"]
+        self.log = log if log else log_instance
 
     #--------------------------------------------- timeframe_nex_date
     def timeframe_nex_date(self, timeframe, date):
@@ -428,14 +428,14 @@ class Forex:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        
+        #--------------Variable
+        buy_sell = None
+        ask = None
+        bid = None
+        sl = None
+        tp = None
+                
         try:
-            #--------------Variable
-            buy_sell = None
-            ask = None
-            bid = None
-            sl = None
-            tp = None
             #--------------Check
             amount = int(amount)
             tp_pips = int(tp_pips) 
@@ -443,8 +443,7 @@ class Forex:
             #--------------Data
             command = fxcorepy.Constants.Commands.CREATE_ORDER
             order_type = fxcorepy.Constants.Orders.TRUE_MARKET_OPEN
-            if action == "buy" : buy_sell=fxcorepy.Constants.BUY
-            if action == "sell": buy_sell=fxcorepy.Constants.SELL
+            buy_sell = fxcorepy.Constants.BUY if action in ("B", "buy") else fxcorepy.Constants.SELL
             #--------------Ask/Bid
             offers = self.fx.get_table(ForexConnect.OFFERS)
             for offer in offers:
@@ -459,11 +458,11 @@ class Forex:
             #--------------TP/SL
             if tp_pips or sl_pips:
                 if action == "buy":
-                    tp = float(ask + (tp_pips * point_size))
-                    sl = float(bid - (sl_pips * point_size))
+                    tp = float(f"{ask + (tp_pips * point_size):.{digits}f}")
+                    sl = float(f"{bid - (sl_pips * point_size):.{digits}f}")
                 elif action == "sell":
-                    tp = float(bid - (tp_pips * point_size))
-                    sl = float(ask + (sl_pips * point_size))
+                    tp = float(f"{bid - (tp_pips * point_size):.{digits}f}")
+                    sl = float(f"{ask + (sl_pips * point_size):.{digits}f}")
             #--------------Order
             if ask and bid :
                 if tp or sl:
@@ -507,17 +506,7 @@ class Forex:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = order_id
-            output.message = {
-                "execute_id": execute_id,
-                "order_id": order_id,
-                "symbol": symbol,
-                "action": action,
-                "amount": amount,
-                "bid": bid,
-                "ask": ask,
-                "tp": tp,
-                "sl": sl
-            }
+            output.message = f"{execute_id} | {order_id} | {symbol} | {action} | {amount} | {bid} | {ask} | {tp} | {sl}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -547,19 +536,17 @@ class Forex:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        #--------------Variable
-        command = fxcorepy.Constants.Commands.CREATE_ORDER
-        order_type = fxcorepy.Constants.Orders.TRUE_MARKET_CLOSE
         
         try:
             #--------------Data
-            if buy_sell == "B" : buy_sell=fxcorepy.Constants.SELL
-            if buy_sell == "S" : buy_sell=fxcorepy.Constants.BUY
-            #--------------Action
+            command = fxcorepy.Constants.Commands.CREATE_ORDER
+            order_type = fxcorepy.Constants.Orders.TRUE_MARKET_CLOSE
+            buy_sell = fxcorepy.Constants.SELL if buy_sell in ("B", "buy") else fxcorepy.Constants.BUY
+            #--------------Order
             request = self.fx.create_order_request(
                 command=command, 
                 order_type=order_type,
-                ACCOUNT_ID=self.account_id,
+                ACCOUNT_ID=self.api.id,
                 ORDER_ID=order_id,
                 SYMBOL=symbol,
                 TRADE_ID=trade_id,
@@ -567,15 +554,11 @@ class Forex:
                 AMOUNT= amount
             )
             response = self.fx.send_request(request)
-            response_details = {
-                "request_id": request.request_id,
-                "response_type": getattr(response, "type", None) if response else None,
-                "order_id": getattr(response, "order_id", None) if response else None,
-            }
+            order_id = getattr(response, "order_id", None) if response else None
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = response_details
-            output.message = {"order_id" : order_id, "trade_id" : trade_id, "symbol" : symbol, "buy_sell" : buy_sell, "amount" : amount}
+            output.data = order_id
+            output.message = f"{order_id} | {trade_id} | {symbol} | {buy_sell} | {amount}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -628,7 +611,8 @@ class Forex:
                         if result.status : count_close +=1
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = {"Order": len(items.data), "Close": count_close, "order_ids": order_ids}
+            output.data = None
+            output.message =f"{len(items.data)} | {order_ids} | {count_close}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

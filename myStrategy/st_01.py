@@ -91,9 +91,9 @@ class ST_01:
         return output
 
     #--------------------------------------------- stop
-    def stop(self, execute_id:int):
+    def stop(self, id):
         #-------------- Description
-        # IN     : order_id
+        # IN     : execute_id
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -106,29 +106,28 @@ class ST_01:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        #--------------Variable
+        #-------------- Variable
         order_ids = []
 
         try:
-            #--------------Data
-            item_execute = self.data_orm.item(model=model_live_execute_db, id=execute_id).data
-            #--------------Data
-            orders:list[model_live_order_db] = self.data_orm.items(model=model_live_order_db, execute_id=execute_id, status='open').data
-            for order in orders:
-                order_ids.append(order.order_id)
             #--------------Action
-            result:model_output = self.forex.order_close_all(order_ids=order_ids)
-            #--------------Update
-            if result.status:
-                item_execute.status = 'stop'
-                self.data_orm.update(model=model_live_execute_db, item=item_execute)
+            orders:model_output = self.data_orm.items(model=model_live_order_db, execute_id=id, status='open')
+            if orders.status:
+                #---Order
+                for order in orders.data : order_ids.append(order.order_id)
+                #---Close
+                if len(order_ids)>0 : close:model_output = self.forex.order_close_all(order_ids=order_ids)
+                #---Database
+                if len(order_ids)>0:
+                    if close.status:
+                        item_execute:model_output = self.data_orm.items(model=model_live_execute_db, id=id)
+                        if item_execute.status:
+                            item_execute.data[0].status = 'stop'
+                            database:model_output = self.data_orm.update(model=model_live_execute_db, item=item_execute.data[0])
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = execute_id
-            output.message = {
-                "Orders": len(order_ids),
-                "Close": result.message["Close"]
-            }
+            output.data = id
+            output.message = f"{orders.status} | {len(order_ids)} | {close.status} | {item_execute.status} | {database.status}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

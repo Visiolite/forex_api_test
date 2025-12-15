@@ -332,8 +332,8 @@ class Data_Orm:
         #--------------Return
         return output
 
-    #-------------------------- [truncate_all_tables]
-    def truncate_all_tables(self) -> model_output:
+    #-------------------------- [truncate_all_table]
+    def truncate_all_table(self) -> model_output:
         #-------------- Description
         # IN     : model
         # OUT    : model_output
@@ -351,7 +351,7 @@ class Data_Orm:
         
         try:
             #--------------Action
-            output:model_output = self.db.truncate_all_tables()
+            output:model_output = self.db.truncate_all_table()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message =None

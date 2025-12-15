@@ -6,6 +6,9 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
+
+from fastapi import params
+from sqlalchemy import desc
 from myLib.model import model_output
 from myLib.logic_global import config, debug, log_instance, data_instance, forex_apis
 from myLib.utils import sort
@@ -19,16 +22,16 @@ class Implementation_Management:
     #-------------------------- [Init]
     def __init__(
             self,
-            data_orm=None, 
-            data_sql=None,
-            log=None
+            data_orm:Data_Orm=None, 
+            data_sql:Data_SQL=None,
+            log:Log=None
         ):
         #-------------- Variable
         self.this_class = self.__class__.__name__
         #-------------- Instance
-        self.log:Log = log if log else log_instance
-        self.data_orm:Data_Orm = data_orm if data_orm else data_instance["management_orm"]
-        self.data_sql:Data_SQL = data_sql if data_sql else data_instance["management_sql"]
+        self.log = log if log else log_instance
+        self.data_orm = data_orm if data_orm else data_instance["management_orm"]
+        self.data_sql = data_sql if data_sql else data_instance["management_sql"]
 
     #--------------------------------------------- create_all_table
     def create_all_table(self):
@@ -83,10 +86,10 @@ class Implementation_Management:
         output.method_name = this_method
 
         try:
-            self.data_orm.create_all_tables()
+            self.data_orm.truncate_all_table()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"Tables created"
+            output.message = f"Tables Truncate"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -239,7 +242,7 @@ class Implementation_Management:
         output.method_name = this_method
         #-------------- Variable
         model = model_strategy_db
-        #-------------- Data
+
         try:
             #-------------- Drop
             if drop : self.data_orm.drop(model=model)
@@ -248,17 +251,12 @@ class Implementation_Management:
             #-------------- Truncate
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
-            if add:
-                obj = model(name='ST_01')
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='ST_02')
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='ST_03')
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='ST_04')
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='ST_05')
-                self.data_orm.add(model=model, item=obj)
+            if add: 
+                self.data_orm.add(model=model, item=model(name='ST_01', description='Buy or Sell, if p>0 same, if p<0 inverse'))
+                self.data_orm.add(model=model, item=model(name='ST_02', description=''))
+                self.data_orm.add(model=model, item=model(name='ST_03', description=''))
+                self.data_orm.add(model=model, item=model(name='ST_04', description=''))
+                self.data_orm.add(model=model, item=model(name='ST_05', description=''))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -303,17 +301,8 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                params = "{'symbol': 'EUR/USD','action': 'buy','amount': 10000,'tp_pips': 1,'st_pips': 10}"
-                obj = model(name='it_1', strategy_id=1, params=params)
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='it_1', strategy_id=2, params=params)
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='it_1', strategy_id=3, params=params)
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='it_1', strategy_id=4, params=params)
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='it_1', strategy_id=5, params=params)
-                self.data_orm.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=model(name='start buy', strategy_id=1, params="{'symbol': 'EUR/USD','action': 'buy','amount': 10000,'tp_pips': 1,'st_pips': 1}"))
+                self.data_orm.add(model=model, item=model(name='start sell', strategy_id=1, params="{'symbol': 'EUR/USD','action': 'sell','amount': 10000,'tp_pips': 1,'st_pips': 1}"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -358,8 +347,8 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                obj = model(name="tst_1", strategy_item_id=1, account_id=4)
-                self.data_orm.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=model(name="test_start_buy", strategy_item_id=1, account_id=4))
+                self.data_orm.add(model=model, item=model(name="test_start_sell", strategy_item_id=2, account_id=4))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

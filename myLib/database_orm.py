@@ -240,8 +240,8 @@ class Database_Orm:
         #--------------Return
         return output
 
-    #-------------------------- [truncate_all_tables]
-    def truncate_all_tables(self) -> model_output:
+    #-------------------------- [truncate_all_table]
+    def truncate_all_table(self) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -259,10 +259,14 @@ class Database_Orm:
 
         try:
             #--------------Action
-            import myModel
-            #BaseModel.metadata.create_all(self.engine)
+            for table in BaseModel.metadata.sorted_tables:
+                table_name = table.name
+                self.session.execute(text(f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE"))
+                self.session.commit()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = None
+            output.message = f"Truncated {len(BaseModel.metadata.sorted_tables)} tables"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
