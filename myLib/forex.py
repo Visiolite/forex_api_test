@@ -364,8 +364,8 @@ class Forex:
         #--------------Return
         return output
 
-    #--------------------------------------------- trade_list
-    def trade_list(self):
+    #--------------------------------------------- orader_open_list
+    def orader_open_list(self):
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -380,11 +380,12 @@ class Forex:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
+        #--------------Variable
+        columns = []
+        items = []
         
         try:
-            #--------------Variable
-            columns = []
-            items = []
+            #--------------Data
             data = self.fx.get_table(ForexConnect.TRADES)
             #--------------Column
             for column in data.columns : columns.append(column.id)
@@ -394,11 +395,56 @@ class Forex:
                 for column in columns : info[column] = getattr(item, column, None)
                 items.append(info)
             #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = items
-            output.message = {
-                "Time": sort(int(time.time() - start_time), 3),
-                "count": len(items),
-            }
+            output.message = len(items)
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- orader_close_list
+    def orader_close_list(self):
+        #-------------- Description
+        # IN     : order_id
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #--------------Variable
+        columns = []
+        items = []
+        
+        try:
+            #--------------Data
+            data = self.fx.get_table(ForexConnect.CLOSED_TRADES)
+            #--------------Column
+            for column in data.columns : columns.append(column.id)
+            #--------------Items
+            for item in data:
+                info = {}
+                for column in columns : info[column] = getattr(item, column, None)
+                items.append(info)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = items
+            output.message = len(items)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -520,60 +566,8 @@ class Forex:
         #--------------Return
         return output
 
-    #--------------------------------------------- order_close
-    def order_close(self, order_id, trade_id, symbol, buy_sell, amount):
-        #-------------- Description
-        # IN     : order_id
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-        
-        try:
-            #--------------Data
-            command = fxcorepy.Constants.Commands.CREATE_ORDER
-            order_type = fxcorepy.Constants.Orders.TRUE_MARKET_CLOSE
-            buy_sell = fxcorepy.Constants.SELL if buy_sell in ("B", "buy") else fxcorepy.Constants.BUY
-            #--------------Order
-            request = self.fx.create_order_request(
-                command=command, 
-                order_type=order_type,
-                ACCOUNT_ID=self.api.id,
-                ORDER_ID=order_id,
-                SYMBOL=symbol,
-                TRADE_ID=trade_id,
-                BUY_SELL= buy_sell,
-                AMOUNT= amount
-            )
-            response = self.fx.send_request(request)
-            order_id = getattr(response, "order_id", None) if response else None
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = order_id
-            output.message = f"{order_id} | {trade_id} | {symbol} | {buy_sell} | {amount}"
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-
     #--------------------------------------------- order_close_all
-    def order_close_all(self, order_ids=None):
+    def order_close(self, order_ids=None):
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -589,12 +583,13 @@ class Forex:
         output.class_name = self.this_class
         output.method_name = this_method
         #-------------- Variable
-        count_close= 0
+        close_order_ids = []
         
         try:
-            #--------------Data
-            items = self.trade_list()
-            #--------------Action
+            #--------------Close
+            command = fxcorepy.Constants.Commands.CREATE_ORDER
+            order_type = fxcorepy.Constants.Orders.TRUE_MARKET_CLOSE
+            items = self.orader_open_list()
             if items.status:
                 for item in items.data:
                     order_id = item['open_order_id']
@@ -602,17 +597,31 @@ class Forex:
                     symbol = item['instrument']
                     buy_sell = item['buy_sell']
                     amount = item['amount']
+                    buy_sell = fxcorepy.Constants.SELL if buy_sell in ("B", "buy") else fxcorepy.Constants.BUY
+                    request = self.fx.create_order_request(
+                        command=command, 
+                        order_type=order_type,
+                        ACCOUNT_ID=self.api.id,
+                        ORDER_ID=order_id,
+                        SYMBOL=symbol,
+                        TRADE_ID=trade_id,
+                        BUY_SELL= buy_sell,
+                        AMOUNT= amount
+                    )
                     if order_ids:
                         if order_id in order_ids:
-                            result:model_output = self.order_close(order_id=order_id, trade_id=trade_id, symbol=symbol, buy_sell=buy_sell, amount=amount)
-                            if result.status : count_close +=1
+                            self.fx.send_request(request)
+                            close_order_ids.append(order_id)
                     else:
-                        result:model_output = self.order_close(order_id=order_id, trade_id=trade_id, symbol=symbol, buy_sell=buy_sell, amount=amount)
-                        if result.status : count_close +=1
+                        self.fx.send_request(request)
+                        close_order_ids.append(order_id)
+            #--------------Complete
+            time.sleep(3)
+            result_complete = self.order_close_complete(order_ids=close_order_ids)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = None
-            output.message =f"{len(items.data)} | {order_ids} | {count_close}"
+            output.data = close_order_ids
+            output.message =f"{len(items.data)} | {len(order_ids)} | {len(close_order_ids)} | {result_complete.data}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -625,3 +634,54 @@ class Forex:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
+
+    #--------------------------------------------- order_close_complete
+    def order_close_complete(self, order_ids=None):
+        #-------------- Description
+        # IN     : order_id
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Variable
+        complete_count = 0
+        
+        try:
+            #--------------data
+            items = self.orader_close_list()
+            #--------------Items
+            if items.status:
+                for item in items.data:
+                    order_id = item['open_order_id']
+                    gross_pl = item['gross_pl']
+                    if order_id in order_ids:
+                        obj = self.data_orm.items(model=model_live_order_db, order_id=order_id).data[0]
+                        obj.profit = gross_pl
+                        obj.status = "close"
+                        self.data_orm.update(model=model_live_order_db, item=obj)
+                        complete_count += 1
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = complete_count
+            output.message =f"{len(items.data)} | {len(order_ids)} | {complete_count}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    

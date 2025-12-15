@@ -116,7 +116,7 @@ class ST_01:
                 #---Order
                 for order in orders.data : order_ids.append(order.order_id)
                 #---Close
-                if len(order_ids)>0 : close:model_output = self.forex.order_close_all(order_ids=order_ids)
+                if len(order_ids)>0 : close:model_output = self.forex.order_close(order_ids=order_ids)
                 #---Database
                 if len(order_ids)>0:
                     if close.status:
