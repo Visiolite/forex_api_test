@@ -82,28 +82,23 @@ def orders(id):
         output.data = data
     return output
 
+#-------------------------- [Detaile]
+@route.get("/detaile/{id}", description="detaile", response_model=model_output)
+def detaile(id): 
+    return logic_management.execute_order_detaile(id=id)
+
 #-------------------------- [start]
 @route.get("/start/{id}", description="start", response_model=model_output)
-def start(id:int):
+def start(id):
     start_time = time.time()
-    detaile = logic_management.execute_detaile(id=id)
-    strategy_name = detaile.data.get("strategy_name")
-    params = detaile.data.get("params")
-    account_id = detaile.data.get("account_id")
-    strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id).data
-    output:model_output = strategy.start(id=id)
+    output:model_output = logic_management.strategy_action(execute_id=id, action="start")
     output.time = sort(f"{(time.time() - start_time):.3f}", 3)
     return output
 
 #-------------------------- [end]
 @route.get("/stop/{id}", description="stop", response_model=model_output)
-def end(id:int):
+def end(id):
     start_time = time.time()
-    detaile = logic_management.execute_detaile(id=id)
-    strategy_name = detaile.data.get("strategy_name")
-    params = detaile.data.get("params")
-    account_id = detaile.data.get("account_id")
-    strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id).data
-    output:model_output = strategy.stop(id=id)
+    output:model_output = logic_management.strategy_action(execute_id=id, action="stop")
     output.time = sort(f"{(time.time() - start_time):.3f}", 3)
     return output

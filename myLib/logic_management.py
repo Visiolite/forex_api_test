@@ -298,3 +298,109 @@ class Logic_Management:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
+    
+    #-------------------------- [strategy_action]
+    def strategy_action(self, execute_id, action) -> model_output:
+        #-------------- Description
+        # IN     : execute_id, action(start,stop,price_change,order_close)
+        # OUT    : model_output
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Data
+            detaile = self.execute_detaile(id=execute_id)
+            strategy_name = detaile.data.get("strategy_name")
+            params = detaile.data.get("params")
+            account_id = detaile.data.get("account_id")
+            strategy = self.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id).data
+            #--------------Action
+            if action == "start" : output:model_output = strategy.start(id=execute_id)
+            if action == "stop" : output:model_output = strategy.stop(id=execute_id)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [execute_order_detaile]
+    def execute_order_detaile(self, id) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Detaile
+        detaile = {}
+        all_count = close_count = open_count = all_amount = close_amount = open_amount = all_profit = close_profit = open_profit = all_buy = close_buy = open_buy = all_sell = close_sell = open_sell = 0
+
+        try:
+            #--------------Data
+            data:model_output = self.data_orm.items(model=model_live_order_db, execute_id=id)
+            #--------------Action
+            if data.status:
+                orders:list[model_live_order_db] = data.data
+                for order in orders:
+                    #---All
+                    all_count += 1
+                    all_amount += order.amount
+                    all_profit += order.profit
+                    all_buy += 1 if order.action == 'buy' else 0; all_sell += 1 if order.action == 'sell' else 0
+                    #---Close
+                    if order.status == 'close':
+                        close_count += 1
+                        close_amount += order.amount
+                        close_profit += order.profit
+                        close_buy += 1 if order.action == 'buy' else 0; close_sell += 1 if order.action == 'sell' else 0
+                    #---Open
+                    if order.status == 'open':
+                        open_count += 1
+                        open_amount += order.amount
+                        open_profit += order.profit
+                        open_buy += 1 if order.action == 'buy' else 0; open_sell += 1 if order.action == 'sell' else 0
+                detaile["all"] = {"count":all_count, "amount":all_amount/100000, "profit":all_profit, "buy":all_buy, "sell":all_sell}
+                detaile["close"] = {"count":close_count, "amount":close_amount/100000, "profit":close_profit, "buy":close_buy, "sell":close_sell}
+                detaile["open"] = {"count":open_count, "amount":open_amount/100000, "profit":open_profit, "buy":open_buy, "sell":open_sell}
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = detaile
+            output.message=id
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
