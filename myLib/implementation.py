@@ -252,7 +252,7 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add: 
-                self.data_orm.add(model=model, item=model(name='ST_01', description='Buy or Sell, if p>0 same, if p<0 inverse'))
+                self.data_orm.add(model=model, item=model(name='ST_01', description='Buy|Sell   if p>0 same   if p<0 inverse'))
                 self.data_orm.add(model=model, item=model(name='ST_02', description=''))
                 self.data_orm.add(model=model, item=model(name='ST_03', description=''))
                 self.data_orm.add(model=model, item=model(name='ST_04', description=''))
@@ -301,8 +301,8 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name='start buy', strategy_id=1, params="{'symbol': 'EUR/USD','action': 'buy','amount': 10000,'tp_pips': 1,'st_pips': 1}"))
-                self.data_orm.add(model=model, item=model(name='start sell', strategy_id=1, params="{'symbol': 'EUR/USD','action': 'sell','amount': 10000,'tp_pips': 1,'st_pips': 1}"))
+                self.data_orm.add(model=model, item=model(name='buy', strategy_id=1, params="{'symbol':'EUR/USD','action':'buy','amount':10000,'tp_pips':1,'st_pips':1}", description="Start buy"))
+                self.data_orm.add(model=model, item=model(name='sell', strategy_id=1, params="{'symbol':'EUR/USD','action':'sell','amount':10000,'tp_pips':1,'st_pips':1}", description="Start sell"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -347,8 +347,8 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="test_start_buy", strategy_item_id=1, account_id=4))
-                self.data_orm.add(model=model, item=model(name="test_start_sell", strategy_item_id=2, account_id=4))
+                self.data_orm.add(model=model, item=model(name="test-1", strategy_item_id=1, account_id=4))
+                self.data_orm.add(model=model, item=model(name="test-1", strategy_item_id=2, account_id=4))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

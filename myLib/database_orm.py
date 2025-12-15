@@ -10,7 +10,7 @@ from myLib.model import model_output
 from myLib.logic_global import debug, log_instance
 from myLib.utils import sort
 from myLib.log import Log
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, null, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import or_, and_
@@ -99,7 +99,7 @@ class Database_Orm:
             query = self.session.query(model)
             if filters:
                 for attr, value in filters.items() : 
-                    query = query.filter(getattr(model, attr) == value)
+                    if value !='null' : query = query.filter(getattr(model, attr) == value)
             query = query.order_by(model.id)
             result = query.all()
             #--------------Output
