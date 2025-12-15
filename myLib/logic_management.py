@@ -21,16 +21,16 @@ class Logic_Management:
     #-------------------------- [Init]
     def __init__(
             self,
-            data_orm=None, 
-            data_sql=None,
-            log=None
+            data_orm:Data_Orm=None, 
+            data_sql:Data_SQL=None,
+            log:Log=None
         ):
         #-------------- Variable
         self.this_class = self.__class__.__name__
         #-------------- Instance
-        self.log:Log = log if log else log_instance
-        self.data_orm:Data_Orm = data_orm if data_orm else data_instance["management_orm"]
-        self.data_sql:Data_SQL = data_sql if data_sql else data_instance["management_sql"]
+        self.data_orm = data_orm if data_orm else data_instance["management_orm"]
+        self.data_sql = data_sql if data_sql else data_instance["management_sql"]
+        self.log = log if log else log_instance
 
     #--------------------------------------------- get_strategy_instance
     def get_strategy_instance(self, name)-> model_output:
@@ -262,9 +262,9 @@ class Logic_Management:
         return output
         
     #-------------------------- [order_close]
-    def order_close(self, order_id) -> model_output:
+    def order_close(self, order_id, profit) -> model_output:
         #-------------- Description
-        # IN     : order_id
+        # IN     : order_id, profit
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -280,12 +280,12 @@ class Logic_Management:
 
         try:
             #--------------Action
-            cmd = f"UPDATE live_order SET status='close' WHERE order_id = '{order_id}';"
+            cmd = f"UPDATE live_order SET status='close', profit={profit} WHERE order_id = '{order_id}';"
             result:model_output = self.data_sql.db.execute(cmd=cmd)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = order_id
-            output.message=f"{order_id}"
+            output.message=f"{order_id} | {profit}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

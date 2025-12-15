@@ -12,6 +12,7 @@ from myLib.logic_global import database_management
 from fastapi import APIRouter, Request
 from myModel.model_live_execute import model_live_execute_py as model_py
 from myModel.model_live_execute import model_live_execute_db as model_db
+from myModel.model_live_order import model_live_order_db as model_db_orders
 from myLib.data_orm import Data_Orm
 from myLib.logic_management import Logic_Management
 
@@ -70,6 +71,16 @@ def status(id:int):
 @route.get("/dead/{id}", description="dead", response_model=model_output)
 def dead(id:int): 
     return data_orm.dead(model=model_db, id=id)
+
+#-------------------------- [Orders]
+@route.get("/orders/{id}", description="orders", response_model=model_output)
+def orders(id): 
+    output:model_output = data_orm.items(model=model_db_orders, execute_id=id)
+    if output.status : 
+        data = []
+        for item in output.data : data.append(item.toDict())
+        output.data = data
+    return output
 
 #-------------------------- [start]
 @route.get("/start/{id}", description="start", response_model=model_output)
