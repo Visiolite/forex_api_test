@@ -11,11 +11,13 @@ from fastapi import APIRouter, Request
 from myModel.model_live_order import model_live_order_py as model_py
 from myModel.model_live_order import model_live_order_db as model_db
 from myLib.data_orm import Data_Orm
+from myLib.logic_management import Logic_Management
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
 data_orm = Data_Orm(database=database_management)
+logic_management = Logic_Management()
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
@@ -44,25 +46,34 @@ def update(item: model_py):
 
 #-------------------------- [Delete]
 @route.delete("/{id}", description="delete", response_model=model_output)
-def delete(id:int): 
+def delete(id): 
     return data_orm.delete(model=model_db, id=id)
 
 #-------------------------- [Enable]
 @route.get("/enable/{id}", description="enable", response_model=model_output)
-def enable(id:int): 
+def enable(id): 
     return data_orm.enable(model=model_db, id=id)
 
 #-------------------------- [Disable]
 @route.get("/disable/{id}", description="disable", response_model=model_output)
-def disable(id:int): 
+def disable(id): 
     return data_orm.disable(model=model_db, id=id)
 
 #-------------------------- [Status]
 @route.get("/status/{id}", description="status", response_model=model_output)
-def status(id:int): 
+def status(id): 
     return data_orm.status(model=model_db, id=id)
 
 #-------------------------- [Dead]
 @route.get("/dead/{id}", description="dead", response_model=model_output)
-def dead(id:int): 
+def dead(id): 
     return data_orm.dead(model=model_db, id=id)
+
+#-------------------------- [Detaile]
+#-------------------------- [Items]
+@route.get("/detaile", description="detaile", response_model=model_output)
+def detaile(request: Request) : 
+    filters = dict(request.query_params)
+    id = int(filters.get('execute_id'))
+    result = logic_management.execute_order_detaile(id=id)
+    return result

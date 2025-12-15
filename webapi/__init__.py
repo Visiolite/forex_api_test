@@ -11,5 +11,5 @@ __all__ = [
     "strategy",
     "strategy_item",
     "live_execute",
-    "live_order",
+    "live_order"
 ]

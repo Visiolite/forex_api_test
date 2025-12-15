@@ -47,7 +47,7 @@ routes = [
     (strategy, "/strategy", ["Strategy"]),
     (strategy_item, "/strategy_item", ["Strategy Item"]),
     (live_execute, "/live_execute", ["Live Execute"]),
-    (live_order, "/live_order", ["Live Order"]),
+    (live_order, "/live_order", ["Live Order"])
 ]
 for router, prefix, tags in routes : app.include_router(router, prefix=prefix, tags=tags)
 

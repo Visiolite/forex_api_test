@@ -72,21 +72,6 @@ def status(id:int):
 def dead(id:int): 
     return data_orm.dead(model=model_db, id=id)
 
-#-------------------------- [Orders]
-@route.get("/orders/{id}", description="orders", response_model=model_output)
-def orders(id): 
-    output:model_output = data_orm.items(model=model_db_orders, execute_id=id)
-    if output.status : 
-        data = []
-        for item in output.data : data.append(item.toDict())
-        output.data = data
-    return output
-
-#-------------------------- [Detaile]
-@route.get("/detaile/{id}", description="detaile", response_model=model_output)
-def detaile(id): 
-    return logic_management.execute_order_detaile(id=id)
-
 #-------------------------- [start]
 @route.get("/start/{id}", description="start", response_model=model_output)
 def start(id):
