@@ -6,11 +6,11 @@
 
 
 #--------------------------------------------------------------------------------- Import
-# #--------------------------------------------- Warnings
-# import logging, warnings
-# warnings.filterwarnings("ignore")
-# logging.getLogger().setLevel(logging.ERROR)
-# logging.getLogger("root").setLevel(logging.CRITICAL)
+#--------------------------------------------- Warnings
+import logging, warnings
+warnings.filterwarnings("ignore")
+logging.getLogger().setLevel(logging.ERROR)
+logging.getLogger("root").setLevel(logging.CRITICAL)
 #--------------------------------------------- Other
 import uvicorn
 import threading

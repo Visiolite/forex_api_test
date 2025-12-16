@@ -615,13 +615,10 @@ class Forex:
                     else:
                         self.fx.send_request(request)
                         close_order_ids.append(order_id)
-            #--------------Complete
-            time.sleep(3)
-            result_complete = self.order_close_complete(order_ids=close_order_ids)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = close_order_ids
-            output.message =f"{len(items.data)} | {len(order_ids)} | {len(close_order_ids)} | {result_complete.data}"
+            output.message =f"{len(items.data)} | {len(order_ids)} | {len(close_order_ids)}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

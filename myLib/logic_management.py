@@ -5,7 +5,7 @@
 # logic_management
 
 #--------------------------------------------------------------------------------- Import
-import inspect, time, ast, threading
+import inspect, time, ast
 from myLib.model import model_output
 from myLib.logic_global import debug, log_instance, data_instance, forex_apis
 from myLib.utils import sort
@@ -228,7 +228,7 @@ class Logic_Management:
 
         try:
             #--------------Action
-            cmd = f"SELECT strategy.name, strategy_item.params, live_execute.id, live_execute.account_id, live_order.id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN live_execute ON strategy_item.id = live_execute.strategy_item_id JOIN live_order ON live_order.execute_id = live_execute.id WHERE live_order.order_id='{order_id}'"
+            cmd = f"SELECT strategy.name, strategy_item.params, live_execute.id, live_execute.account_id, live_order.id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status, live_execute.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN live_execute ON strategy_item.id = live_execute.strategy_item_id JOIN live_order ON live_order.execute_id = live_execute.id WHERE live_order.order_id='{order_id}'"
             result:model_output = self.data_sql.db.items(cmd=cmd)
             #--------------Data
             if result.status and len(result.data) > 0 :
@@ -247,6 +247,7 @@ class Logic_Management:
                 detaile["sl"] = result.data[0][12]
                 detaile["profit"] = result.data[0][13]
                 detaile["status"] = result.data[0][14]
+                detaile["execute_status"] = result.data[0][15]
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile
@@ -269,7 +270,7 @@ class Logic_Management:
         #-------------- Description
         # IN     : order_id | profit
         # OUT    : model_output
-        # Action : update order on database(status/profit) | get strategy and run action order_close
+        # Action : update order on database:status,profit | get strategy and run action order_close
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
@@ -286,13 +287,13 @@ class Logic_Management:
             cmd = f"UPDATE live_order SET status='close', profit={profit} WHERE order_id='{order_id}'"
             self.data_sql.db.execute(cmd=cmd)
             #--------------Strategy
-            detaile = self.order_detaile(order_id=order_id).data
-            execute_id = detaile["execute_id"]
-            self.strategy_action(execute_id=execute_id, action="order_close", order_detaile=detaile)
+            order_detaile = self.order_detaile(order_id=order_id).data
+            if order_detaile["execute_status"] != "stop" :
+                self.strategy_action(action="order_close", order_detaile=order_detaile)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = detaile
-            output.message = f"{order_id} | {profit} | {execute_id}"
+            output.data = order_detaile
+            output.message = f"{order_id} | {profit}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -307,11 +308,11 @@ class Logic_Management:
         return output
     
     #-------------------------- [strategy_action]
-    def strategy_action(self, execute_id, action, order_detaile=None) -> model_output:
+    def strategy_action(self, execute_id=None, action="start", order_detaile=None) -> model_output:
         #-------------- Description
-        # IN     : execute_id, action(start|stop|price_change|order_close)
+        # IN     : 
         # OUT    : model_output
-        # Action :
+        # Action : run strategy action
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
@@ -325,20 +326,18 @@ class Logic_Management:
 
         try:
             #--------------Data
-            execute_detaile = self.execute_detaile(id=execute_id).data
-            strategy_name = execute_detaile.get("strategy_name")
-            params = execute_detaile.get("params")
-            account_id = execute_detaile.get("account_id")
-            strategy = self.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id,execute_id=execute_id).data
+            if execute_id:
+                execute_detaile = self.execute_detaile(id=execute_id).data
+                strategy_name = execute_detaile["strategy_name"]
+                params = execute_detaile["params"]
+                account_id = execute_detaile["account_id"]
+            else:
+                execute_id = order_detaile["execute_id"]
+                strategy_name = order_detaile["strategy_name"]
+                params = order_detaile["params"]
+                account_id = order_detaile["account_id"]
+            strategy = self.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id, execute_id=execute_id).data
             #--------------Action
-            # def run_order():
-            #     if action == "start" : strategy.start()
-            #     if action == "stop" : strategy.stop()
-            #     if action == "order_close" : strategy.order_close(order_detaile=order_detaile)
-            #     if action == "price_change" : strategy.price_change(order_detaile=order_detaile)
-            # thread = threading.Thread(target=run_order)
-            # thread.start()
-            # thread.join()
             if action == "start" : strategy.start()
             if action == "stop" : strategy.stop()
             if action == "order_close" : strategy.order_close(order_detaile=order_detaile)
@@ -402,9 +401,9 @@ class Logic_Management:
                         open_amount += order.amount
                         open_profit += order.profit
                         open_buy += 1 if order.action == 'buy' else 0; open_sell += 1 if order.action == 'sell' else 0
-                detaile["all"] = {"count":all_count, "amount":all_amount/100000, "profit":all_profit, "buy":all_buy, "sell":all_sell}
-                detaile["close"] = {"count":close_count, "amount":close_amount/100000, "profit":close_profit, "buy":close_buy, "sell":close_sell}
-                detaile["open"] = {"count":open_count, "amount":open_amount/100000, "profit":open_profit, "buy":open_buy, "sell":open_sell}
+                detaile["all"] = {"count":all_count, "amount":all_amount/100000, "profit":round(all_profit, 2), "buy":all_buy, "sell":all_sell}
+                detaile["close"] = {"count":close_count, "amount":close_amount/100000, "profit":round(close_profit, 2), "buy":close_buy, "sell":close_sell}
+                detaile["open"] = {"count":open_count, "amount":open_amount/100000, "profit":round(open_profit, 2), "buy":open_buy, "sell":open_sell}
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile

@@ -117,19 +117,14 @@ class ST_01:
         order_ids = []
 
         try:
+            #--------------Database
+            cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id='{execute_id}';"
+            self.data_sql.db.execute(cmd=cmd)
             #--------------Action
             orders:model_output = self.data_orm.items(model=model_live_order_db, execute_id=execute_id, status='open')
             if orders.status:
-                #---Order
                 for order in orders.data : order_ids.append(order.order_id)
-                #---Close
-                if len(order_ids)>0 : 
-                    close:model_output = self.forex.order_close(order_ids=order_ids)
-                #---Database
-                if len(order_ids)>0:
-                    if close.status:
-                        cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id='{execute_id}';"
-                        self.data_sql.db.execute(cmd=cmd)
+                if len(order_ids)>0 : self.forex.order_close(order_ids=order_ids)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = execute_id
@@ -148,7 +143,7 @@ class ST_01:
         return output
     
     #--------------------------------------------- order_close
-    def order_close(self, order_detaile:model_output):
+    def order_close(self, order_detaile):
         #-------------- Description
         # IN     : execute_id
         # OUT    : 
@@ -188,7 +183,7 @@ class ST_01:
             #--------------Database
             if result.status:
                 cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id={execute_id};"
-                database:model_output = self.data_sql.db.execute(cmd=cmd)
+                self.data_sql.db.execute(cmd=cmd)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = execute_id

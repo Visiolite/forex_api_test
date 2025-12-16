@@ -20,10 +20,9 @@ class Listen_Close_Execute:
     def start(self):
         while True:
             for item in self.items:
-                print(f"Listen_Close_Execute : Start :  {item}")
+                print(f"Trade Execute : {item['order_id']} | {item['profit']}")
                 order_id = item.get("order_id")
                 profit = item.get("profit")
                 self.logic_management.order_close(order_id=order_id, profit=profit)
-                print(f"Listen_Close_Execute : End :  {item}")
                 self.items.remove(item)
             time.sleep(self.sleep_time )

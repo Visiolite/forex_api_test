@@ -19,7 +19,7 @@ class CloseTradesListener(TableListener):
     def on_added(self, row_id, row):
         item = {"date": datetime.datetime.now().timestamp(), "order_id": row.open_order_id, "profit": row.gross_pl}
         self.parent.items.append(item)
-        print(f"Trade closed: {item}")
+        print(f"Trade closed  : {row.open_order_id} | {row.gross_pl}")
 
 #--------------------------------------------------------------------------------- Class
 class Listen_Close:
