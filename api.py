@@ -4,9 +4,16 @@
 #--------------------------------------------------------------------------------- Description
 # This is main file of webapi
 
+
 #--------------------------------------------------------------------------------- Import
+#--------------------------------------------- Warnings
+import logging, warnings
+warnings.filterwarnings("ignore")
+logging.getLogger().setLevel(logging.ERROR)
+logging.getLogger("root").setLevel(logging.CRITICAL)
+#--------------------------------------------- Other
 import uvicorn
-from myLib.logic_global import config, load_forex_api
+from myLib.logic_global import config, load_forex_api, listen_close
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from webapi import *
