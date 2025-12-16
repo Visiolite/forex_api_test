@@ -14,37 +14,35 @@ from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
 from myLib.forex import Forex
 from myModel.model_live_order import model_live_order_db
+from myModel.model_live_execute import model_live_execute_db
 
 #--------------------------------------------------------------------------------- Action
 class ST_02:
     #--------------------------------------------- init
     def __init__(
             self,
-            forex:Forex=None,
+            execute_id=None,
             params=None,
+            forex:Forex=None,
             data_orm:Data_Orm=None, 
             data_sql:Data_SQL=None,
             log:Log=None
         ):
         #-------------- Variable
         self.this_class = self.__class__.__name__
-        self.id = 2
+        self.execute_id = execute_id
+        self.params = params
         self.forex = forex
         #-------------- Instance
         self.log = log if log else log_instance
         self.data_orm = data_orm if data_orm else data_instance["management_orm"]
         self.data_sql = data_sql if data_sql else data_instance["management_sql"]
-        #-------------- Params
-        self.symbol = params["symbol"]
-        self.action = params["action"]
-        self.amount = int(params["amount"])
-        self.tp_pips = int(params["tp_pips"])
-        self.st_pips = int(params["st_pips"])
-
+        self.data_sql_data = data_sql if data_sql else data_instance["data_sql"]
+        
     #--------------------------------------------- start
-    def start(self, execute_id:int):
+    def start(self):
         #-------------- Description
-        # IN     : order_id
+        # IN     : 
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -57,14 +55,34 @@ class ST_02:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
+        #-------------- Variable
+        execute_id = self.execute_id
+        params = self.params
         
         try:
-            #--------------Action
-            result:model_output = self.forex.trade_open(action=self.action, symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, execute_id=execute_id)
+            #--------------Data
+            action = params["action"]
+            symbol = params["symbol"]
+            amount = params["amount"]
+            tp_pips = params["tp_pips"]
+            sl_pips = params["st_pips"]
+            #--------------Forex
+            result:model_output = self.forex.order_open(
+                action=action, 
+                symbol=symbol,
+                amount=amount,
+                tp_pips=tp_pips,
+                sl_pips=sl_pips,
+                execute_id=execute_id
+            )
+            #--------------Database
+            if result.status:
+                cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id={execute_id}"
+                self.data_sql.db.execute(cmd=cmd)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = None
-            output.message = {self.action: result.status}
+            output.data = execute_id
+            output.message = execute_id
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -78,10 +96,10 @@ class ST_02:
         #--------------Return
         return output
 
-    #--------------------------------------------- end
-    def end(self, execute_id:int):
+    #--------------------------------------------- stop
+    def stop(self):
         #-------------- Description
-        # IN     : order_id
+        # IN     :
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -94,28 +112,23 @@ class ST_02:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        #--------------Variable
+        #-------------- Variable
+        execute_id = self.execute_id
         order_ids = []
 
         try:
-            #--------------Data
-            orders:list[model_live_order_db] = self.data_orm.items(model=model_live_order_db, execute_id=execute_id, status='open').data
-            for order in orders:
-                order_ids.append(order.order_id)
+            #--------------Database
+            cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id='{execute_id}';"
+            self.data_sql.db.execute(cmd=cmd)
             #--------------Action
-            result:model_output = self.forex.order_close_all(order_ids=order_ids)
-            #--------------Update
-            if result.status:
-                for order in orders:
-                    order.status = 'close'
-                    self.data_orm.update(model=model_live_order_db, item=order)
+            orders:model_output = self.data_orm.items(model=model_live_order_db, execute_id=execute_id, status='open')
+            if orders.status:
+                for order in orders.data : order_ids.append(order.order_id)
+                if len(order_ids)>0 : self.forex.order_close(order_ids=order_ids)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = None
-            output.message = {
-                "Orders": len(order_ids),
-                "Close": result.message["Close"]
-            }
+            output.data = execute_id
+            output.message = execute_id
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -130,9 +143,9 @@ class ST_02:
         return output
     
     #--------------------------------------------- order_close
-    def order_close(self, order_detail):
+    def order_close(self, order_detaile):
         #-------------- Description
-        # IN     : order_id
+        # IN     : execute_id
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -145,14 +158,38 @@ class ST_02:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-
+        #-------------- Variable
+        execute_id = self.execute_id
+        params = self.params
+        
         try:
-            #--------------Action
-            pass
+            #--------------Data
+            action = params["action"]
+            symbol = params["symbol"]
+            amount = params["amount"]
+            tp_pips = params["tp_pips"]
+            sl_pips = params["st_pips"]
+            #--------------Check
+            if order_detaile["profit"] < 0 :
+                if action == "buy" : action = "sell"
+                if action == "sell" : action = "buy"
+            #--------------Forex
+            result:model_output = self.forex.order_open(
+                action=action, 
+                symbol=symbol,
+                amount=amount,
+                tp_pips=tp_pips,
+                sl_pips=sl_pips,
+                execute_id=execute_id
+            )
+            #--------------Database
+            if result.status:
+                cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id={execute_id};"
+                self.data_sql.db.execute(cmd=cmd)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = order_detail
-            output.message = None
+            output.data = execute_id
+            output.message = execute_id
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -169,7 +206,7 @@ class ST_02:
     #--------------------------------------------- price_change
     def price_change(self, order_detail):
         #-------------- Description
-        # IN     : order_id
+        # IN     : execute_id
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -182,14 +219,37 @@ class ST_02:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-
+        #-------------- Variable
+        execute_id = self.execute_id
+        params = self.params
+        order_detaile = order_detaile.data
+        
         try:
-            #--------------Action
-            pass
+            #--------------Data
+            action = params["action"]
+            symbol = params["symbol"]
+            amount = params["amount"]
+            tp_pips = params["tp_pips"]
+            sl_pips = params["st_pips"]
+            #--------------Check
+            action = "sell" if order_detaile["action"] == "buy" else "buy"
+            #--------------Forex
+            result:model_output = self.forex.order_open(
+                action=action, 
+                symbol=symbol,
+                amount=amount,
+                tp_pips=tp_pips,
+                sl_pips=sl_pips,
+                execute_id=execute_id
+            )
+            #--------------Database
+            if result.status:
+                cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id={execute_id};"
+                database:model_output = self.data_sql.db.execute(cmd=cmd)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = order_detail
-            output.message = None
+            output.data = execute_id
+            output.message = f"{execute_id} | {result.status} | {database.status} | {action} | {symbol} | {amount} | {tp_pips} | {sl_pips}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

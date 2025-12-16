@@ -13,8 +13,8 @@ from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
 from myLib.forex import Forex
-from myModel.model_live_execute import model_live_execute_db
 from myModel.model_live_order import model_live_order_db
+from myModel.model_live_execute import model_live_execute_db
 
 #--------------------------------------------------------------------------------- Action
 class ST_01:
@@ -170,7 +170,8 @@ class ST_01:
             tp_pips = params["tp_pips"]
             sl_pips = params["st_pips"]
             #--------------Check
-            action = "sell" if order_detaile["action"] == "buy" else "buy"
+            if order_detaile["profit"] < 0 :
+                action = "sell" if action == "buy" else "buy"
             #--------------Forex
             result:model_output = self.forex.order_open(
                 action=action, 

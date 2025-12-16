@@ -295,8 +295,8 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name='buy', strategy_id=1, params="{'symbol':'EUR/USD','action':'buy','amount':10000,'tp_pips':10,'st_pips':10}", description="Start buy"))
-                self.data_orm.add(model=model, item=model(name='sell', strategy_id=1, params="{'symbol':'EUR/USD','action':'sell','amount':10000,'tp_pips':10,'st_pips':10}", description="Start sell"))
+                self.data_orm.add(model=model, item=model(name='TK/TP', strategy_id=1, params="{'symbol':'EUR/USD','action':'buy','amount':10000,'tp_pips':1,'st_pips':1}", description="Start buy"))
+                self.data_orm.add(model=model, item=model(name='TK', strategy_id=1, params="{'symbol':'EUR/USD','action':'buy','amount':10000,'tp_pips':1,'st_pips':1000}", description="Start sell"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -341,8 +341,8 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="test-1", strategy_item_id=1, account_id=1))
-                self.data_orm.add(model=model, item=model(name="test-1", strategy_item_id=2, account_id=1))
+                self.data_orm.add(model=model, item=model(name="test-TK-SL", strategy_item_id=1, account_id=1))
+                self.data_orm.add(model=model, item=model(name="test-TK", strategy_item_id=2, account_id=1))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
