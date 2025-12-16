@@ -235,7 +235,7 @@ class Forex:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
-       
+    
     #--------------------------------------------- instruments
     def instruments(self):
         #-------------- Description
@@ -616,7 +616,7 @@ class Forex:
                         self.fx.send_request(request)
                         close_order_ids.append(order_id)
             #--------------Complete
-            time.sleep(1)
+            time.sleep(3)
             result_complete = self.order_close_complete(order_ids=close_order_ids)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)

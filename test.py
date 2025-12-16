@@ -5,15 +5,30 @@
 # test
 
 #--------------------------------------------------------------------------------- Import
-from myLib.logic_global import load_forex_api, load_data
+from myLib.logic_global import load_forex_api
 from myLib.logic_management import Logic_Management
+from myLib.forex import Forex
+from forexconnect import ForexConnect, fxcorepy
+load_forex_api()
+from myLib.logic_global import forex_apis
 
 #--------------------------------------------------------------------------------- Action  : Order cloese
-load_forex_api()
-lm = Logic_Management()
-order_id = '1826677525'
-lm.order_close(order_id=order_id)
-order_detail = lm.order_detaile(order_id='1826677525').data
-strategy = lm.get_strategy(order_detail=order_detail).data
-result = strategy.order_close(order_detail=order_detail)
+def run() :
+    command = fxcorepy.Constants.Commands.CREATE_ORDER
+    order_type = fxcorepy.Constants.Orders.TRUE_MARKET_OPEN
+
+    fx = forex_apis[1]
+    request = fx.fx.create_order_request(
+        ACCOUNT_ID=fx.id,
+        command=command, 
+        order_type=order_type,
+        BUY_SELL= "B",
+        SYMBOL = "EUR/USD",
+        AMOUNT= 1000
+    )
+    response = fx.fx.send_request_async(request)
+    order_id = getattr(response, "order_id", None) if response else None
+    print(order_id)
+
+run()
 

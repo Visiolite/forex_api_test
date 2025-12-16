@@ -5,7 +5,7 @@
 # logic_management
 
 #--------------------------------------------------------------------------------- Import
-import inspect, time, ast
+import inspect, time, ast, threading
 from myLib.model import model_output
 from myLib.logic_global import debug, log_instance, data_instance, forex_apis
 from myLib.utils import sort
@@ -331,10 +331,14 @@ class Logic_Management:
             account_id = execute_detaile.get("account_id")
             strategy = self.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id,execute_id=execute_id).data
             #--------------Action
-            if action == "start" : output:model_output = strategy.start()
-            if action == "stop" : output:model_output = strategy.stop()
-            if action == "order_close" : output:model_output = strategy.order_close(order_detaile=order_detaile)
-            if action == "price_change" : output:model_output = strategy.price_change(order_detaile=order_detaile)
+            def run_order():
+                if action == "start" : strategy.start()
+                if action == "stop" : strategy.stop()
+                if action == "order_close" : strategy.order_close(order_detaile=order_detaile)
+                if action == "price_change" : strategy.price_change(order_detaile=order_detaile)
+            thread = threading.Thread(target=run_order)
+            thread.start()
+            thread.join()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
