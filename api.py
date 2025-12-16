@@ -6,17 +6,19 @@
 
 
 #--------------------------------------------------------------------------------- Import
-#--------------------------------------------- Warnings
-import logging, warnings
-warnings.filterwarnings("ignore")
-logging.getLogger().setLevel(logging.ERROR)
-logging.getLogger("root").setLevel(logging.CRITICAL)
+# #--------------------------------------------- Warnings
+# import logging, warnings
+# warnings.filterwarnings("ignore")
+# logging.getLogger().setLevel(logging.ERROR)
+# logging.getLogger("root").setLevel(logging.CRITICAL)
 #--------------------------------------------- Other
 import uvicorn
-from myLib.logic_global import config, load_forex_api, listen_close
+import threading
+from myLib.logic_global import config, load_forex_api, list_close
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from webapi import *
+from listen_close import Listen_Close
 
 #--------------------------------------------------------------------------------- Variable
 title = config.get("api", {}).get("title", {})
@@ -28,6 +30,7 @@ redoc_url = config.get("api", {}).get("redoc_url", {})
 key = config.get("api", {}).get("key", {})
 host = config.get("api", {}).get("host", {})
 port = config.get("api", {}).get("port", {})
+load_forex_api()
 
 #--------------------------------------------------------------------------------- App
 app = FastAPI(
@@ -45,8 +48,27 @@ app.add_middleware(
     allow_credentials=True, 
     allow_methods=["*"], 
     allow_headers=["*"]
-) 
+)
 
+#--------------------------------------------------------------------------------- Listen_Close
+listener_close = None
+listener_thread = None
+
+@app.on_event("startup")
+async def startup_event():
+    global listener_close, listener_thread
+    from myLib.logic_global import forex_apis
+    
+    listener_close = Listen_Close(forex_api=forex_apis[1], items=list_close)
+    listener_thread = threading.Thread(target=listener_close.start, daemon=True)
+    listener_thread.start()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    global listener_close
+    if listener_close:
+        listener_close.stop()
+        
 #--------------------------------------------------------------------------------- Route
 routes = [
     (account, "/account", ["Account"]),
@@ -58,8 +80,6 @@ routes = [
 ]
 for router, prefix, tags in routes : app.include_router(router, prefix=prefix, tags=tags)
 
-#--------------------------------------------------------------------------------- Forex
-load_forex_api()
-
 #--------------------------------------------------------------------------------- Run
-if __name__ == "__main__" : uvicorn.run(app, host=host, port=port)
+if __name__ == "__main__" : 
+    uvicorn.run(app, host=host, port=port)

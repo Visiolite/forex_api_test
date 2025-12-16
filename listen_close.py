@@ -1,19 +1,15 @@
 #--------------------------------------------------------------------------------- Location
-# listen_close.py
+# mylib/listen_close.py
 
 #--------------------------------------------------------------------------------- Description
 # listen_close
 
 #--------------------------------------------------------------------------------- Import
 #--------------------------------------------- Forex
+import datetime, time
 from forexconnect import ForexConnect, fxcorepy
 from forexconnect.TableListener import TableListener
 import forexconnect.lib
-import datetime
-import time
-from myLib.logic_global import config, load_forex_api, list_close
-load_forex_api()
-from myLib.logic_global import forex_apis
 
 #--------------------------------------------------------------------------------- Listen_Close
 class Listen_Close:
@@ -46,7 +42,7 @@ class Listen_Close:
             print("Listener is already running.")
             return
             
-        print("Initializing listener...")
+        print("Listen_Close : Starting")
         self.listener = self.CloseTradesListener(self)
         table_manager = self.forex_api.fx.table_manager
         
@@ -59,7 +55,7 @@ class Listen_Close:
         self.close_table.subscribe_update(fxcorepy.O2GTableUpdateType.INSERT, self.listener)
         self.is_running = True
         
-        print("Listening for trade close events... Press Ctrl+C to stop.")
+        print("Listen_Close : Started")
         try:
             while True:
                 time.sleep(1)
@@ -75,8 +71,3 @@ class Listen_Close:
             self.forex_api.logout()
         self.is_running = False
         print("Listener stopped.")
-
-#--------------------------------------------------------------------------------- Main
-if __name__ == "__main__":
-    listener_close = Listen_Close(forex_api=forex_apis[1], items=list_close)
-    listener_close.start()
