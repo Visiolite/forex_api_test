@@ -242,10 +242,10 @@ config_python()
     pyenv local 3.7
     python -m venv .env
     .env/bin/python -m pip install --upgrade pip
-    source .env/bin/activate
+    . .env/bin/activate
     pip install -r requirements.txt
     pip list
-    source $path/.env/bin/activate
+    . $path/.env/bin/activate
 }
 #-----------------------------config_implementation
 config_implementation()
