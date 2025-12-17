@@ -70,15 +70,15 @@ monitor()
     nginx_api_key=$(yq '.nginx.api.key' "$config_file" | tr -d '"')
     nginx_gui_port=$(yq '.nginx.gui.port' "$config_file" | tr -d '"')
     nginx_gui_key=$(yq '.nginx.gui.key' "$config_file" | tr -d '"')
-    wifiip=$(ip -4 addr show wlan0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+    ipaddress=$(hostname -I | awk '{print $1}')
     #----------Action
-    echo -e "${BLUE}Webapi${ENDCOLOR}"
+    echo -e "${color_verbose}Webapi${ENDCOLOR}"
     echo -e "${ENDCOLOR}http://${webapi_host}:${webapi_port}${ENDCOLOR}"
     echo -e "${ENDCOLOR}http://${webapi_host}:${webapi_port}/doc1${ENDCOLOR}"
-    echo -e "${BLUE}Nginx API${ENDCOLOR}"
-    echo -e "${ENDCOLOR}http://${wifiip}:${nginx_api_port}/${nginx_api_key}/doc1${ENDCOLOR}"
-    echo -e "${BLUE}Nginx GUI${ENDCOLOR}"
-    echo -e "${ENDCOLOR}http://${wifiip}:${nginx_gui_port}/${nginx_gui_key}${ENDCOLOR}"
+    echo -e "${color_verbose}Nginx API${ENDCOLOR}"
+    echo -e "${ENDCOLOR}http://${ipaddress}:${nginx_api_port}/${nginx_api_key}/doc1${ENDCOLOR}"
+    echo -e "${color_verbose}Nginx GUI${ENDCOLOR}"
+    echo -e "${ENDCOLOR}http://${ipaddress}:${nginx_gui_port}/${nginx_gui_key}${ENDCOLOR}"
 }
 #-----------------------------all
 all()
@@ -113,7 +113,7 @@ config_general()
     #----------Data
     timeZone=$(yq '.general.time_zone' "$config_file" | tr -d '"')
     #----------Verbose
-    echo -e "${BLUE}sudo timedatectl set-timezone $timeZone${ENDCOLOR}"
+    echo -e "${color_verbose}sudo timedatectl set-timezone $timeZone${ENDCOLOR}"
     #----------Action
     sudo timedatectl set-timezone $timeZone
 }
@@ -373,14 +373,14 @@ install_iptables()
     echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
     #----------Action
     #---unistall ufw
-    echo -e "${BLUE}unistall ufw${ENDCOLOR}"
+    echo -e "${color_verbose}unistall ufw${ENDCOLOR}"
     apt remove ufw -y
     apt purge ufw  -y
     #---install iptables
-    echo -e "${BLUE}install iptables${ENDCOLOR}"
+    echo -e "${color_verbose}install iptables${ENDCOLOR}"
     sudo apt install iptables iptables-persistent -y
     #---configure iptables
-    echo -e "${BLUE}configure iptables${ENDCOLOR}"
+    echo -e "${color_verbose}configure iptables${ENDCOLOR}"
     sudo iptables -F 
     sudo iptables -X
     sudo iptables -P OUTPUT ACCEPT
@@ -412,7 +412,7 @@ install_iptables()
     sudo iptables -A INPUT -p tcp --dport 1101 -j ACCEPT
     sudo iptables -A INPUT -p tcp --dport 1102 -j ACCEPT
     #---save iptables config
-    echo -e "${BLUE}save iptables config${ENDCOLOR}"
+    echo -e "${color_verbose}save iptables config${ENDCOLOR}"
     sudo iptables-save | uniq > /etc/iptables/rules.v4
     #---restart iptables
     systemctl restart iptables
@@ -456,28 +456,28 @@ service_control_all()
         stop)
             echo -e "${YELLOW}service_stop_all\n$LINE3${ENDCOLOR}"
             for service in "${SERVICES[@]}"; do
-                echo -e "${BLUE}$service${ENDCOLOR}"
+                echo -e "${color_verbose}$service${ENDCOLOR}"
                 systemctl stop $service
             done
         ;;
         restart)
             echo -e "${YELLOW}service_restart_all\n$LINE3${ENDCOLOR}"
             for service in "${SERVICES[@]}"; do
-                echo -e "${BLUE}$service${ENDCOLOR}"
+                echo -e "${color_verbose}$service${ENDCOLOR}"
                 systemctl restart $service
             done
         ;;
         disable)
             echo -e "${YELLOW}service_disable_all\n$LINE3${ENDCOLOR}"
             for service in "${SERVICES[@]}"; do
-                echo -e "${BLUE}$service${ENDCOLOR}"
+                echo -e "${color_verbose}$service${ENDCOLOR}"
                 systemctl disable $service
             done
         ;;
         enable)
             echo -e "${YELLOW}service_enable_all\n$LINE3${ENDCOLOR}"
             for service in "${SERVICES[@]}"; do
-                echo -e "${BLUE}$service${ENDCOLOR}"
+                echo -e "${color_verbose}$service${ENDCOLOR}"
                 systemctl enable $service
             done
         ;;
