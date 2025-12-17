@@ -205,11 +205,33 @@ install_python()
     echo -e "${verbose_color}apt install python3 -y${ENDCOLOR}"
     echo -e "${verbose_color}apt install python3-pip -y${ENDCOLOR}"
     echo -e "${verbose_color}apt install python3-venv -y${ENDCOLOR}"
+    #----------Verbose
+    echo -e "${verbose_color}apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev git${ENDCOLOR}"
+    echo -e "${verbose_color}curl https://pyenv.run | bash${ENDCOLOR}"
+    echo -e "${verbose_color}export PYENV_ROOT=\"\$HOME/.pyenv\"${ENDCOLOR}"
+    echo -e "${verbose_color}export PATH=\"\$PYENV_ROOT/bin:\$PATH\"${ENDCOLOR}"
+    echo -e "${verbose_color}eval \"\$(pyenv init -)\"${ENDCOLOR}"
+    echo -e "${verbose_color}eval \"\$(pyenv virtualenv-init -)\"${ENDCOLOR}"
+    echo -e "${verbose_color}source ~/.bashrc${ENDCOLOR}"
+    echo -e "${verbose_color}pyenv install 3.7${ENDCOLOR}"
+    echo -e "${verbose_color}pyenv local 3.7${ENDCOLOR}"
     #----------Action
-    add-apt-repository ppa:deadsnakes/ppa -y
-    apt install python3 -y
-    apt install python3-pip -y
-    apt install python3-venv -y
+    # Install dependencies
+    sudo apt install -y make build-essential libssl-dev zlib1g-dev \
+    libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+    libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev \
+    libffi-dev liblzma-dev git
+    # Install pyenv
+    curl https://pyenv.run | bash
+    # Add pyenv to bashrc
+    echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+    echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+    echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+    echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+    # Reload bashrc and install Python
+    source ~/.bashrc
+    pyenv install 3.7
+    pyenv local 3.7
 }
 #-----------------------------install_nginx  : Shell
 install_nginx()
