@@ -306,11 +306,6 @@ install_python()
     #----------Header
     echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
     #----------Verbose
-    echo -e "${verbose_color}add-apt-repository ppa:deadsnakes/ppa -y${ENDCOLOR}"
-    echo -e "${verbose_color}apt install python3 -y${ENDCOLOR}"
-    echo -e "${verbose_color}apt install python3-pip -y${ENDCOLOR}"
-    echo -e "${verbose_color}apt install python3-venv -y${ENDCOLOR}"
-    #----------Verbose
     echo -e "${verbose_color}sudo apt update -y${ENDCOLOR}"
     echo -e "${verbose_color}sudo apt install software-properties-common -y${ENDCOLOR}"
     echo -e "${verbose_color}sudo add-apt-repository ppa:deadsnakes/ppa -y${ENDCOLOR}"
