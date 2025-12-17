@@ -552,6 +552,7 @@ service_create_nginx_create_api()
     api_port=$webapi_port
     
     echo """server {
+    listen $port;
     server_name _;
 
         location /$key {
