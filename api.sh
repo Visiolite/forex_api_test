@@ -281,7 +281,7 @@ install_postgres()
     systemctl start postgresql
     systemctl restart postgresql
 }
-#-----------------------------install_iptables  : Shell
+#-----------------------------install_iptables
 install_iptables()
 {
     #----------Header

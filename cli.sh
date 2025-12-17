@@ -280,17 +280,13 @@ menu_backup()
 #---------------------------------------------------------------------------------api_interface
 api_interface()
 {
-    if [  "$1" == "install_nats_from_github" ]; then install_nats_from_githubfv; fi
-    if [  "$1" == "webapi_cron_min" ]; then webapi_cron_min; fi
-    if [  "$1" == "all" ]; then all; fi
-    if [  "$1" == "config_all" ]; then config_all; fi
-    if [  "$1" == "install_all" ]; then install_all; fi
-    if [  "$1" == "service_create_all" ]; then service_create_all; fi
-    if [  "$1" == "install_gui" ]; then install_gui; fi
-    if [  "$1" == "service_start_app_enable" ]; then service_start_app_enable; fi
-    if [  "$1" == "service_hotspod_enable" ]; then service_hotspod_enable; fi
-    if [  "$1" == "install_flutter" ]; then install_flutter; fi
-    if [  "$1" == "service_startup" ]; then service_startup; fi
+    # Call any function from api.sh with all arguments passed through
+    if declare -f "$1" > /dev/null 2>&1; then
+        "$@"
+    else
+        echo "Error: Function '$1' not found"
+        exit 1
+    fi
 }
 
 #---------------------------------------------------------------------------------Actions
