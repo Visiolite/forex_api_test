@@ -105,7 +105,7 @@ config_all()
     config_python
     config_implementation
 }
-#-----------------------------config_general  : Shell
+#-----------------------------config_general
 config_general()
 {
     #----------Header
@@ -117,13 +117,13 @@ config_general()
     #----------Action
     sudo timedatectl set-timezone $timeZone
 }
-#-----------------------------config_network  : Shell
+#-----------------------------config_network
 config_network()
 {
     #----------Header
     echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
 }
-#-----------------------------config_git  : Shell
+#-----------------------------config_git
 config_git()
 {
     #----------Header

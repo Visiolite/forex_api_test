@@ -59,22 +59,18 @@ menu_main()
     clear
     while true; do
         getHeader
-        echo -e  ${YELLOW}"1)  ${GREEN}All" ${ENDCOLOR}
-        echo -e  ${YELLOW}"2)  ${GREEN}Install" ${ENDCOLOR}
-        echo -e  ${YELLOW}"3)  ${GREEN}Service" ${ENDCOLOR}
-        echo -e  ${YELLOW}"4)  ${GREEN}Cron"    ${ENDCOLOR}
-        echo -e  ${YELLOW}"5)  ${GREEN}Backup"  ${ENDCOLOR}
-        echo -e  ${YELLOW}"6)  ${GREEN}Monitor" ${ENDCOLOR}
-        echo -e "${YELLOW}${LINE2}${ENDCOLOR}"
-        echo -e  ${YELLOW}"q)  ${GREEN}Exit"    ${ENDCOLOR}
-        read -p "Enter your choice [1-6]: " choice
+        echo -e  ${YELLOW}"1)  ${GREEN}All"          ${ENDCOLOR}
+        echo -e  ${YELLOW}"2)  ${GREEN}Menu Install" ${ENDCOLOR}
+        echo -e  ${YELLOW}"3)  ${GREEN}Menu Config"  ${ENDCOLOR}
+        echo -e  ${YELLOW}"4)  ${GREEN}Menu Service" ${ENDCOLOR}
+        echo -e "${YELLOW}${LINE2}                   ${ENDCOLOR}"
+        echo -e  ${YELLOW}"q)  ${GREEN}Exit"         ${ENDCOLOR}
+        read -p "Enter your choice [1-4]: " choice
         case $choice in
             1)  clear && all;;
             2)  clear && menu_install;;
-            3)  clear && menu_service;;
-            4)  clear && menu_cron;;
-            5)  clear && menu_backup;;
-            6)  clear && monitor;;
+            3)  clear && menu_config;;
+            4)  clear && menu_service;;
             q)  clear && exit;;
             *)  exit;;
         esac
@@ -82,7 +78,7 @@ menu_main()
     done
 }
 
-#--------------------menu_install : 1
+#--------------------menu_install
 menu_install()
 {
     clear
@@ -92,20 +88,22 @@ menu_install()
         echo -e  ${YELLOW}"1)  ${GREEN}All"      ${ENDCOLOR}
         echo -e  ${YELLOW}"2)  ${GREEN}Update"   ${ENDCOLOR}
         echo -e  ${YELLOW}"3)  ${GREEN}Upgrade"  ${ENDCOLOR}
-        echo -e  ${YELLOW}"4)  ${GREEN}Genaral"  ${ENDCOLOR}
-        echo -e  ${YELLOW}"5)  ${GREEN}Nginx"    ${ENDCOLOR}
-        echo -e  ${YELLOW}"6)  ${GREEN}Iptables" ${ENDCOLOR}
-        echo -e  ${YELLOW}"6)  ${GREEN}Postgres" ${ENDCOLOR}
+        echo -e  ${YELLOW}"4)  ${GREEN}Iptables" ${ENDCOLOR}
+        echo -e  ${YELLOW}"5)  ${GREEN}Genaral"  ${ENDCOLOR}
+        echo -e  ${YELLOW}"6)  ${GREEN}Nginx"    ${ENDCOLOR}
+        echo -e  ${YELLOW}"7)  ${GREEN}Postgres" ${ENDCOLOR}
+        echo -e  ${YELLOW}"8)  ${GREEN}Python"   ${ENDCOLOR}
         echo -e  ${YELLOW}${LINE2}               ${ENDCOLOR}
-        read -p "Enter your choice [0-7]: " choice
+        read -p "Enter your choice [0-8]: " choice
         case $choice in    
             1)  clear && install_all;;
             2)  clear && install_update;;
             3)  clear && install_upgrade;;
-            4)  clear && install_general;;
-            5)  clear && install_nginx;;
-            6)  clear && install_iptables;;
+            4)  clear && install_iptables;;
+            5)  clear && install_general;;
+            6)  clear && install_nginx;;
             7)  clear && install_postgres;;
+            8)  clear && install_python;;
             q)  clear && menu_main;;
             *)  menu_main;;
         esac
@@ -113,7 +111,38 @@ menu_install()
     done
 }
 
-#--------------------menu_service : 2
+#--------------------menu_config
+menu_config()
+{
+    clear
+    while true; do
+        getHeader
+        echo -e  ${YELLOW}${LINE2}Config          ${ENDCOLOR}
+        echo -e  ${YELLOW}"1)  ${GREEN}All"       ${ENDCOLOR}
+        echo -e  ${YELLOW}"2)  ${GREEN}General"   ${ENDCOLOR}
+        echo -e  ${YELLOW}"3)  ${GREEN}Network"   ${ENDCOLOR}
+        echo -e  ${YELLOW}"4)  ${GREEN}Git"       ${ENDCOLOR}
+        echo -e  ${YELLOW}"5)  ${GREEN}Postgres"  ${ENDCOLOR}
+        echo -e  ${YELLOW}"6)  ${GREEN}Python"    ${ENDCOLOR}
+        echo -e  ${YELLOW}"7)  ${GREEN}Implement" ${ENDCOLOR}
+        echo -e  ${YELLOW}${LINE2}                ${ENDCOLOR}
+        read -p "Enter your choice [0-7]: " choice
+        case $choice in    
+            1)  clear && config_all;;
+            2)  clear && config_general;;
+            3)  clear && config_network;;
+            4)  clear && config_git;;
+            5)  clear && config_postgres;;
+            6)  clear && config_python;;
+            7)  clear && config_implementation;;
+            q)  clear && menu_main;;
+            *)  menu_main;;
+        esac
+        echo -e "\n"
+    done
+}
+
+#--------------------menu_service
 menu_service()
 {
     clear
@@ -147,31 +176,6 @@ menu_service()
         echo -e  ${YELLOW}"22) ${GREEN}Enable"       ${ENDCOLOR}
         echo -e  ${YELLOW}"23) ${GREEN}Disable"      ${ENDCOLOR}
         echo -e  ${YELLOW}"24) ${GREEN}Monitor"      ${ENDCOLOR}
-        echo -e  ${BLUE}"${LINE1}Cron min"           ${ENDCOLOR}
-        echo -e  ${YELLOW}"25) ${GREEN}Create"       ${ENDCOLOR}
-        echo -e  ${YELLOW}"26) ${GREEN}Status"       ${ENDCOLOR}
-        echo -e  ${YELLOW}"27) ${GREEN}Stop"         ${ENDCOLOR}
-        echo -e  ${YELLOW}"28) ${GREEN}Start"        ${ENDCOLOR}
-        echo -e  ${YELLOW}"29) ${GREEN}Restart"      ${ENDCOLOR}
-        echo -e  ${YELLOW}"30) ${GREEN}Enable"       ${ENDCOLOR}
-        echo -e  ${YELLOW}"31) ${GREEN}Disable"      ${ENDCOLOR}
-        echo -e  ${YELLOW}"32) ${GREEN}Monitor"      ${ENDCOLOR}
-        echo -e  ${BLUE}"${LINE1}nats-server"        ${ENDCOLOR}
-        echo -e  ${YELLOW}"33) ${GREEN}Create"       ${ENDCOLOR}
-        echo -e  ${YELLOW}"34) ${GREEN}Status"       ${ENDCOLOR}
-        echo -e  ${YELLOW}"35) ${GREEN}Stop"         ${ENDCOLOR}
-        echo -e  ${YELLOW}"36) ${GREEN}Start"        ${ENDCOLOR}
-        echo -e  ${YELLOW}"37) ${GREEN}Restart"      ${ENDCOLOR}
-        echo -e  ${YELLOW}"38) ${GREEN}Enable"       ${ENDCOLOR}
-        echo -e  ${YELLOW}"39) ${GREEN}Disable"      ${ENDCOLOR}
-        echo -e  ${YELLOW}"40) ${GREEN}Monitor"      ${ENDCOLOR}
-        echo -e  ${BLUE}"${LINE1}Other"              ${ENDCOLOR}
-        echo -e  ${YELLOW}"41) ${GREEN}SApp ON"      ${ENDCOLOR}
-        echo -e  ${YELLOW}"42) ${GREEN}SApp OFF"     ${ENDCOLOR}
-        echo -e  ${YELLOW}"43) ${GREEN}Hotspod ON"   ${ENDCOLOR}
-        echo -e  ${YELLOW}"44) ${GREEN}Hotspod OFF"  ${ENDCOLOR}
-        echo -e  ${YELLOW}"45) ${GREEN}Wifi Connect" ${ENDCOLOR}
-        echo -e  ${YELLOW}${LINE2}                   ${ENDCOLOR}
         read -p "Enter your choice [1-45]: " choice
         case $choice in
             #--------------------------All
@@ -201,30 +205,6 @@ menu_service()
             22) clear && systemctl enable nginx;;
             23) clear && systemctl disable nginx;;
             24) clear && journalctl -n 100 -u nginx -f;;
-            #--------------------------Cron
-            25) clear && service_cron_min ;;
-            26) clear && systemctl status $name"_"service_cron_min.service;;
-            27) clear && systemctl stop $name"_"service_cron_min.timer && systemctl stop $name"_"service_cron_min.service;;
-            28) clear && systemctl start $name"_"service_cron_min.timer && systemctl start $name"_"service_cron_min.service;;
-            29) clear && systemctl restart $name"_"service_cron_min.timer && systemctl restart $name"_"service_cron_min.service;;
-            30) clear && systemctl enable $name"_"service_cron_min.service;;
-            31) clear && systemctl disable $name"_"service_cron_min.service;;
-            32) clear && journalctl -n 100 -u $name"_"service_cron_min.service -f;;
-            #--------------------------Nats
-            33) clear && service_create_nats_server ;;
-            34) clear && systemctl status $name"_"nats_server.service;;
-            35) clear && systemctl stop $name"_"nats_server.service;;
-            36) clear && systemctl start $name"_"nats_server.service;;
-            37) clear && systemctl restart $name"_"nats_server.service;;
-            38) clear && systemctl enable $name"_"nats_server.service;;
-            39) clear && systemctl disable $name"_"nats_server.service;;
-            40) clear && journalctl -n 100 -u $name"_"nats_server.service -f;;
-            #--------------------------Other
-            41) clear && service_start_app_enable ;;
-            42) clear && service_start_app_disable ;;
-            43) clear && service_hotspod_enable ;;
-            44) clear && service_hotspod_disable ;;
-            45) clear && service_wifi_connect ;;
             q)  clear && menu_main;;
             *)  menu_main ;;
         esac
@@ -232,52 +212,6 @@ menu_service()
     done
 }
 
-#--------------------menu_cron : 3
-menu_cron()
-{
-    clear
-    while true; do
-        getHeader
-        echo -e  ${YELLOW}${LINE2}Cron        ${ENDCOLOR}
-        echo -e  ${YELLOW}"1) ${GREEN}Daily"  ${ENDCOLOR}
-        echo -e  ${YELLOW}"2) ${GREEN}Hourly" ${ENDCOLOR}
-        echo -e  ${YELLOW}"3) ${GREEN}Minly"  ${ENDCOLOR}
-        echo -e  ${YELLOW}"4) ${GREEN}Backup" ${ENDCOLOR}
-        echo -e  ${YELLOW}${LINE2}            ${ENDCOLOR}
-        read -p "Enter your choice [0-4]: " choice
-        case $choice in            
-            1) clear && cron_daily ;;
-            2) clear && cron_hourly ;;
-            3) clear && cron_minly ;;
-            4) clear && cron_backup ;;
-            q) clear && menu_main ;;
-            *) menu_main ;;
-        esac
-        echo -e "\n"
-    done
-}
-
-#--------------------menu_backup : 4
-menu_backup()
-{
-    clear
-    while true; do
-        getHeader
-        echo -e  ${YELLOW}${LINE2}Bckup${ENDCOLOR}
-        echo -e  ${YELLOW}"1)  ${GREEN}Backup"      ${ENDCOLOR}
-        echo -e  ${YELLOW}"2)  ${GREEN}Push github" ${ENDCOLOR}
-        echo -e  ${YELLOW}"3)  ${GREEN}Restore"     ${ENDCOLOR}
-        echo -e  ${YELLOW}${LINE2}                  ${ENDCOLOR}
-        read -p "Enter your choice [1-3]: " choice
-        case $choice in
-            1) clear && backup_database ;;
-            2) clear && github_push ;;
-            3) clear && restore_database ;;
-            *) menu_main ;;
-        esac
-        echo -e "\n"
-    done
-}
 
 #---------------------------------------------------------------------------------api_interface
 api_interface()
