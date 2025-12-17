@@ -253,9 +253,9 @@ config_implementation()
     #----------Header
     echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
     #----------Verbose
-    echo -e "${verbose_color}$path/.myenv3/bin/python  $path/implement.py${ENDCOLOR}"
+    echo -e "${verbose_color}$path/.env/bin/python  $path/implement.py${ENDCOLOR}"
     #----------Action
-    $path/.myenv3/bin/python  $path/implement.py
+    $path/.env/bin/python  $path/implement.py
 }
 
 #---------------------------------------------------------------------------------Install
