@@ -630,7 +630,7 @@ service_create_nginx_create_gui()
     server_name _;
 
         location /$key {
-            alias /var/www/$name"_"gui;
+            alias /var/www/$name"_"gui/;
             index index.html;
             try_files \$uri \$uri/ =404;
         }
@@ -641,7 +641,19 @@ service_create_nginx_create_gui()
     systemctl reload nginx
     systemctl restart nginx
 
-    
+
+# server {
+#     listen 8002;
+#     server_name _;
+
+#     location / {
+#         alias /var/www/forex_gui/;
+#         index index.html;
+#         try_files $uri $uri/ =404;
+#     }
+# }
+
+
 #     echo "server {
 #     listen $port;
 #     server_name _;
