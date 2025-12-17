@@ -22,15 +22,15 @@ from listen_close import Listen_Close
 from listen_close_execute import Listen_Close_Execute
 
 #--------------------------------------------------------------------------------- Variable
-title = config.get("api", {}).get("title", {})
-description = config.get("api", {}).get("description", {})
-version = config.get("api", {}).get("version", {})
-openapi_url = config.get("api", {}).get("openapi_url", {})
-docs_url = config.get("api", {}).get("docs_url", {})
-redoc_url = config.get("api", {}).get("redoc_url", {})
-key = config.get("api", {}).get("key", {})
-host = config.get("api", {}).get("host", {})
-port = config.get("api", {}).get("port", {})
+title = config.get("webapi", {}).get("title", {})
+description = config.get("webapi", {}).get("description", {})
+version = config.get("webapi", {}).get("version", {})
+openapi_url = config.get("webapi", {}).get("openapi_url", {})
+docs_url = config.get("webapi", {}).get("docs_url", {})
+redoc_url = config.get("webapi", {}).get("redoc_url", {})
+key = config.get("webapi", {}).get("key", {})
+host = config.get("webapi", {}).get("host", {})
+port = config.get("webapi", {}).get("port", {})
 load_forex_api()
 
 #--------------------------------------------------------------------------------- App
