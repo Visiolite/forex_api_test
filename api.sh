@@ -242,10 +242,9 @@ config_python()
     pyenv local 3.7
     python -m venv .env
     .env/bin/python -m pip install --upgrade pip
-    . .env/bin/activate
+    source "$path/.env/bin/activate"
     pip install -r requirements.txt
     pip list
-    source /root/forex_api/.env/bin/activate
 }
 #-----------------------------config_implementation
 config_implementation()
