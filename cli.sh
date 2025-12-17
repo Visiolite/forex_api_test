@@ -36,7 +36,7 @@ check_jq_yq()
         if [[ "$OSTYPE" == "darwin"* ]]; then
             brew install yq || { echo "Failed to install yq"; return 1; }
         else
-            apt update && apt install yq -y || { echo "Failed to install yq"; return 1; }
+            apt update && snap install yq || { echo "Failed to install yq"; return 1; }
         fi
     fi
     
@@ -280,13 +280,17 @@ menu_backup()
 #---------------------------------------------------------------------------------api_interface
 api_interface()
 {
-    # Call the function if it exists in api.sh
-    if declare -f "$1" > /dev/null 2>&1; then
-        "$@"
-    else
-        echo -e "${RED}Error: Function '$1' not found${ENDCOLOR}"
-        exit 1
-    fi
+    if [  "$1" == "install_nats_from_github" ]; then install_nats_from_githubfv; fi
+    if [  "$1" == "webapi_cron_min" ]; then webapi_cron_min; fi
+    if [  "$1" == "all" ]; then all; fi
+    if [  "$1" == "config_all" ]; then config_all; fi
+    if [  "$1" == "install_all" ]; then install_all; fi
+    if [  "$1" == "service_create_all" ]; then service_create_all; fi
+    if [  "$1" == "install_gui" ]; then install_gui; fi
+    if [  "$1" == "service_start_app_enable" ]; then service_start_app_enable; fi
+    if [  "$1" == "service_hotspod_enable" ]; then service_hotspod_enable; fi
+    if [  "$1" == "install_flutter" ]; then install_flutter; fi
+    if [  "$1" == "service_startup" ]; then service_startup; fi
 }
 
 #---------------------------------------------------------------------------------Actions
