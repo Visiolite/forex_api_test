@@ -550,8 +550,8 @@ service_create_nginx_create_api()
     key=$nginx_api_key
     api_host=$webapi_host
     api_port=$webapi_port
-    echo "server {
-    listen $port;
+    
+    echo """server {
     server_name _;
 
         location /$key {
@@ -568,7 +568,28 @@ service_create_nginx_create_api()
             proxy_read_timeout 60s;
             send_timeout 60s;
         }
-    }" > /etc/nginx/sites-available/$name"_"api.conf
+    }""" > /etc/nginx/sites-available/$name"_"api.conf
+
+
+    # echo "server {
+    # listen $port;
+    # server_name _;
+
+    #     location /$key {
+    #         proxy_pass http://$api_host:$api_port;
+    #         proxy_set_header Host \$host;
+    #         proxy_set_header X-Real-IP \$remote_addr;
+    #         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    #         proxy_set_header X-Forwarded-Proto \$scheme;
+
+    #         proxy_ssl_verify off;
+
+    #         proxy_connect_timeout 60s;
+    #         proxy_send_timeout 60s;
+    #         proxy_read_timeout 60s;
+    #         send_timeout 60s;
+    #     }
+    # }" > /etc/nginx/sites-available/$name"_"api.conf
     
     ln -s /etc/nginx/sites-available/$name"_"api.conf /etc/nginx/sites-enabled/
     nginx -t
@@ -618,7 +639,7 @@ service_create_nginx_create_gui()
     nginx -t
     systemctl reload nginx
     systemctl restart nginx
-    
+
     
 #     echo "server {
 #     listen $port;
