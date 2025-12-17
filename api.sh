@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 #---------------------------------------------------------------------------------Tools
 #-----------------------------check_os
@@ -239,11 +239,13 @@ config_python()
     echo -e "${verbose_color}pip install -r requirements.txt${ENDCOLOR}"
     echo -e "${verbose_color}pip list${ENDCOLOR}"
     #----------Action
-    #pyenv local 3.7
+    pyenv local 3.7
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+    pip list
     #python -m venv .env
     #.env/bin/python -m pip install --upgrade pip
-    . /root/forex_api/.env/bin/activate
-    source /root/forex_api/.env/bin/activate
+    #source $path/.env/bin/activate
     #pip install -r requirements.txt
     #pip list
 }
