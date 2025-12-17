@@ -610,7 +610,7 @@ service_create_nginx_create_gui()
     index index.html;
 
     location /$key {
-        try_files $uri $uri/ =404;
+        try_files \$uri \$uri/ =404;
     }
 }
 "> /etc/nginx/sites-available/$name"_"gui.conf
