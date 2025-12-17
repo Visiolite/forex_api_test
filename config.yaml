@@ -1,12 +1,27 @@
 #--------------------------------------------------------------------------------- General
 general:
-  name: forex_download
+  #---Info
+  name: forex
+  time_zone: UTC
+  path_api: /root/forex_api
+  path_gui: /root/forex_gui
+  #---Debug
+  debug: false
+  log: false
+  verbose: false
+  #---Database
   database_management: management
   database_data: data
   database_log: log
 
+#--------------------------------------------------------------------------------- Git
+git:
+  name: morteza
+  email: kashani.morteza@gmail.com
+
 #--------------------------------------------------------------------------------- Database
 database:
+  #---Data
   data:
     server: postgresql
     host: 127.0.0.1
@@ -14,6 +29,7 @@ database:
     username: forex
     password: "&WnA8v!(THG%)czK"
     database: forex
+  #---Management
   management:
     server: postgresql
     host: 127.0.0.1
@@ -21,6 +37,7 @@ database:
     username: forex
     password: "&WnA8v!(THG%)czK"
     database: management
+  #---Log
   log:
     server: postgresql
     host: 127.0.0.1
@@ -29,37 +46,49 @@ database:
     password: "&WnA8v!(THG%)czK"
     database: log
 
-#--------------------------------------------------------------------------------- Api
-api:
+#--------------------------------------------------------------------------------- Webapi
+webapi:
   title: forex_api
   description: This is my custom API schema description
   version: '1.0.0'
   openapi_url: /schema
   docs_url: /doc1
   redoc_url: /doc2
-  key: "e21d6dfd-85cf-4886-a512-8c6e432bf9c9"
+  key: ""
   host: 127.0.0.1
-  port: 7001
-  workers: 3
+  port: 8000
+  workers: 2
+
+#--------------------------------------------------------------------------------- Nginx
+nginx:
+  #---API
+  api:
+    host: 0.0.0.0
+    port: 8001
+    key: "57b3e8ae-4aca-4776-9aa1-9ccce396dc6f"
+  #---GUI
+  gui:
+    host: 0.0.0.0
+    port: 8002
+    key: "c9db34f6-24ea-4468-9746-fe17efc3b77d"
 
 #--------------------------------------------------------------------------------- Log
 log:
-
-  #---------------------------------General
+  #---General
   general:
     table: forex
     file: log.txt
-  #---------------------------------Error
+  #---Error
   error:
     verbose: True
     file: False
     database: False
-  #---------------------------------Report
+  #---Report
   report:
     verbose: True
     file: False
     database: False
-  #---------------------------------Notification
+  #---Notification
   notification:
     verbose: True
     file: False

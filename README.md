@@ -408,28 +408,52 @@ Instal
 sudo apt update
 sudo apt install nginx -y
 sudo chmod -R 755 /var/www/html
-```
-<!-------------------------- Config -->
-Config
-```bash
 echo "" > /etc/nginx/sites-enabled/default 
-sudo vim /etc/nginx/sites-enabled/default
+```
+<!-------------------------- Config API -->
+API
+```bash
+vim /etc/nginx/sites-enabled/forex_api
 ```
 ```bash
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+    listen 8001;
+    server_name _;
 
-    root /var/www/html;
-    index index.html index.htm;
+        location /57b3e8ae-4aca-4776-9aa1-9ccce396dc6f {
+            proxy_pass http://127.0.0.1:7001;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
 
-    location / {
-        autoindex on;
-        autoindex_exact_size off;
-        autoindex_localtime on;
+            proxy_ssl_verify off;
+
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+            send_timeout 60s;
+        }
     }
-}
 ```
+<!-------------------------- Config GUI -->
+GUI
+```bash
+vim /etc/nginx/sites-enabled/forex_gui
+```
+```bash
+server {
+    listen 8002;
+    server_name _;
+
+        location /c9db34f6-24ea-4468-9746-fe17efc3b77d {
+            alias /var/www/xrayforex_api_gui;
+            index index.html;
+            try_files $uri $uri/ =404;
+        }
+    }
+```
+
 <!-------------------------- Service -->
 Service
 ```bash
@@ -480,8 +504,6 @@ python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,
 <br><br>
 
 # Task
-    --------------------------------
-    Listener close order
     --------------------------------
     Listener price change
     --------------------------------
