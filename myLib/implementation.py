@@ -342,7 +342,9 @@ class Implementation:
             #-------------- Add
             if add:
                 self.data_orm.add(model=model, item=model(name="Test-TP-SL", strategy_item_id=1, account_id=1))
-                self.data_orm.add(model=model, item=model(name="Test-TP", strategy_item_id=2, account_id=1))
+                self.data_orm.add(model=model, item=model(name="Test-TP-E", strategy_item_id=2, account_id=1))
+                self.data_orm.add(model=model, item=model(name="Test-TP-X", strategy_item_id=3, account_id=1))
+                self.data_orm.add(model=model, item=model(name="Test-TP-O", strategy_item_id=4, account_id=1))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
