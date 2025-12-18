@@ -569,29 +569,7 @@ service_create_nginx_create_api()
             proxy_read_timeout 60s;
             send_timeout 60s;
         }
-    }""" > /etc/nginx/sites-available/$name"_"api.conf
-
-
-    # echo "server {
-    # listen $port;
-    # server_name _;
-
-    #     location /$key {
-    #         proxy_pass http://$api_host:$api_port;
-    #         proxy_set_header Host \$host;
-    #         proxy_set_header X-Real-IP \$remote_addr;
-    #         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    #         proxy_set_header X-Forwarded-Proto \$scheme;
-
-    #         proxy_ssl_verify off;
-
-    #         proxy_connect_timeout 60s;
-    #         proxy_send_timeout 60s;
-    #         proxy_read_timeout 60s;
-    #         send_timeout 60s;
-    #     }
-    # }" > /etc/nginx/sites-available/$name"_"api.conf
-    
+    }""" > /etc/nginx/sites-available/$name"_"api.conf    
     ln -s /etc/nginx/sites-available/$name"_"api.conf /etc/nginx/sites-enabled/
     nginx -t
     systemctl reload nginx
@@ -640,36 +618,6 @@ service_create_nginx_create_gui()
     nginx -t
     systemctl reload nginx
     systemctl restart nginx
-
-
-# server {
-#     listen 8002;
-#     server_name _;
-
-#     location / {
-#         alias /var/www/forex_gui/;
-#         index index.html;
-#         try_files $uri $uri/ =404;
-#     }
-# }
-
-
-#     echo "server {
-#     listen $port;
-#     server_name _;
-
-#     root /var/www/$name"_"gui;
-#     index index.html;
-
-#     location /$key {
-#         try_files \$uri \$uri/ =404;
-#     }
-# }
-# "> /etc/nginx/sites-available/$name"_"gui.conf
-#     ln -s /etc/nginx/sites-available/$name"_"gui.conf /etc/nginx/sites-enabled/
-#     nginx -t
-#     systemctl reload nginx
-#     systemctl restart nginx
 }
 #-----------------------------nginx_remove_gui
 nginx_remove_gui()
