@@ -69,7 +69,7 @@ class Data_Orm:
         return output
 
     #--------------------------[Items]
-    def items(self, model, **filters) -> model_output:
+    def items(self, model, order_item=None, order_type=None, **filters) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -87,7 +87,7 @@ class Data_Orm:
 
         try:
             #--------------Action
-            output:model_output = self.db.items(model=model, **filters)
+            output:model_output = self.db.items(model=model, order_item=order_item, order_type=order_type, **filters)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message =f"{model}"

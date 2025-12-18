@@ -78,7 +78,7 @@ class Database_Orm:
         return output
     
     #-------------------------- [Items]
-    def items(self, model, **filters) -> model_output:
+    def items(self, model, order_item=None, order_type=None, **filters) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -100,10 +100,14 @@ class Database_Orm:
             if filters:
                 for attr, value in filters.items() : 
                     if value !='null' : query = query.filter(getattr(model, attr) == value)
-            if hasattr(model, 'date'):
-                query = query.order_by(model.date.desc())
+
+            if order_item:
+                if order_type.upper() == 'ASC':
+                    query = query.order_by(getattr(model, order_item).asc())
+                else:
+                    query = query.order_by(getattr(model, order_item).desc())
             else:
-                query = query.order_by(model.id.desc())
+                query = query.order_by(model.id.asc())
             result = query.all()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
