@@ -293,12 +293,13 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name='TP-SL-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy','amount':10000,'tp_pips':1,'st_pips':1}", description="TP/SL"))
-                self.data_orm.add(model=model, item=model(name='TP-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy,sell','amount':10000,'tp_pips':1,'st_pips':1000}", description="TP-EURUSD"))
-                self.data_orm.add(model=model, item=model(name='TP-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':10000}", description="TP-XAUUSD"))
-                self.data_orm.add(model=model, item=model(name='TP-USOIL', strategy_id=1, params="{'symbols':'USOil','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':10000}", description="TP-USOIL"))
-                self.data_orm.add(model=model, item=model(name='TP-XAGUSD', strategy_id=1, params="{'symbols':'XAG/USD','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':10000}", description="TP-XAGUSD"))
-                self.data_orm.add(model=model, item=model(name='TP-UKOil', strategy_id=1, params="{'symbols':'UKOil','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':10000}", description="TP-UKOil"))
+                self.data_orm.add(model=model, item=model(name='TP-SL-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy','amount':1000,'tp_pips':1,'st_pips':1}", description="TP/SL"))
+                self.data_orm.add(model=model, item=model(name='TP-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy,sell','amount':1000,'tp_pips':1,'st_pips':100}", description="TP-EURUSD"))
+                self.data_orm.add(model=model, item=model(name='TP-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':100}", description="TP-XAUUSD"))
+                self.data_orm.add(model=model, item=model(name='TP-USOIL', strategy_id=1, params="{'symbols':'USOil','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':100}", description="TP-USOIL"))
+                self.data_orm.add(model=model, item=model(name='TP-XAGUSD', strategy_id=1, params="{'symbols':'XAG/USD','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':100}", description="TP-XAGUSD"))
+                self.data_orm.add(model=model, item=model(name='TP-UKOil', strategy_id=1, params="{'symbols':'UKOil','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':100}", description="TP-UKOil"))
+                self.data_orm.add(model=model, item=model(name='TP-EUR', strategy_id=1, params="{'symbols':'EUR/USD', 'EUR/GBP,EUR/CHF,EUR/JPY,EUR/AUD,EUR/CAD,EUR/NZD','actions':'buy,sell','amount':1000,'tp_pips':1,'st_pips':100}", description="TP-EURU"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -349,6 +350,7 @@ class Implementation:
                 self.data_orm.add(model=model, item=model(name="Test-TP-UKOil", strategy_item_id=4, account_id=1))
                 self.data_orm.add(model=model, item=model(name="Test-TP-XAGUSD", strategy_item_id=5, account_id=1))
                 self.data_orm.add(model=model, item=model(name="Test-TP-UKOil", strategy_item_id=6, account_id=1))
+                self.data_orm.add(model=model, item=model(name="Test-TP-EUR", strategy_item_id=7, account_id=1))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

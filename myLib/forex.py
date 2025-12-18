@@ -499,7 +499,7 @@ class Forex:
                         digits = offer.digits
                         bid = float(f"{offer.bid:.{digits}f}")
                         ask = float(f"{offer.ask:.{digits}f}")
-                        spread = (ask-bid) * point_size 
+                        spread = f"{ask-bid:.{digits}f}" 
                         break
             #--------------TP/SL
             if tp_pips or sl_pips:
