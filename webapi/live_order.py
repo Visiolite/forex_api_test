@@ -32,7 +32,7 @@ def add(item:model_py) :
 @route.get("/items", description="items", response_model=model_output)
 def items(request: Request) : 
     filters = dict(request.query_params)
-    output:model_output = data_orm.items(model=model_db, order_item='date', order_type='DESC', **filters)
+    output:model_output = data_orm.items(model=model_db, order_by={"status":"desc","date":"desc"}, **filters)
     if output.status : 
         data = []
         for item in output.data : 

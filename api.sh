@@ -91,167 +91,6 @@ all()
     service_create_all
 }
 
-#---------------------------------------------------------------------------------Config
-#-----------------------------config_all
-config_all()
-{
-    #----------Header
-    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
-    #----------Action
-    config_general
-    config_network
-    config_git
-    config_postgres
-    config_python
-    config_implementation
-}
-#-----------------------------config_general
-config_general()
-{
-    #----------Header
-    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
-    #----------Data
-    timeZone=$(yq '.general.time_zone' "$config_file" | tr -d '"')
-    #----------Verbose
-    echo -e "${verbose_color}sudo timedatectl set-timezone $timeZone${ENDCOLOR}"
-    #----------Action
-    sudo timedatectl set-timezone $timeZone
-}
-#-----------------------------config_network
-config_network()
-{
-    #----------Header
-    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
-}
-#-----------------------------config_git
-config_git()
-{
-    #----------Header
-    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
-    #----------Data
-    git_name=$(yq '.git.name' "$config_file" | tr -d '"')
-    git_email=$(yq '.git.email' "$config_file" | tr -d '"')
-    #----------Verbose
-    echo -e "${verbose_color}git config --global user.email \"${git_email}\"${ENDCOLOR}"
-    echo -e "${verbose_color}git config --global user.name \"${git_name}\"${ENDCOLOR}"
-    echo -e "${verbose_color}git config --global core.editor \"vim\"${ENDCOLOR}"
-    echo -e "${verbose_color}git config user.email \"${git_email}\"${ENDCOLOR}"
-    echo -e "${verbose_color}git config user.name \"${git_name}\"${ENDCOLOR}"
-    echo -e "${verbose_color}git config core.editor \"vim\"${ENDCOLOR}"
-    echo -e "${verbose_color}git config pull.rebase false${ENDCOLOR}"
-    #----------Action
-    git config --global user.email "${git_email}"
-    git config --global user.name "${git_name}"
-    git config --global core.editor "vim"
-    git config user.email "${git_email}"
-    git config user.name "${git_name}"
-    git config core.editor "vim"
-    git config pull.rebase false
-}
-#-----------------------------config_postgres
-config_postgres()
-{
-    #----------Header
-    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
-    #----------Data
-    username=$(yq '.database.data.username' "$config_file" | tr -d '"')
-    password=$(yq '.database.data.password' "$config_file" | tr -d '"')
-    echo -e "${verbose_color}username: $username${ENDCOLOR}"
-    echo -e "${verbose_color}password: $password${ENDCOLOR}"
-    #----------Role
-    echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE ROLE ${username} WITH LOGIN CREATEDB PASSWORD '${password}';\"${ENDCOLOR}"
-    sudo -u postgres psql -c "CREATE ROLE ${username} WITH LOGIN CREATEDB PASSWORD '${password}';"
-    #----------Database
-    echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE DATABASE forex WITH OWNER=${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE DATABASE management WITH OWNER=${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE DATABASE log WITH OWNER=${username};\"${ENDCOLOR}"
-    sudo -u postgres psql -c "CREATE DATABASE forex WITH OWNER=${username};"
-    sudo -u postgres psql -c "CREATE DATABASE management WITH OWNER=${username};"
-    sudo -u postgres psql -c "CREATE DATABASE log WITH OWNER=${username};"
-    #----------Grant privileges for data database
-    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"ALTER ROLE ${username} WITH CONNECTION LIMIT -1;\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"ALTER DATABASE forex OWNER TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"ALTER SCHEMA public OWNER TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT USAGE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT CREATE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
-    sudo -u postgres psql -d forex -c "ALTER ROLE ${username} WITH CONNECTION LIMIT -1;"
-    sudo -u postgres psql -d forex -c "ALTER DATABASE forex OWNER TO ${username};"
-    sudo -u postgres psql -d forex -c "ALTER SCHEMA public OWNER TO ${username};"
-    sudo -u postgres psql -d forex -c "GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};"
-    sudo -u postgres psql -d forex -c "GRANT USAGE ON SCHEMA public TO ${username};"
-    sudo -u postgres psql -d forex -c "GRANT CREATE ON SCHEMA public TO ${username};"
-    sudo -u postgres psql -d forex -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};"
-    sudo -u postgres psql -d forex -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};"
-    sudo -u postgres psql -d forex -c "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};"
-    #----------Grant privileges for management database
-    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"ALTER ROLE ${username} WITH CONNECTION LIMIT -1;\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"ALTER DATABASE management OWNER TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"ALTER SCHEMA public OWNER TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT USAGE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT CREATE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
-    sudo -u postgres psql -d management -c "ALTER ROLE ${username} WITH CONNECTION LIMIT -1;"
-    sudo -u postgres psql -d management -c "ALTER DATABASE management OWNER TO ${username};"
-    sudo -u postgres psql -d management -c "ALTER SCHEMA public OWNER TO ${username};"
-    sudo -u postgres psql -d management -c "GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};"
-    sudo -u postgres psql -d management -c "GRANT USAGE ON SCHEMA public TO ${username};"
-    sudo -u postgres psql -d management -c "GRANT CREATE ON SCHEMA public TO ${username};"
-    sudo -u postgres psql -d management -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};"
-    sudo -u postgres psql -d management -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};"
-    sudo -u postgres psql -d management -c "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};"
-    #----------Grant privileges for log database
-    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"ALTER ROLE ${username} WITH CONNECTION LIMIT -1;\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"ALTER DATABASE log OWNER TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"ALTER SCHEMA public OWNER TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT USAGE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT CREATE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
-    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
-    sudo -u postgres psql -d log -c "ALTER ROLE ${username} WITH CONNECTION LIMIT -1;"
-    sudo -u postgres psql -d log -c "ALTER DATABASE log OWNER TO ${username};"
-    sudo -u postgres psql -d log -c "ALTER SCHEMA public OWNER TO ${username};"
-    sudo -u postgres psql -d log -c "GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};"
-    sudo -u postgres psql -d log -c "GRANT USAGE ON SCHEMA public TO ${username};"
-    sudo -u postgres psql -d log -c "GRANT CREATE ON SCHEMA public TO ${username};"
-    sudo -u postgres psql -d log -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};"
-    sudo -u postgres psql -d log -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};"
-    sudo -u postgres psql -d log -c "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};"
-}
-#-----------------------------config_python
-config_python()
-{
-    #----------Header
-    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
-    #----------Verbose
-    echo -e "${verbose_color}python3.7 -m pip install --upgrade pip${ENDCOLOR}"
-    echo -e "${verbose_color}python3.7 -m pip install -r requirements.txt${ENDCOLOR}"
-    echo -e "${verbose_color}python3.7 -m pip list${ENDCOLOR}"
-    #----------Action
-    python3.7 -m pip install --upgrade pip
-    python3.7 -m pip install -r requirements.txt
-    python3.7 -m pip uninstall pytz -y
-    python3.7 -m pip install pytz==2023.3
-    python3.7 -m pip list
-}
-#-----------------------------config_implementation
-config_implementation()
-{
-    #----------Header
-    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
-    #----------Verbose
-    echo -e "${verbose_color}python3.7  $path/implement.py${ENDCOLOR}"
-    #----------Action
-    python3.7  $path/implement.py
-}
 
 #---------------------------------------------------------------------------------Install
 #-----------------------------install_all
@@ -425,6 +264,169 @@ install_iptables()
     #---Log
     log_variable="api.sh | install_iptables"; log
 }
+
+#---------------------------------------------------------------------------------Config
+#-----------------------------config_all
+config_all()
+{
+    #----------Header
+    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
+    #----------Action
+    config_general
+    config_network
+    config_git
+    config_postgres
+    config_python
+    config_implementation
+}
+#-----------------------------config_general
+config_general()
+{
+    #----------Header
+    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
+    #----------Data
+    timeZone=$(yq '.general.time_zone' "$config_file" | tr -d '"')
+    #----------Verbose
+    echo -e "${verbose_color}sudo timedatectl set-timezone $timeZone${ENDCOLOR}"
+    #----------Action
+    sudo timedatectl set-timezone $timeZone
+}
+#-----------------------------config_network
+config_network()
+{
+    #----------Header
+    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
+}
+#-----------------------------config_git
+config_git()
+{
+    #----------Header
+    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
+    #----------Data
+    git_name=$(yq '.git.name' "$config_file" | tr -d '"')
+    git_email=$(yq '.git.email' "$config_file" | tr -d '"')
+    #----------Verbose
+    echo -e "${verbose_color}git config --global user.email \"${git_email}\"${ENDCOLOR}"
+    echo -e "${verbose_color}git config --global user.name \"${git_name}\"${ENDCOLOR}"
+    echo -e "${verbose_color}git config --global core.editor \"vim\"${ENDCOLOR}"
+    echo -e "${verbose_color}git config user.email \"${git_email}\"${ENDCOLOR}"
+    echo -e "${verbose_color}git config user.name \"${git_name}\"${ENDCOLOR}"
+    echo -e "${verbose_color}git config core.editor \"vim\"${ENDCOLOR}"
+    echo -e "${verbose_color}git config pull.rebase false${ENDCOLOR}"
+    #----------Action
+    git config --global user.email "${git_email}"
+    git config --global user.name "${git_name}"
+    git config --global core.editor "vim"
+    git config user.email "${git_email}"
+    git config user.name "${git_name}"
+    git config core.editor "vim"
+    git config pull.rebase false
+}
+#-----------------------------config_postgres
+config_postgres()
+{
+    #----------Header
+    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
+    #----------Data
+    username=$(yq '.database.data.username' "$config_file" | tr -d '"')
+    password=$(yq '.database.data.password' "$config_file" | tr -d '"')
+    echo -e "${verbose_color}username: $username${ENDCOLOR}"
+    echo -e "${verbose_color}password: $password${ENDCOLOR}"
+    #----------Role
+    echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE ROLE ${username} WITH LOGIN CREATEDB PASSWORD '${password}';\"${ENDCOLOR}"
+    sudo -u postgres psql -c "CREATE ROLE ${username} WITH LOGIN CREATEDB PASSWORD '${password}';"
+    #----------Database
+    echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE DATABASE forex WITH OWNER=${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE DATABASE management WITH OWNER=${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE DATABASE log WITH OWNER=${username};\"${ENDCOLOR}"
+    sudo -u postgres psql -c "CREATE DATABASE forex WITH OWNER=${username};"
+    sudo -u postgres psql -c "CREATE DATABASE management WITH OWNER=${username};"
+    sudo -u postgres psql -c "CREATE DATABASE log WITH OWNER=${username};"
+    #----------Grant privileges for data database
+    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"ALTER ROLE ${username} WITH CONNECTION LIMIT -1;\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"ALTER DATABASE forex OWNER TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"ALTER SCHEMA public OWNER TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT USAGE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT CREATE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d forex -c \"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
+    sudo -u postgres psql -d forex -c "ALTER ROLE ${username} WITH CONNECTION LIMIT -1;"
+    sudo -u postgres psql -d forex -c "ALTER DATABASE forex OWNER TO ${username};"
+    sudo -u postgres psql -d forex -c "ALTER SCHEMA public OWNER TO ${username};"
+    sudo -u postgres psql -d forex -c "GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};"
+    sudo -u postgres psql -d forex -c "GRANT USAGE ON SCHEMA public TO ${username};"
+    sudo -u postgres psql -d forex -c "GRANT CREATE ON SCHEMA public TO ${username};"
+    sudo -u postgres psql -d forex -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};"
+    sudo -u postgres psql -d forex -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};"
+    sudo -u postgres psql -d forex -c "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};"
+    #----------Grant privileges for management database
+    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"ALTER ROLE ${username} WITH CONNECTION LIMIT -1;\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"ALTER DATABASE management OWNER TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"ALTER SCHEMA public OWNER TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT USAGE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT CREATE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d management -c \"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
+    sudo -u postgres psql -d management -c "ALTER ROLE ${username} WITH CONNECTION LIMIT -1;"
+    sudo -u postgres psql -d management -c "ALTER DATABASE management OWNER TO ${username};"
+    sudo -u postgres psql -d management -c "ALTER SCHEMA public OWNER TO ${username};"
+    sudo -u postgres psql -d management -c "GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};"
+    sudo -u postgres psql -d management -c "GRANT USAGE ON SCHEMA public TO ${username};"
+    sudo -u postgres psql -d management -c "GRANT CREATE ON SCHEMA public TO ${username};"
+    sudo -u postgres psql -d management -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};"
+    sudo -u postgres psql -d management -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};"
+    sudo -u postgres psql -d management -c "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};"
+    #----------Grant privileges for log database
+    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"ALTER ROLE ${username} WITH CONNECTION LIMIT -1;\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"ALTER DATABASE log OWNER TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"ALTER SCHEMA public OWNER TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT USAGE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT CREATE ON SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -d log -c \"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};\"${ENDCOLOR}"
+    sudo -u postgres psql -d log -c "ALTER ROLE ${username} WITH CONNECTION LIMIT -1;"
+    sudo -u postgres psql -d log -c "ALTER DATABASE log OWNER TO ${username};"
+    sudo -u postgres psql -d log -c "ALTER SCHEMA public OWNER TO ${username};"
+    sudo -u postgres psql -d log -c "GRANT ALL PRIVILEGES ON SCHEMA public TO ${username};"
+    sudo -u postgres psql -d log -c "GRANT USAGE ON SCHEMA public TO ${username};"
+    sudo -u postgres psql -d log -c "GRANT CREATE ON SCHEMA public TO ${username};"
+    sudo -u postgres psql -d log -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};"
+    sudo -u postgres psql -d log -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};"
+    sudo -u postgres psql -d log -c "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};"
+}
+#-----------------------------config_python
+config_python()
+{
+    #----------Header
+    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
+    #----------Verbose
+    echo -e "${verbose_color}python3.7 -m pip install --upgrade pip${ENDCOLOR}"
+    echo -e "${verbose_color}python3.7 -m pip install -r requirements.txt${ENDCOLOR}"
+    echo -e "${verbose_color}python3.7 -m pip list${ENDCOLOR}"
+    #----------Action
+    python3.7 -m pip install --upgrade pip
+    python3.7 -m pip install -r requirements.txt
+    python3.7 -m pip uninstall pytz -y
+    python3.7 -m pip install pytz==2023.3
+    python3.7 -m pip list
+}
+#-----------------------------config_implementation
+config_implementation()
+{
+    #----------Header
+    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
+    #----------Verbose
+    echo -e "${verbose_color}python3.7  $path/implement.py${ENDCOLOR}"
+    #----------Action
+    python3.7  $path/implement.py
+}
+
 
 #---------------------------------------------------------------------------------Service
 SERVICES=("iptables" "${name}_webapi.service" "nginx")
