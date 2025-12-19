@@ -128,10 +128,10 @@ forex_connect:
 
 #--------------------------------------------------------------------------------- Download
 download:
-  instrument: UKOil
+  instrument: XAU/USD
   timeframe: t1
   mode: complete
-  count: 100000
+  count: 1000
   repeat: 1
   delay: 0
   save: True
@@ -214,9 +214,8 @@ debug:
     login: {log: false, verbose: false, model: "Logic_Forex"}
     logout: {log: false, verbose: false, model: "Logic_Forex"}
     info: {log: false, verbose: false, model: "Logic_Forex"}
-    store: {log: false, verbose: false, model: "Logic_Forex"}
-    history: {log: false, verbose: false, model: "Logic_Forex"}
-    save: {log: false, verbose: false, model: "Logic_Forex"}
+    store: {log: false, verbose: true, model: "Logic_Forex"}
+    save: {log: false, verbose: true, model: "Logic_Forex"}
     symbol: {log: false, verbose: false, model: "Logic_Forex"}
     account_info: {log: false, verbose: false, model: "Logic_Forex"}
     trade_list: {log: false, verbose: false, model: "Logic_Forex"}

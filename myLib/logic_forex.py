@@ -398,7 +398,7 @@ class Logic_Forex:
 
         try:
             #--------------Action
-            result:model_output = self.api.history(instrument, timeframe, datefrom=None, dateto=None, count=None)
+            result:model_output = self.api.history(instrument, timeframe, datefrom=datefrom, dateto=dateto, count=count)
             #--------------Output
             output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)

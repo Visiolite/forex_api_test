@@ -250,7 +250,6 @@ class Fxcm_API:
                 output.status = False
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = data
             output.message =f"{instrument} | {timeframe} | {sort(data_count, 6)} | {start} | {end}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)

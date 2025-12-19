@@ -10,8 +10,7 @@ from datetime import datetime
 from myLib.model import model_output
 from myLib.logic_global import config
 from myLib.utils import parse_cli_args, format_dict_block, to_bool
-from myLib.fxcm_api import Forex
-from myLib.forex_api import Forex_Api
+from myLib.logic_forex import Logic_Forex
 
 #--------------------------------------------------------------------------------- Debug
 this_class = "Download"
@@ -60,34 +59,15 @@ try:
         for timeframe in timeframes:
             for instrument in instruments:
                 account_cfg = config.get("forex_connect", {}).get(account, {})
-                forex_api = Forex_Api(
-                    name=account, 
-                    type=account_cfg.get("type"), 
-                    username=account_cfg.get("username"), 
-                    password=account_cfg.get("password"), 
-                    url=account_cfg.get("url"), 
-                    key=account_cfg.get("key")
-                )
-                forex_api.login()
-                forex = Forex(forex_api=forex_api)
+                forex = Logic_Forex(account_info=account_cfg)
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
-                forex_api.logout()
     else :
         account_cfg = config.get("forex_connect", {}).get(account, {})
-        forex_api = Forex_Api(
-            name=account, 
-            type=account_cfg.get("type"), 
-            username=account_cfg.get("username"), 
-            password=account_cfg.get("password"), 
-            url=account_cfg.get("url"), 
-            key=account_cfg.get("key")
-        )
-        forex_api.login()
-        forex = Forex(forex_api=forex_api)
+        forex = Logic_Forex(account_info=account_cfg)
+        forex.api.login()
         for timeframe in timeframes:
             for instrument in instruments:
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)        
-        forex_api.logout()
 except Exception as e:
     #--------------Error
     output.status = False
