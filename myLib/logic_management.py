@@ -18,12 +18,7 @@ from myStrategy import *
 #--------------------------------------------------------------------------------- Class
 class Logic_Management:
     #-------------------------- [Init]
-    def __init__(
-            self,
-            data_orm:Data_Orm=None, 
-            data_sql:Data_SQL=None,
-            log:Log=None
-        ):
+    def __init__(self, data_orm:Data_Orm=None, data_sql:Data_SQL=None, log:Log=None):
         #-------------- Variable
         self.this_class = self.__class__.__name__
         #-------------- Instance
@@ -92,9 +87,8 @@ class Logic_Management:
             #--------------Data
             params = ast.literal_eval(params)
             #--------------Action
-            forex_api = forex_apis[account_id]
             strategy = self.get_strategy_instance(strategy_name).data
-            strategy.forex = forex_api
+            strategy.forex = forex_apis[account_id]
             strategy.params = params
             strategy.execute_id = execute_id
             #--------------Output
@@ -264,48 +258,6 @@ class Logic_Management:
         #--------------Return
         return output
         
-    #-------------------------- [order_close]
-    def order_close(self, order_id, trade_id, profit) -> model_output:
-        #-------------- Description
-        # IN     : order_id | profit
-        # OUT    : model_output
-        # Action : update order on database:status,profit | get strategy and run action order_close
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-
-        try:
-            #--------------Database
-            cmd = f"UPDATE live_order SET trade_id='{trade_id}', status='close', profit={profit} WHERE order_id='{order_id}'"
-            self.data_sql.db.execute(cmd=cmd)
-            #--------------Strategy
-            order_detaile = self.order_detaile(order_id=order_id).data
-            if order_detaile["execute_status"] != "stop" :
-                self.strategy_action(action="order_close", order_detaile=order_detaile)
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = order_detaile
-            output.message = f"{order_id} | {profit}"
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-    
     #-------------------------- [strategy_action]
     def strategy_action(self, execute_id=None, action="start", order_detaile=None) -> model_output:
         #-------------- Description
@@ -409,6 +361,50 @@ class Logic_Management:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile
             output.message=id
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [order_close]
+    def order_close(self, order_id, trade_id, profit) -> model_output:
+        #-------------- Description
+        # IN     : order_id | profit
+        # OUT    : model_output
+        # Action : update order on database:status,profit | get strategy and run action order_close
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Database
+            cmd = f"UPDATE live_order SET trade_id='{trade_id}', status='close', profit={profit} WHERE order_id='{order_id}'"
+            self.data_sql.db.execute(cmd=cmd)
+            #--------------Strategy
+            order_detaile = self.order_detaile(order_id=order_id)
+            if order_detaile.status:
+                order_detaile = order_detaile.data
+                if order_detaile["execute_status"] != "stop" : 
+                    result:model_output = self.strategy_action(action="order_close", order_detaile=order_detaile)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = order_detaile
+            output.message = f"{order_id} | {profit}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

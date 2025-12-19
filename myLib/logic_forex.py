@@ -11,7 +11,6 @@ from myLib.model import model_output
 from myLib.logic_global import debug, log_instance, data_instance
 from myLib.utils import sort, get_tbl_name, format_dict_block
 from myLib.log import Log
-from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
 from myLib.fxcm_api import Fxcm_API
 from myModel import *
@@ -19,13 +18,13 @@ from myModel import *
 #--------------------------------------------------------------------------------- Action
 class Logic_Forex:
     #--------------------------------------------- init
-    def __init__(self, account_info:dict, data_orm:Data_Orm=None, data_sql:Data_SQL=None, log:Log=None):
+    def __init__(self, account_info:dict, data_sql:Data_SQL=None, management_sql:Data_SQL=None, log:Log=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.account_info = account_info
         self.api_name = None
         #--------------------Instance
-        self.data_orm = data_orm if data_orm else data_instance["management_orm"]
+        self.management_sql = management_sql if management_sql else data_instance["management_sql"]
         self.data_sql = data_sql if data_sql else data_instance["data_sql"]
         self.log = log if log else log_instance
         #--------------------Api
@@ -475,8 +474,8 @@ class Logic_Forex:
             #--------------Database
             if result.status:
                 order_id, bid, ask, tp, sl = result.data
-                cmd = f"INSERT INTO live_order (execute_id, order_id, symbol, action, amount, bid, ask, tp, sl, status) VALUES ({execute_id}, '{order_id}', '{symbol}', '{action}', {amount}, {bid}, {ask}, {tp}, {sl}, 'open')"
-                self.data_sql.db.execute(cmd=cmd)
+                cmd = f"INSERT INTO live_order (execute_id, order_id, symbol, action, amount, bid, ask, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', '{symbol}', '{action}', {amount}, {bid}, {ask}, {tp}, {sl}, 'open', 'run...', 0.0, True)"
+                self.management_sql.db.execute(cmd=cmd)
             #--------------Output
             output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -529,12 +528,12 @@ class Logic_Forex:
         #--------------Return
         return output
 
-    #--------------------------------------------- order_close_complete
-    def order_close_complete(self, order_ids=None):
+    #--------------------------------------------- order_close_update
+    def order_close_update(self, order_ids=None):
         #-------------- Description
-        # IN     : order_id
-        # OUT    : 
-        # Action :
+        # IN     : list of order_id
+        # OUT    : model_output
+        # Action : Get all close trades and update live_order table with profit and status='close'
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
@@ -558,7 +557,7 @@ class Logic_Forex:
                     gross_pl = item['gross_pl']
                     if order_id in order_ids:
                         cmd = f"UPDATE live_order SET profit={gross_pl}, status='close' WHERE order_id='{order_id}'"
-                        self.data_sql.db.execute(cmd=cmd)
+                        self.management_sql.db.execute(cmd=cmd)
                         count += 1
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)

@@ -324,7 +324,7 @@ class Fxcm_API:
             if ask and bid :
                 if tp or sl:
                     request = self.fx.create_order_request(
-                        ACCOUNT_ID=self.api.id,
+                        ACCOUNT_ID=self.id,
                         command=command, 
                         order_type=order_type,
                         BUY_SELL= buy_sell,
@@ -335,7 +335,7 @@ class Fxcm_API:
                     )
                 else:
                     request = self.fx.create_order_request(
-                        ACCOUNT_ID=self.api.id,
+                        ACCOUNT_ID=self.id,
                         command=command, 
                         order_type=order_type,
                         BUY_SELL= buy_sell,
