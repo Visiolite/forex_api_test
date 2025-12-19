@@ -549,7 +549,7 @@ class Logic_Forex:
         
         try:
             #--------------data
-            result:model_output = self.api.get_table("closed_trades")
+            result:model_output = self.api.get_table("CLOSED_TRADES")
             #--------------Items
             if result.status:
                 for item in result.data:
