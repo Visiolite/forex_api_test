@@ -12,7 +12,6 @@ from myModel.model_account import model_account_py as model_py
 from myModel.model_account import model_account_db as model_db
 from myLib.data_orm import Data_Orm
 from myLib.logic_global import forex_apis
-from myLib.fxcm_api import Forex
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
@@ -72,6 +71,5 @@ def dead(id:int):
 @route.get("/close_all_order/{id}", description="close_all_order", response_model=model_output)
 def close_all_order(id:int): 
     forex_api = forex_apis[id]
-    forex = Forex(forex_api = forex_api)
-    result = forex.order_close()
+    result = forex_api.order_close()
     return result

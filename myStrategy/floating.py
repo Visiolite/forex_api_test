@@ -12,9 +12,8 @@ from myLib.utils import sort
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
-from myLib.fxcm_api import Forex
+from myLib.fxcm_api import Fxcm_API
 from myModel.model_live_order import model_live_order_db
-from myModel.model_live_execute import model_live_execute_db
 
 #--------------------------------------------------------------------------------- Action
 class Floating:
@@ -23,7 +22,7 @@ class Floating:
             self,
             execute_id=None,
             params=None,
-            forex:Forex=None,
+            forex:Fxcm_API=None,
             data_orm:Data_Orm=None, 
             data_sql:Data_SQL=None,
             log:Log=None

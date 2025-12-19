@@ -46,19 +46,18 @@ def load_data():
 
 #-------------------------- load_forex_api
 def load_forex_api():
-    from myLib.forex_api import Forex_Api
+    from myLib.fxcm_api import Fxcm_API
     from myModel.model_account import model_account_db
     from myLib.data_orm import Data_Orm
-    from myLib.data_sql import Data_SQL
     data_orm = Data_Orm(database=database_management)
     forex_accounts = data_orm.items(model=model_account_db, enable=True)
-    for acc in forex_accounts.data :
-        forex_api = Forex_Api(name=acc.name, type=acc.type, username=acc.username, password=acc.password, url=acc.url, key=acc.key)
-        forex_api.login()
-        forex_apis[acc.id] = forex_api
+    for account in forex_accounts.data :
+        fxcm_api = Fxcm_API(account_info=account.toDict())
+        fxcm_api.login()
+        forex_apis[account.id] = fxcm_api
 
 #--------------------------------------------------------------------------------- Action
-config = load_config()
+config:dict = load_config()
 database_management = config.get("general", {}).get("database_management", {})
 database_data = config.get("general", {}).get("database_data", {})
 database_log = config.get("general", {}).get("database_log", {})

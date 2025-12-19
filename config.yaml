@@ -210,19 +210,18 @@ debug:
     order_detaile: {log: false, verbose: false, model: "Logic_Management"}
     strategy_action: {log: false, verbose: false, model: "Logic_Management"}
     get_strategy_item_instance: {log: false, verbose: false, model: "Logic_Management"}
-  Forex_Api:
-    login: {log: false, verbose: true, model: "Forex"}
-    logout: {log: false, verbose: true, model: "Forex"}
-  Forex:
-    store: {log: false, verbose: true, model: "Forex"}
-    history: {log: false, verbose: true, model: "Forex"}
-    save: {log: false, verbose: true, model: "Forex"}
-    symbol: {log: false, verbose: true, model: "Forex"}
-    account_info: {log: false, verbose: true, model: "Forex"}
-    trade_list: {log: false, verbose: true, model: "Forex"}
-    order_open: {log: false, verbose: true, model: "Forex"}
-    order_close: {log: false, verbose: true, model: "Forex"}
-    order_close_all: {log: false, verbose: false, model: "Forex"}
+  Fxcm_API:
+    login: {log: false, verbose: true, model: "Fxcm_API"}
+    logout: {log: false, verbose: true, model: "Fxcm_API"}
+    store: {log: false, verbose: true, model: "Fxcm_API"}
+    history: {log: false, verbose: true, model: "Fxcm_API"}
+    save: {log: false, verbose: true, model: "Fxcm_API"}
+    symbol: {log: false, verbose: true, model: "Fxcm_API"}
+    account_info: {log: false, verbose: true, model: "Fxcm_API"}
+    trade_list: {log: false, verbose: true, model: "Fxcm_API"}
+    order_open: {log: false, verbose: true, model: "Fxcm_API"}
+    order_close: {log: false, verbose: true, model: "Fxcm_API"}
+    order_close_all: {log: false, verbose: false, model: "Fxcm_API"}
   Data:
     save: {log: false, verbose: true, model: "Data"}
     get_max_min: {log: false, verbose: false, model: "Data"}

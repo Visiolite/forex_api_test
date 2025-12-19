@@ -7,36 +7,158 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 from datetime import timedelta
-import forexconnect
 import pandas as pd
 from myLib.model import model_output
-from myLib.logic_global import config, debug, log_instance, data_instance
+from myLib.logic_global import debug, log_instance, data_instance
 from myLib.utils import sort, get_tbl_name, format_dict_block
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
-from myLib.forex_api import Forex_Api
 from forexconnect import ForexConnect, fxcorepy
 from myModel import *
 
 #--------------------------------------------------------------------------------- Action
-class Forex:
+class Fxcm_API:
     #--------------------------------------------- init
-    def __init__(self,
-            forex_api:Forex_Api,
-            data_orm:Data_Orm=None,
-            data_sql:Data_SQL=None,
-            log:Log=None
-        ):
+    def __init__(self, account_info:dict, data_orm:Data_Orm=None, data_sql:Data_SQL=None, log:Log=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.api = forex_api
-        self.fx:ForexConnect = self.api.fx
+        self.id = None
+        self.name = account_info.get("name")
+        self.type = account_info.get("type")
+        self.username = account_info.get("username")
+        self.password = account_info.get("password")
+        self.url = account_info.get("url")
+        self.key = account_info.get("key")
+        self.balance = None
+        self.equity = None
+        self.fx = ForexConnect()
         #--------------------Instance
         self.data_orm = data_orm if data_orm else data_instance["management_orm"]
         self.data_sql = data_sql if data_sql else data_instance["data_sql"]
         self.log = log if log else log_instance
 
+    #--------------------------------------------- on_status_changed
+    def session_status_changed(self, session: fxcorepy.O2GSession, status: fxcorepy.AO2GSessionStatus.O2GSessionStatus):
+        print("Trading session status: " + str(status))
+
+    #--------------------------------------------- login
+    def login(self):
+        #-------------- Description
+        # IN     : order_id
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Action
+            result = self.fx.login(self.username, self.password, self.url, self.type, self.session_status_changed)
+            self.info()
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = result
+            output.message = f"{self.type} | {self.id} | {self.name} | {self.balance} | {self.equity}" 
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- logout
+    def logout(self):
+        #-------------- Description
+        # IN     : order_id
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Action
+            result = self.fx.logout()
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = result
+            output.message= f"{self.type} | {self.id} | {self.name} | {self.balance} | {self.equity}" 
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- logout
+    def info(self):
+        #-------------- Description
+        # IN     : order_id
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Action
+            accounts_table = self.fx.get_table(ForexConnect.ACCOUNTS)
+            for account in accounts_table:
+                self.id = account.account_id
+                self.balance = account.balance
+                self.equity = account.equity
+                break
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = account
+            output.message= f"{self.name} | {self.id} | Balance: {self.balance} | Equity: {self.equity}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
     #--------------------------------------------- timeframe_nex_date
     def timeframe_nex_date(self, timeframe, date):
         #-------------- Description

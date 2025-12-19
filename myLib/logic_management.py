@@ -12,7 +12,6 @@ from myLib.utils import sort
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
-from myLib.fxcm_api import Forex
 from myModel import *
 from myStrategy import *
 
@@ -94,9 +93,8 @@ class Logic_Management:
             params = ast.literal_eval(params)
             #--------------Action
             forex_api = forex_apis[account_id]
-            forex = Forex(forex_api=forex_api)
             strategy = self.get_strategy_instance(strategy_name).data
-            strategy.forex = forex
+            strategy.forex = forex_api
             strategy.params = params
             strategy.execute_id = execute_id
             #--------------Output
