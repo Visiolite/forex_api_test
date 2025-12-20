@@ -314,6 +314,7 @@ class Logic_Forex:
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            raise
         #--------------Return
         return output
     
@@ -375,6 +376,7 @@ class Logic_Forex:
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            raise
         #--------------Return
         return output
     
