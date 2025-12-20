@@ -6,9 +6,8 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from myLib.model import model_output
 from myLib.logic_global import config, debug, log_instance, data_instance, forex_apis
-from myLib.utils import sort
+from myLib.utils import model_output, sort
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL

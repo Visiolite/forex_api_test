@@ -7,9 +7,8 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 from datetime import timedelta
-from myLib.model import model_output
 from myLib.logic_global import debug, log_instance, data_instance
-from myLib.utils import sort, get_tbl_name, format_dict_block
+from myLib.utils import model_output, sort, get_tbl_name, format_dict_block
 from myLib.log import Log
 from myLib.data_sql import Data_SQL
 from myLib.fxcm_api import Fxcm_API

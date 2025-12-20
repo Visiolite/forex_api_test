@@ -7,9 +7,8 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 import psycopg2
-from myLib.model import model_output
 from myLib.logic_global import debug, log_instance
-from myLib.utils import sort
+from myLib.utils import model_output, sort
 from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Action

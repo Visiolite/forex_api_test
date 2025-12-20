@@ -5,7 +5,7 @@
 # This is route for strategy
 
 #--------------------------------------------------------------------------------- Import
-from myLib.model import model_output
+from myLib.utils import model_output
 from myLib.logic_global import database_management
 from fastapi import APIRouter, Request
 from myModel.model_strategy import model_strategy_py as model_py

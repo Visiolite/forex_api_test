@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 import sys
 from datetime import datetime
-from myLib.model import model_output
+from myLib.utils import model_output
 from myLib.logic_global import config
 from myLib.utils import parse_cli_args, format_dict_block, to_bool
 from myLib.logic_forex import Logic_Forex

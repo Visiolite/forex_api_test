@@ -5,8 +5,6 @@
 # data_sql
 
 #--------------------------------------------------------------------------------- Import
-import inspect, time
-from myLib.model import model_output
 from myLib.logic_global import config, debug, log_instance
 from myLib.utils import sort, get_tbl_name
 from myLib.log import Log

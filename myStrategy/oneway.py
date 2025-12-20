@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from myLib.model import model_output
+from myLib.utils import model_output
 from myLib.logic_global import debug, log_instance, data_instance
 from myLib.utils import sort
 from myLib.log import Log
