@@ -24,8 +24,8 @@ class CloseTradesListener(TableListener):
 #--------------------------------------------------------------------------------- Class
 class Listen_Close:
     #--------------------------------------------- __init__
-    def __init__(self, forex_api, items):
-        self.forex_api = forex_api
+    def __init__(self, forex, items):
+        self.forex = forex
         self.items = items
         self.listener = None
         self.close_table = None
@@ -33,25 +33,26 @@ class Listen_Close:
     
     #--------------------------------------------- start
     def start(self):
-        print("Listen_Close : Started")
-        self.listener = CloseTradesListener(self)
-        table_manager = self.forex_api.api.fx.table_manager
-        while table_manager.status != forexconnect.lib.fxcorepy.O2GTableManagerStatus.TABLES_LOADED : 
-            time.sleep(0.1)
-        self.close_table = table_manager.get_table(ForexConnect.CLOSED_TRADES)
-        self.close_table.subscribe_update(fxcorepy.O2GTableUpdateType.INSERT, self.listener)
-        self.is_running = True
-        try:
-            while True : time.sleep(1)
-        except KeyboardInterrupt:
-            print("\nStopping listener...")
-            self.stop()
+        if self.forex.api.connected :
+            print("Listen_Close : Started")
+            self.listener = CloseTradesListener(self)
+            table_manager = self.forex.api.fx.table_manager
+            while table_manager.status != forexconnect.lib.fxcorepy.O2GTableManagerStatus.TABLES_LOADED : 
+                time.sleep(0.1)
+            self.close_table = table_manager.get_table(ForexConnect.CLOSED_TRADES)
+            self.close_table.subscribe_update(fxcorepy.O2GTableUpdateType.INSERT, self.listener)
+            self.is_running = True
+            try:
+                while True : time.sleep(1)
+            except KeyboardInterrupt:
+                print("\nStopping listener...")
+                self.stop()
     
     #--------------------------------------------- stop
     def stop(self):
         print("Listen_Close : Stopped")
         if self.close_table and self.listener:
             self.close_table.unsubscribe_update(fxcorepy.O2GTableUpdateType.INSERT, self.listener)
-        if self.forex_api:
-            self.forex_api.logout()
+        if self.forex:
+            self.forex.logout()
         self.is_running = False

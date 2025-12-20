@@ -6,31 +6,48 @@
 
 #--------------------------------------------------------------------------------- Import
 from __future__ import annotations
-import time
+from pydantic import BaseModel
+from typing import Any
+
+#--------------------------------------------------------------------------------- Class
+class model_output(BaseModel):
+    class_name : str = ''
+    method_name : str = ''
+    status : bool = True
+    time : int = 0
+    data : Any = {}
+    message : Any = {}
 
 #--------------------------------------------------------------------------------- Action
-#-------------------------- get_tbl_name
+#---------------------------------------------get_tbl_name
 def get_tbl_name(symbol, timeFrame):
+    #-------------------- Description
+    # IN     : 
+    # OUT    : 
+    # Action :
+    #-------------------- Action
     symbol=symbol.replace('/', '')
     symbol=symbol.replace('.', '')
     res = f"{symbol}_{timeFrame}".lower()
     if res[0].isdigit() : res = f'"{res}"'
     return res
 
-#-------------------------- sort
+#---------------------------------------------sort
 def sort(value, size) : 
     #-------------------- Description
     # IN     : 
     # OUT    : 
-    # Action : Sort value 
+    # Action :
+    #-------------------- Action
     return str(value).ljust(size)
 
-#-------------------------- _to_bool
+#---------------------------------------------to_bool
 def to_bool(value: str) -> bool:
     #-------------------- Description
     # IN     : 
     # OUT    : 
-    # Action : Convert to bool
+    # Action :
+    #-------------------- Action
     if isinstance(value, str):
         v = value.lower()
         if v in {"true", "1", "yes", "y"} : return True
@@ -38,12 +55,13 @@ def to_bool(value: str) -> bool:
         raise ValueError(f"Invalid boolean: {value}")
     return bool(value)
 
-#-------------------------- parse_cli_args
+#---------------------------------------------parse_cli_args
 def parse_cli_args(argv: list[str]) -> dict[str, object]:
     #-------------------- Description
     # IN     : 
     # OUT    : 
-    # Action : Pars cli arguments
+    # Action :
+    #-------------------- Action
     config: dict[str, object] = {}
     for term in argv:
         key, raw_value = term.split("=", 1)
@@ -51,12 +69,13 @@ def parse_cli_args(argv: list[str]) -> dict[str, object]:
         config[key] = value
     return config
 
-#-------------------------- format_dict_block
+#---------------------------------------------format_dict_block
 def format_dict_block(title, data: dict) -> str:
     #-------------------- Description
     # IN     : 
     # OUT    : 
-    # Action : Format dictionary to block
+    # Action :
+    #-------------------- Action
     def normalize_value(v):
         if isinstance(v, str):
             if v.lower() in ("true", "false"):

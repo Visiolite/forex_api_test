@@ -6,7 +6,6 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from sqlalchemy import desc
 from myLib.model import model_output
 from myLib.logic_global import config, debug, log_instance, data_instance, forex_apis
 from myLib.utils import sort

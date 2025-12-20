@@ -61,7 +61,7 @@ async def startup_event():
     from myLib.logic_global import forex_apis
     
     # Start Listen_Close
-    listener_close = Listen_Close(forex_api=forex_apis[1], items=list_close)
+    listener_close = Listen_Close(forex=forex_apis[1], items=list_close)
     listener_thread = threading.Thread(target=listener_close.start, daemon=True)
     listener_thread.start()
     

@@ -26,6 +26,7 @@ class Fxcm_API:
         self.password = account_info.get("password")
         self.url = account_info.get("url")
         self.key = account_info.get("key")
+        self.connected = False
         #--------------------Instance
         self.fx = ForexConnect()
         self.log = log if log else log_instance
@@ -54,6 +55,7 @@ class Fxcm_API:
         try:
             #--------------Action
             result = self.fx.login(self.username, self.password, self.url, self.type, self.session_status_changed)
+            self.connected = True
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = result
@@ -91,6 +93,7 @@ class Fxcm_API:
         try:
             #--------------Action
             result = self.fx.logout()
+            self.connected = False
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = result
