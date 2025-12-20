@@ -141,8 +141,10 @@ class Database_SQL:
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            #self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            #self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            if "already" not in str(e):  
+                self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+                raise
+                #self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
     
