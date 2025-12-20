@@ -34,7 +34,7 @@ database:
     server: postgresql
     host: 10.10.10.114
     port: 5432
-    username: forex
+    username: management
     password: "&WnA8v!(THG%)czK"
     database: management
   #---Log

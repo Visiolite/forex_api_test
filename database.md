@@ -33,6 +33,7 @@ psql -d postgres
 ```sql
 ALTER USER postgres WITH PASSWORD '&WnA8v!(THG%)czK';
 CREATE ROLE forex WITH LOGIN CREATEDB PASSWORD '&WnA8v!(THG%)czK';
+CREATE ROLE management WITH LOGIN CREATEDB PASSWORD '&WnA8v!(THG%)czK';
 ```
 
 
@@ -82,16 +83,16 @@ CREATE DATABASE management;
 \c management
 ```
 ```sql
-ALTER DATABASE management OWNER TO forex;
-ALTER SCHEMA public OWNER TO forex;
-GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
-GRANT USAGE ON SCHEMA public TO forex;
-GRANT CREATE ON SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO forex;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
-GRANT pg_read_server_files TO forex;
+ALTER DATABASE management OWNER TO management;
+ALTER SCHEMA public OWNER TO management;
+GRANT ALL PRIVILEGES ON SCHEMA public TO management;
+GRANT ALL PRIVILEGES ON SCHEMA public TO management;
+GRANT USAGE ON SCHEMA public TO management;
+GRANT CREATE ON SCHEMA public TO management;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO management;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO management;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO management;
+GRANT pg_read_server_files TO management;
 ```
 <!-------------------------- Log -->
 log
