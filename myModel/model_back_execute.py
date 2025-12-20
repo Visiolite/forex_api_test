@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------- Location
-# models/model_test_execute.py
+# models/model_back_execute.py
 
 #--------------------------------------------------------------------------------- Description
-# model_test_execute
+# model_back_execute
 
 #--------------------------------------------------------------------------------- Import
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
@@ -13,9 +13,9 @@ from pydantic import BaseModel as BaseModel_py
 from typing import Optional
 
 #--------------------------------------------------------------------------------- Database
-class model_test_execute_db(BaseModel_db):
+class model_back_execute_db(BaseModel_db):
     #---Name
-    __tablename__ = 'test_execute'
+    __tablename__ = 'back_execute'
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, default='')
@@ -32,7 +32,7 @@ class model_test_execute_db(BaseModel_db):
     def toDict(self) : return {column.key: getattr(self, column.key) for column in inspect(self).mapper.column_attrs}
 
 #--------------------------------------------------------------------------------- Python
-class model_test_execute_py(BaseModel_py):
+class model_back_execute_py(BaseModel_py):
     id : int = 0
     name : str = ''
     date_from : Optional[str] = ''

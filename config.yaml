@@ -204,6 +204,9 @@ debug:
     strategy: {log: false, verbose: true, model: "Implementation"}
     strategy_item: {log: false, verbose: true, model: "Implementation"}
     live_execute: {log: false, verbose: true, model: "Implementation"}
+    live_order: {log: false, verbose: true, model: "Implementation"}
+    back_execute: {log: false, verbose: true, model: "Implementation"}
+    back_order: {log: false, verbose: true, model: "Implementation"}
     create_instrument_timeframe_table: {log: false, verbose: true, model: "Implementation_Data"}
   Logic_Management:
     order_close: {log: false, verbose: false, model: "Logic_Management"}

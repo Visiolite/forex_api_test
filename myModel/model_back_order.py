@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------- Location
-# models/model_test_order.py
+# models/model_back_order.py
 
 #--------------------------------------------------------------------------------- Description
-# model_test_order
+# model_back_order
 
 #--------------------------------------------------------------------------------- Import
 from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime
@@ -14,9 +14,9 @@ from typing import Optional
 from datetime import datetime
 
 #--------------------------------------------------------------------------------- Database
-class model_test_order_db(BaseModel_db):
+class model_back_order_db(BaseModel_db):
     #---Name
-    __tablename__ = 'test_order'
+    __tablename__ = 'back_order'
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
     date_open = Column(DateTime, default=func.now(), server_default=func.now())
@@ -46,7 +46,7 @@ class model_test_order_db(BaseModel_db):
         return data
 
 #--------------------------------------------------------------------------------- Python
-class model_test_order_py(BaseModel_py):
+class model_back_order_py(BaseModel_py):
     id : int = 0
     date_open : Optional[str] = ''
     date_close : Optional[str] = ''
