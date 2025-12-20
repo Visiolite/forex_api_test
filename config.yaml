@@ -225,6 +225,10 @@ debug:
     order_open: {log: false, verbose: false, model: "Logic_Forex"}
     order_close: {log: false, verbose: false, model: "Logic_Forex"}
     order_close_all: {log: false, verbose: false, model: "Logic_Forex"}
+  Logic_BackTest:
+    start: {log: false, verbose: true, model: "Logic_BackTest"}
+    order_open: {log: false, verbose: true, model: "Logic_BackTest"}
+    order_close: {log: false, verbose: true, model: "Logic_BackTest"}
   Fxcm_API:
     login: {log: false, verbose: true, model: "Fxcm_API"}
     logout: {log: false, verbose: true, model: "Fxcm_API"}

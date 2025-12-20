@@ -137,7 +137,7 @@ class Floating:
         output.class_name = self.this_class
         output.method_name = this_method
         #--------------Variable
-        output.data = [dict]
+        output.data = []
 
         try:
             #--------------Data
@@ -145,7 +145,7 @@ class Floating:
             symbol = order_detaile.get("symbol")
             amount = order_detaile.get("amount")
             tp_pips = self.params.get("tp_pips")
-            sl_pips = self.params.get("st_pips")
+            sl_pips = self.params.get("sl_pips")
             profit = order_detaile.get("profit")
             trade_id = order_detaile.get("trade_id")
             #--------------Rule

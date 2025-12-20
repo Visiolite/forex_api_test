@@ -187,7 +187,7 @@ class Logic_Management:
             table = "live_execute" if mode == "live" else "back_execute"
             #--------------Action
             cmd_live = f"SELECT strategy.name, strategy_item.params, {table}.id, {table}.account_id, live_order.id, live_order.trade_id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id JOIN live_order ON live_order.execute_id = {table}.id WHERE live_order.order_id='{order_id}'"
-            cmd_back = f"SELECT strategy.name, strategy_item.params, {table}.id, {table}.account_id, live_order.id, live_order.trade_id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status, {table}.status, {table}.date_from, {table}.date_to FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id JOIN live_order ON live_order.execute_id = {table}.id WHERE live_order.order_id='{order_id}'"
+            cmd_back = f"SELECT strategy.name, strategy_item.params, {table}.id, {table}.account_id, back_order.id, back_order.trade_id, back_order.date_open, back_order.symbol, back_order.action, back_order.amount, back_order.bid, back_order.ask, back_order.tp, back_order.sl, back_order.profit, back_order.status, {table}.status, back_order.date_open, back_order.date_close FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id JOIN back_order ON back_order.execute_id = {table}.id WHERE back_order.id='{order_id}'"
             cmd = cmd_live if mode == "live" else cmd_back
             result:model_output = self.data_sql.db.items(cmd=cmd)
             #--------------Detaile
@@ -210,8 +210,8 @@ class Logic_Management:
                 detaile["status"] = result.data[0][15]
                 detaile["execute_status"] = result.data[0][16]
                 if mode == "back":
-                    detaile["date_from"] = result.data[0][17]
-                    detaile["date_to"] = result.data[0][18]
+                    detaile["date_open"] = result.data[0][17]
+                    detaile["date_close"] = result.data[0][18]
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile
