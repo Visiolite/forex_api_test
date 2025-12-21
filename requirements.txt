@@ -2,7 +2,6 @@ psycopg2-binary
 numpy
 pandas
 PyYAML
-fxcmpy
 forexconnect
 flask
 uvicorn

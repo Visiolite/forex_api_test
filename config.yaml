@@ -24,7 +24,7 @@ database:
   #---Data
   data:
     server: postgresql
-    host: 10.10.10.114
+    host: 127.0.0.1
     port: 5432
     username: forex
     password: "&WnA8v!(THG%)czK"
@@ -32,7 +32,7 @@ database:
   #---Management
   management:
     server: postgresql
-    host: 10.10.10.114
+    host: 127.0.0.1
     port: 5432
     username: management
     password: "&WnA8v!(THG%)czK"
@@ -40,7 +40,7 @@ database:
   #---Log
   log:
     server: postgresql
-    host: 10.10.10.114
+    host: 127.0.0.1
     port: 5432
     username: forex
     password: "&WnA8v!(THG%)czK"
