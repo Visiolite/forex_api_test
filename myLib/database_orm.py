@@ -268,6 +268,17 @@ class Database_Orm:
                 table_name = table.name
                 if table_name != 'instrument':
                     self.session.execute(text(f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE"))
+                    
+                    # Reset sequences for columns that use Sequence()
+                    for column in table.columns:
+                        if column.default and hasattr(column.default, 'name'):
+                            sequence_name = column.default.name
+                            if sequence_name:
+                                try:
+                                    self.session.execute(text(f"ALTER SEQUENCE {sequence_name} RESTART WITH 1"))
+                                except:
+                                    pass  # Sequence might not exist or already handled
+                    
                     self.session.commit()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -342,6 +353,18 @@ class Database_Orm:
         try:
             #--------------Action
             self.session.execute(text(f"TRUNCATE TABLE {model.__tablename__} RESTART IDENTITY CASCADE"))
+            
+            # Reset sequences for columns that use Sequence()
+            for column in model.__table__.columns:
+                if column.default and hasattr(column.default, 'name'):
+                    # Check if it's a sequence
+                    sequence_name = column.default.name
+                    if sequence_name:
+                        try:
+                            self.session.execute(text(f"ALTER SEQUENCE {sequence_name} RESTART WITH 1"))
+                        except:
+                            pass  # Sequence might not exist or already handled
+            
             self.session.commit()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)            

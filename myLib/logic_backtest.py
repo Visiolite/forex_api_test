@@ -29,11 +29,24 @@ class Logic_BackTest:
         self.execute_id = execute_id
         self.count = 1
         #--------------------Instance
+        #---management_orm
         self.management_orm = management_orm if management_orm else Data_Orm(database=database_management)
-        self.management_sql = management_sql if management_sql else Data_SQL(database=database_management)
-        self.data_sql = data_sql if data_sql else Data_SQL(database=database_data)
-        self.log = log if log else log_instance
+        #---management_sql
+        if management_sql:
+            self.management_sql = management_sql
+        else:
+            self.management_sql = Data_SQL(database=database_management)
+            self.management_sql.db.open()
+        #---data_sql
+        if data_sql:
+            self.data_sql = data_sql
+        else:
+            self.data_sql = Data_SQL(database=database_data)
+            self.data_sql.db.open()
+        #---logic_management
         self.logic_management = Logic_Management(data_orm=self.management_orm, data_sql=self.management_sql)
+        #---log
+        self.log = log if log else log_instance
 
     #--------------------------------------------- run
     def run(self):
@@ -56,7 +69,7 @@ class Logic_BackTest:
 
         try:
             #--------------Detaile
-            execute_detaile:model_output = self.logic_management.execute_detaile(id=self.execute_id, mode="back").data
+            execute_detaile:model_output = self.logic_management.execute_detaile(id=self.execute_id, mode="back")
             self.date_from = execute_detaile.get("date_from")
             self.date_to = execute_detaile.get("date_to")
             strategy_name = execute_detaile.get("strategy_name")
@@ -176,10 +189,9 @@ class Logic_BackTest:
                     #---Check TP/SL
                     check_tp_sl = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
                     for item in check_tp_sl :
-                        item = self.order_close(item = item)
+                        item = self.order_close(item = item).data
                         if order_open_accept:
                             order_id = item.get("id")
-                            #order_detaile = self.logic_management.order_detaile(order_id=order_id, mode="back").data
                             result_strategy:model_output = self.strategy.order_close(order_detaile=item)
                             for item in result_strategy.data :
                                 item["father_id"] = order_id
