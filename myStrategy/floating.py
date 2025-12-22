@@ -145,8 +145,8 @@ class Floating:
 
         try:
             #--------------Data
-            action = order_detaile.get("action")
             symbol = order_detaile.get("symbol")
+            action = order_detaile.get("action")
             amount = order_detaile.get("amount")
             profit = order_detaile.get("profit")
             trade_id = order_detaile.get("trade_id")

@@ -6,6 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
+from unittest import result
 from myLib.logic_global import debug, log_instance, data_instance, forex_apis
 from myLib.utils import model_output, sort
 from myLib.log import Log
@@ -18,7 +19,11 @@ from myStrategy import *
 #--------------------------------------------------------------------------------- Class
 class Logic_Management:
     #-------------------------- [Init]
-    def __init__(self, data_orm:Data_Orm=None, data_sql:Data_SQL=None, log:Log=None):
+    def __init__(self,
+        data_orm:Data_Orm=None,
+        data_sql:Data_SQL=None,
+        log:Log=None
+        ):
         #-------------- Variable
         self.this_class = self.__class__.__name__
         #-------------- Instance
@@ -112,54 +117,30 @@ class Logic_Management:
     
     #-------------------------- [execute_detaile]
     def execute_detaile(self, id, mode="live") -> model_output:
-        #-------------- Description
-        # IN     : execute_id
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
         #-------------- Variable
-        detaile = {}
-
-        try:
-            #--------------Data
-            table = "live_execute" if mode == "live" else "back_execute"
-            #--------------Action
-            cmd_live = f"SELECT strategy.name, strategy_item.params, {table}.account_id, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = '{id}';"
-            cmd_back = f"SELECT strategy.name, strategy_item.params, {table}.account_id, {table}.status, {table}.date_from, {table}.date_to FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = '{id}';"
-            cmd = cmd_live if mode == "live" else cmd_back
-            result:model_output = self.data_sql.db.items(cmd=cmd)
-            #--------------Data
-            if result.status and len(result.data) > 0 :
-                detaile["strategy_name"] = result.data[0][0]
-                detaile["params"] = result.data[0][1]
-                detaile["account_id"] = result.data[0][2]
-                detaile["status"] = result.data[0][3]
-                if mode == "back":
-                    detaile["date_from"] = result.data[0][4]
-                    detaile["date_to"] = result.data[0][5]
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = detaile
-            output.message=id
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        output = {}
+        #--------------Data
+        table = "live_execute" if mode == "live" else "back_execute"
+        #--------------Action
+        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.limit_trade, strategy_item.limit_profit, strategy_item.limit_loss, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.count, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = '{id}';"
+        result:model_output = self.data_sql.db.items(cmd=cmd)
+        #--------------Data
+        if result.status and len(result.data) > 0 :
+            output["strategy_name"] = result.data[0][0]
+            output["symbols"] = result.data[0][1]
+            output["actions"] = result.data[0][2]
+            output["amount"] = result.data[0][3]
+            output["tp_pips"] = result.data[0][4]
+            output["sl_pips"] = result.data[0][5]
+            output["limit_trade"] = result.data[0][6]
+            output["limit_profit"] = result.data[0][7]
+            output["limit_loss"] = result.data[0][8]
+            output["params"] = ast.literal_eval(result.data[0][9]) if result.data[0][9] else {}
+            output["date_from"] = result.data[0][10]
+            output["date_to"] = result.data[0][11]
+            output["account_id"] = result.data[0][12]
+            output["count"] = result.data[0][13]
+            output["status"] = result.data[0][14]
         #--------------Return
         return output
     
@@ -228,7 +209,7 @@ class Logic_Management:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
-        
+    
     #-------------------------- [strategy_action]
     def strategy_action(self, execute_id=None, action="start", order_detaile=None) -> model_output:
         #-------------- Description

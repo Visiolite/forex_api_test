@@ -266,8 +266,9 @@ class Database_Orm:
             #--------------Action
             for table in BaseModel.metadata.sorted_tables:
                 table_name = table.name
-                self.session.execute(text(f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE"))
-                self.session.commit()
+                if table_name != 'instrument':
+                    self.session.execute(text(f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE"))
+                    self.session.commit()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None

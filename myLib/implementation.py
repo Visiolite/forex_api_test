@@ -265,7 +265,7 @@ class Implementation:
     #--------------------------------------------- strategy_item
     def strategy_item(self, drop=False, truncate=False,  create=True, add=True):
         #-------------- Description
-        # IN     : 
+        # IN     :
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -445,51 +445,6 @@ class Implementation:
         #--------------Return
         return output
     
-    #--------------------------------------------- live_order
-    def live_order(self, drop=False, truncate=False,  create=True, add=True):
-        #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-        #-------------- Variable
-        model = model_live_order_db
-
-        try:
-            #-------------- Drop
-            if drop : self.data_orm.drop(model=model)
-            #-------------- Create
-            if create : self.data_orm.create(model=model)
-            #-------------- Truncate
-            if truncate : self.data_orm.truncate(model=model)
-            #-------------- Add
-            if add:
-                pass
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-    
     #--------------------------------------------- back_execute
     def back_execute(self, drop=False, truncate=False,  create=True, add=True):
         #-------------- Description
@@ -518,57 +473,12 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=1, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=2, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=3, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=4, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=5, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=6, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-    
-    #--------------------------------------------- back_order
-    def back_order(self, drop=False, truncate=False,  create=True, add=True):
-        #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-        #-------------- Variable
-        model = model_back_order_db
-
-        try:
-            #-------------- Drop
-            if drop : self.data_orm.drop(model=model)
-            #-------------- Create
-            if create : self.data_orm.create(model=model)
-            #-------------- Truncate
-            if truncate : self.data_orm.truncate(model=model)
-            #-------------- Add
-            if add:
-                pass
+                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=1, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=2, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=3, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=4, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=5, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=6, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

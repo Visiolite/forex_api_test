@@ -5,8 +5,8 @@
 # logic_backtest
 
 #--------------------------------------------------------------------------------- Import
-import inspect, time, ast
-from myLib.logic_global import debug, list_instrument, log_instance, data_instance, Strategy_Run
+import inspect, time
+from myLib.logic_global import debug, list_instrument, log_instance, data_instance, Strategy_Run, database_management, database_data
 from myLib.utils import model_output, sort, get_tbl_name
 from myLib.log import Log
 from myLib.data_sql import Data_SQL
@@ -17,25 +17,28 @@ from myModel.model_back_order import model_back_order_db
 #--------------------------------------------------------------------------------- Action
 class Logic_BackTest:
     #--------------------------------------------- init
-    def __init__(self, execute_id, data_sql:Data_SQL=None, management_sql:Data_SQL=None, management_orm:Data_Orm=None, log:Log=None):
+    def __init__(self, 
+            execute_id,
+            management_sql:Data_SQL=None, 
+            management_orm:Data_Orm=None, 
+            data_sql:Data_SQL=None, 
+            log:Log=None
+        ):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.execute_id = execute_id
-        self.strategy = None
-        self.data = None
-        self.list_order_open = []
-        self.list_order_close = []
+        self.count = 1
         #--------------------Instance
-        self.management_orm = management_orm if management_orm else data_instance["management_orm"]
-        self.management_sql = management_sql if management_sql else data_instance["management_sql"]
-        self.data_sql = data_sql if data_sql else data_instance["data_sql"]
+        self.management_orm = management_orm if management_orm else Data_Orm(database=database_management)
+        self.management_sql = management_sql if management_sql else Data_SQL(database=database_management)
+        self.data_sql = data_sql if data_sql else Data_SQL(database=database_data)
         self.log = log if log else log_instance
-        self.logic_management = Logic_Management()
+        self.logic_management = Logic_Management(data_orm=self.management_orm, data_sql=self.management_sql)
 
     #--------------------------------------------- run
     def run(self):
         #-------------- Description
-        # IN     : order_id
+        # IN     :
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -48,32 +51,42 @@ class Logic_BackTest:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
+        #-------------- Output
+        data_params = []
 
         try:
             #--------------Detaile
-            execute_detaile:model_output = self.logic_management.execute_detaile(id=self.execute_id, mode="back")
-            detaile = execute_detaile.data
-            self.strategy_name = detaile.get("strategy_name")
-            self.status = detaile.get("status")
-            self.date_from = detaile.get("date_from")
-            self.date_to = detaile.get("date_to")
-            self.params = ast.literal_eval(detaile.get("params"))
-            #--------------Data
-            self.symbols = self.params.get("symbols", "").split(',')
-            self.data = self.get_data(symbols=self.symbols, date_from=self.date_from, date_to=self.date_to).data
+            execute_detaile:model_output = self.logic_management.execute_detaile(id=self.execute_id, mode="back").data
+            self.date_from = execute_detaile.get("date_from")
+            self.date_to = execute_detaile.get("date_to")
+            strategy_name = execute_detaile.get("strategy_name")
+            symbols = execute_detaile.get("symbols", "").split(',')
+            count = execute_detaile.get("count")
             #--------------Strategy
-            self.strategy = self.logic_management.get_strategy_instance(self.strategy_name, self.params).data
-            #--------------Start
-            result_start:model_output = self.start()
-            #--------------Next
-            result_next:model_output = self.next()
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"{result_start.status} | {result_next.status}"
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
+            self.strategy = self.logic_management.get_strategy_instance(strategy_name, execute_detaile).data
+
+            if self.count <= count:
+                #--------------Variable
+                self.account_profit = 0
+                self.account_loss = 0
+                self.list_order_open = []
+                self.list_order_close = []
+                #--------------Data
+                for symbol in symbols : data_params.append({"symbol": symbol, "date_from":self.date_from, "date_to": self.date_to})
+                self.data = self.get_data(params=data_params).data
+                #--------------Start
+                result_start:model_output = self.start()
+                #--------------Next
+                result_next:model_output = self.next()
+                #--------------Increase count
+                self.count += 1
+                #--------------Output
+                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                output.message = f"{result_start.status} | {result_next.status}"
+                #--------------Verbose
+                if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+                #--------------Log
+                if log : self.log.log(log_model, output)
         except Exception as e:  
             #--------------Error
             output.status = False
@@ -83,7 +96,7 @@ class Logic_BackTest:
         #--------------Return
         return output
 
-    #--------------------------------------------- strategy_start
+    #--------------------------------------------- start
     def start(self):
         #-------------- Description
         # IN     : order_id
@@ -102,7 +115,7 @@ class Logic_BackTest:
 
         try:
             #--------------Data
-            result_strategy: model_output = self.strategy.start()
+            result_strategy:model_output = self.strategy.start()
             #--------------Items
             for item in result_strategy.data :
                 item["father_id"] = 0
@@ -157,18 +170,17 @@ class Logic_BackTest:
             #--------------Action
             for symbol in self.data:
                 for row in self.data[symbol]:
-                    id = row[0]
                     date = row[1]
                     ask = row[2]
                     bid = row[3]
                     #---Check TP/SL
-                    fires = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
-                    for item in fires :
-                        self.order_close(item =item)
+                    check_tp_sl = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
+                    for item in check_tp_sl :
+                        item = self.order_close(item = item)
                         if order_open_accept:
                             order_id = item.get("id")
-                            order_detaile = self.logic_management.order_detaile(order_id=order_id, mode="back").data
-                            result_strategy:model_output = self.strategy.order_close(order_detaile=order_detaile)
+                            #order_detaile = self.logic_management.order_detaile(order_id=order_id, mode="back").data
+                            result_strategy:model_output = self.strategy.order_close(order_detaile=item)
                             for item in result_strategy.data :
                                 item["father_id"] = order_id
                                 item["date"] = date
@@ -176,7 +188,7 @@ class Logic_BackTest:
                                 item["bid"] = bid
                                 self.action(items=result_strategy.data)
                     #---Check limit
-                    check_limit_status, check_limit_param  = self.check_limit(ask, bid)
+                    check_limit_status, check_limit_param  = self.check_limit(ask, bid, date)
                     if not check_limit_status:
                         if check_limit_param == 'trade':
                             order_open_accept = False
@@ -205,123 +217,54 @@ class Logic_BackTest:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
-    
-    #--------------------------------------------- get_data
-    def get_data(self, symbols, date_from, date_to):
-        #-------------- Description
-        # IN     : order_id
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-        #-------------- Variable
-        output.data = {}
 
-        try:
-            #--------------Action
-            for symbol in symbols:
-                table = get_tbl_name(symbol, "t1")
-                cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{date_from}' and date<='{date_to}' ORDER BY date ASC"
-                result:model_output = self.data_sql.db.items(cmd=cmd)
-                if result.status == True :
-                    output.data[symbol] = result.data
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"{date_from} | {date_to} | {len(symbols)}"
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-    
     #--------------------------------------------- action
     def action(self, items:dict)-> model_output:
-        #-------------- Description
-        # IN     : order_id
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
+        #-------------- Variable
         output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-
-        try:
-            #--------------Action
-            for item in items :
-                run = item.get("run")
-                if run == Strategy_Run.ORDER_OPEN : result:model_output =self.order_open(item=item)
-                if run == Strategy_Run.ORDER_CLOSE : result:model_output = self.order_close(item=item)
-                if run == Strategy_Run.ORDER_CLOSE_ALL : result:model_output = self.order_close_all(item=item)
-            #--------------Output
-            output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Action
+        for item in items :
+            run = item.get("run")
+            if run == Strategy_Run.ORDER_OPEN : output:model_output =self.order_open(item=item)
+            if run == Strategy_Run.ORDER_CLOSE : output:model_output = self.order_close(item=item)
+            if run == Strategy_Run.ORDER_CLOSE_ALL : output:model_output = self.order_close_all(item=item)
         #--------------Return
         return output
-
+    
     #--------------------------------------------- check_tp_sl
     def check_tp_sl(self, symbol, ask, bid, date)-> model_output:
         #--------------Variable
-        items = []
+        output = []
         #--------------Action
         for order in self.list_order_open :
             fire = False
-            order_symbol = order[6]
+            order_symbol = order[10]
             if order_symbol == symbol :
-                order_id = order[0]
-                order_action = order[7]
-                order_amount = order[8]
-                price_open = order[11]
+                #--------------Data
+                id = order[0]
+                price_open = order[5]
+                action = order[11]
+                amount = order[12]
                 order_tp = order[13]
                 order_sl = order[14]
-                #--------------Check TP/SL
+                #--------------Variable
                 #---Buy
-                if order_action == "buy":
+                if action == "buy":
                     if bid > order_tp and order_tp > 0 : fire = True
                     if bid < order_sl and order_sl > 0 : fire = True
                 #---Sell
-                if order_action == "sell":
+                if action == "sell":
                     if ask < order_tp and order_tp > 0 :fire = True
                     if ask > order_sl and order_sl > 0 : fire = True
                 #---Fire
                 if fire :
-                    item = {"id":order_id, "symbol":order_symbol, "action":order_action, "amount":order_amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
-                    items.append(item)
+                    item = {"id":id, "symbol":order_symbol, "action":action, "amount":amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
+                    output.append(item)
         #--------------Return
-        return items
+        return output
 
     #--------------------------------------------- check_limit
-    def check_limit(self, ask, bid)-> model_output:
+    def check_limit(self, ask, bid, date)-> model_output:
         #--------------Variable
         result = True
         param = None
@@ -331,10 +274,12 @@ class Logic_BackTest:
         #--------------Calculate
         for item in self.list_order_close : 
             trade_count += 1
-            profit_close = profit_close + item[15]
+            profit_close = profit_close + item[8]
+            profit_close = float(f"{profit_close:.{2}f}")
         for item in self.list_order_open : 
             trade_count += 1
             profit_open = profit_open + self.profit_calculate(item, ask, bid)
+            profit_open = float(f"{profit_open:.{2}f}")
         #--------------Trade
         if self.strategy.limit_trade !=-1 and trade_count >= self.strategy.limit_trade : 
             result = False
@@ -345,13 +290,21 @@ class Logic_BackTest:
             param='profit'
         #--------------Loss
         if profit_close < 0 :
-            if self.strategy.limit_loss !=-1 and (profit_open+profit_close) <= self.strategy.limit_loss:
+            profit_open = profit_open + profit_close
+            if self.strategy.limit_loss !=-1 and profit_open <= self.strategy.limit_loss:
                 result = False
                 param='loss'
         else:
             if self.strategy.limit_loss !=-1 and profit_open <= self.strategy.limit_loss:
                 result = False
                 param='loss'
+        #--------------Log
+        if (self.account_profit != profit_close or self.account_loss != profit_open):
+            if (abs(profit_close-self.account_profit)>1 or abs(profit_open-self.account_loss)>1) :
+                self.account_profit = profit_close
+                self.account_loss = profit_open
+                cmd = f"INSERT INTO back_execute_detaile (date,execute_id,count,profit,loss) VALUES('{date}', {self.execute_id}, {self.count}, {profit_close}, {profit_open})"
+                self.management_sql.db.execute(cmd=cmd)
         #--------------Return
         output = result, param
         return output
@@ -359,14 +312,12 @@ class Logic_BackTest:
     #--------------------------------------------- profit_calculate
     def profit_calculate(self, item, ask, bid)-> model_output:
         #--------------Data
-        action = item[7]
-        amount = item[8]
-        price_open = item[11]
+        action = item[11]
+        amount = item[12]
+        price_open = item[5]
+        profit = 0
         #--------------Action
-        if action == "buy":
-            profit = (bid - price_open) * amount
-        elif action == "sell":
-            profit = (price_open - ask) * amount
+        profit = (bid - price_open) * amount if action == "buy" else (price_open - ask) * amount if action == "sell" else 0
         profit = f"{profit:.{2}f}"
         #--------------Return
         output = float(profit)
@@ -417,6 +368,7 @@ class Logic_BackTest:
             obj.father_id = father_id
             obj.date_open = date
             obj.execute_id = self.execute_id
+            obj.count = self.count
             obj.symbol = symbol
             obj.action = action
             obj.amount = amount
@@ -482,7 +434,9 @@ class Logic_BackTest:
             elif action == "sell":
                 price_close = ask
                 profit = (price_open - ask) * amount
-            profit = f"{profit:.{2}f}"
+            profit = float(f"{profit:.{2}f}")
+            self.account_profit = self.account_profit + profit
+            item["profit"] = profit
             #-------------- Action
             cmd = f"UPDATE back_order SET date_close='{date}', price_close={price_close}, profit={profit}, status='close' WHERE id='{id}'"
             result_database:model_output = self.management_sql.db.execute(cmd=cmd)
@@ -492,7 +446,7 @@ class Logic_BackTest:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = result_database.status
-            output.data = None
+            output.data = item
             output.message = f"{id} | {symbol} | {action} | {profit}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
@@ -543,6 +497,52 @@ class Logic_BackTest:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None
             output.message = len(self.list_order_open)
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #--------------------------------------------- get_data
+    def get_data(self, params):
+        #-------------- Description
+        # IN     : order_id
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Variable
+        output.data = {}
+
+        try:
+            #--------------Action
+            for item in params:
+                symbol = item.get("symbol")
+                date_from = item.get("date_from")
+                date_to = item.get("date_to")
+                table = get_tbl_name(symbol, "t1")
+                cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{date_from}' and date<='{date_to}' ORDER BY date ASC"
+                result:model_output = self.data_sql.db.items(cmd=cmd)
+                if result.status == True :
+                    output.data[symbol] = result.data
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log

@@ -226,6 +226,7 @@ debug:
     order_close: {log: false, verbose: false, model: "Logic_Forex"}
     order_close_all: {log: false, verbose: false, model: "Logic_Forex"}
   Logic_BackTest:
+    run: {log: false, verbose: true, model: "Logic_BackTest"}
     start: {log: false, verbose: true, model: "Logic_BackTest"}
     order_open: {log: false, verbose: true, model: "Logic_BackTest"}
     order_close: {log: false, verbose: true, model: "Logic_BackTest"}
