@@ -469,12 +469,12 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=1, count=9999, date_from="2025-01-01 00:00:00", date_to="2025-12-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=1, count=9999, date_from="2025-01-01 00:00:00", date_to="2025-12-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=1, count=9999, date_from="2025-01-01 00:00:00", date_to="2025-12-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=1, count=9999, date_from="2025-01-01 00:00:00", date_to="2025-12-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, count=9999, date_from="2025-01-01 00:00:00", date_to="2025-12-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, count=9999, date_from="2025-01-01 00:00:00", date_to="2025-12-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=1, count=100, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=1, count=100, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=1, count=100, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=1, count=100, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, count=100, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, count=100, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

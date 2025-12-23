@@ -616,11 +616,42 @@ class Logic_BackTest:
         detaile = []
         
         try:
-            #--------------Data
             cmd = f"SELECT max(count) FROM back_order WHERE execute_id={execute_id}"
             max_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-            #--------------Items
             if max_count:
+                #--------------All
+                cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM back_order WHERE execute_id={execute_id}"
+                data = self.management_sql.db.items(cmd=cmd).data[0]
+                date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
+                date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
+                all_count = data[2]
+                profit = f"{data[3]:.{2}f}"
+                cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and status='open'"
+                open_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+                cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and status='close'"
+                close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+                cmd = f"SELECT count(id) FROM back_order  WHERE execute_id={execute_id} and status='close'"
+                close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+                cmd = f"SELECT min(profit), max(profit), min(loss), max(loss) FROM back_execute_detaile WHERE execute_id={execute_id}"
+                data = self.management_sql.db.items(cmd=cmd).data[0]
+                profit_min = f"{data[0]:.{2}f}"
+                profit_max = f"{data[1]:.{2}f}"
+                loss_max = f"{data[2]:.{2}f}"
+                loss_min = f"{data[3]:.{2}f}"
+                detaile.append({
+                    "count":'All',
+                    "date_from":date_from,
+                    "date_to":date_to,
+                    "all_count":all_count,
+                    "profit":profit,
+                    "open_count":open_count,
+                    "close_count":close_count,
+                    "profit_min":profit_min,
+                    "profit_max":profit_max,
+                    "loss_min":loss_min,
+                    "loss_max":loss_max
+                })
+                #--------------Items
                 for i in range(max_count):
                     i += 1
                     cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM back_order WHERE execute_id={execute_id} and count={i}"
