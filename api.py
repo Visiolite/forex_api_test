@@ -17,8 +17,6 @@ from myLib.logic_global import config, load_forex_api, list_close
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from webapi import *
-from listen_close import Listen_Close
-from listen_close_execute import Listen_Close_Execute
 
 #--------------------------------------------------------------------------------- Variable
 title = config.get("webapi", {}).get("title", {})
@@ -83,10 +81,12 @@ routes = [
     (strategy, f"/{key}/strategy", ["Strategy"]),
     (strategy_item, f"/{key}/strategy_item", ["Strategy Item"]),
     (live_execute, f"/{key}/live_execute", ["Live Execute"]),
-    (live_order, f"/{key}/live_order", ["Live Order"])
+    (live_order, f"/{key}/live_order", ["Live Order"]),
+    (back_execute, f"/{key}/back_execute", ["Back Execute"]),
+    (back_order, f"/{key}/back_order", ["Back Order"])
 ]
 for router, prefix, tags in routes : app.include_router(router, prefix=prefix, tags=tags)
 
 #--------------------------------------------------------------------------------- Run
 if __name__ == "__main__" : 
-    uvicorn.run(app, host=host, port=port, log_level="warning")
+    uvicorn.run(app, host=host, port=port, log_level="info")

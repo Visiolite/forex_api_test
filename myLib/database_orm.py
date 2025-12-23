@@ -106,6 +106,8 @@ class Database_Orm:
                             query = query.order_by(getattr(model, attr).desc())
                         else:
                             query = query.order_by(getattr(model, attr).asc())
+            else:
+                query = query.order_by(model.id.asc())
             result = query.all()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)

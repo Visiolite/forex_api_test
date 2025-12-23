@@ -43,7 +43,8 @@ class model_back_order_db(BaseModel_db):
     #---Json
     def toDict(self):
         data = {column.key: getattr(self, column.key) for column in inspect(self).mapper.column_attrs}
-        if data.get('date') and isinstance(data['date'], datetime) : data['date'] = data['date'].strftime('%Y-%m-%d %H:%M:%S')
+        if data.get('date_open') and isinstance(data['date_open'], datetime) : data['date_open'] = data['date_open'].strftime('%Y-%m-%d %H:%M:%S')
+        if data.get('date_close') and isinstance(data['date_close'], datetime) : data['date_close'] = data['date_close'].strftime('%Y-%m-%d %H:%M:%S')
         return data
 
 #--------------------------------------------------------------------------------- Python

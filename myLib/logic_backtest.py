@@ -11,14 +11,13 @@ from myLib.utils import model_output, sort, get_tbl_name
 from myLib.log import Log
 from myLib.data_sql import Data_SQL
 from myLib.data_orm import Data_Orm
-from myLib.logic_management import Logic_Management
 from myModel.model_back_order import model_back_order_db
 
 #--------------------------------------------------------------------------------- Action
 class Logic_BackTest:
     #--------------------------------------------- init
     def __init__(self, 
-            execute_id,
+            execute_id=None,
             management_sql:Data_SQL=None, 
             management_orm:Data_Orm=None, 
             data_sql:Data_SQL=None, 
@@ -43,8 +42,6 @@ class Logic_BackTest:
         else:
             self.data_sql = Data_SQL(database=database_data)
             self.data_sql.db.open()
-        #---logic_management
-        self.logic_management = Logic_Management(data_orm=self.management_orm, data_sql=self.management_sql)
         #---log
         self.log = log if log else log_instance
 
@@ -64,8 +61,12 @@ class Logic_BackTest:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        #-------------- Output
+        #-------------- Variable
+        #---general
         data_params = []
+        #---logic_management
+        from myLib.logic_management import Logic_Management
+        self.logic_management = Logic_Management(data_orm=self.management_orm, data_sql=self.management_sql)
 
         try:
             #--------------Detaile
@@ -75,24 +76,34 @@ class Logic_BackTest:
             strategy_name = execute_detaile.get("strategy_name")
             symbols = execute_detaile.get("symbols", "").split(',')
             count = execute_detaile.get("count")
+            #--------------Count
+            cmd = f"SELECT MAX(count) FROM back_order WHERE execute_id='{self.execute_id}'"
+            count_history = self.management_sql.db.items(cmd=cmd).data[0][0]
+            if count_history:
+                self.count = count+1
+            else:
+                self.count = 1
             #--------------Strategy
             self.strategy = self.logic_management.get_strategy_instance(strategy_name, execute_detaile).data
-
-            if self.count <= count:
+            #--------------Data
+            for symbol in symbols : data_params.append({"symbol": symbol, "date_from":self.date_from, "date_to": self.date_to})
+            self.data = self.get_data(params=data_params).data
+            #--------------Action
+            for i in range(count):
                 #--------------Variable
                 self.account_profit = 0
                 self.account_loss = 0
                 self.list_order_open = []
                 self.list_order_close = []
-                #--------------Data
-                for symbol in symbols : data_params.append({"symbol": symbol, "date_from":self.date_from, "date_to": self.date_to})
-                self.data = self.get_data(params=data_params).data
                 #--------------Start
                 result_start:model_output = self.start()
                 #--------------Next
                 result_next:model_output = self.next()
                 #--------------Increase count
                 self.count += 1
+                #--------------Database
+                cmd = f"UPDATE back_execute SET status='stop' WHERE id={self.execute_id}"
+                result_database:model_output = self.management_sql.db.execute(cmd=cmd)
                 #--------------Output
                 output.time = sort(f"{(time.time() - start_time):.3f}", 3)
                 output.message = f"{result_start.status} | {result_next.status}"
@@ -100,6 +111,9 @@ class Logic_BackTest:
                 if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
                 #--------------Log
                 if log : self.log.log(log_model, output)
+            #--------------Database
+            self.management_sql.db.close()
+            self.data_sql.db.close()
         except Exception as e:  
             #--------------Error
             output.status = False
@@ -125,27 +139,35 @@ class Logic_BackTest:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
+        #-------------- Variable
+        keep = False
 
         try:
             #--------------Data
             result_strategy:model_output = self.strategy.start()
             #--------------Items
             for item in result_strategy.data :
-                item["father_id"] = 0
-                item["date"] = self.data[item.get("symbol")][0][1]
-                item["ask"] = self.data[item.get("symbol")][0][2]
-                item["bid"] = self.data[item.get("symbol")][0][3]
-            self.data[item.get("symbol")].pop(0)
-            state = item.get("state")
+                if len(self.data[item.get("symbol")])>0:
+                    item["father_id"] = 0
+                    item["date"] = self.data[item.get("symbol")][0][1]
+                    item["ask"] = self.data[item.get("symbol")][0][2]
+                    item["bid"] = self.data[item.get("symbol")][0][3]
+                    self.data[item.get("symbol")].pop(0)
+                    state = item.get("state")
+                    keep = True
+                else:
+                    keep = False
             #--------------Action
-            result_action:model_output = self.action(items=result_strategy.data)
+            if keep :
+                result_action:model_output = self.action(items=result_strategy.data)
             #--------------Database
-            cmd = f"UPDATE back_execute SET status='{state}' WHERE id={self.execute_id}"
-            result_database:model_output = self.management_sql.db.execute(cmd=cmd)
+            if keep :
+                cmd = f"UPDATE back_execute SET status='{state}' WHERE id={self.execute_id}"
+                result_database:model_output = self.management_sql.db.execute(cmd=cmd)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None
-            output.message = f"{result_strategy.status} | {result_action.status} | {result_database.status}"
+            output.message = None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
@@ -217,7 +239,9 @@ class Logic_BackTest:
                                     item["bid"] = bid
                                     self.action(items=result_strategy.data)
                     else:
-                        self.data[symbol].pop(0)
+                        break
+            if len(self.data[symbol])>1: 
+                self.data[symbol] = self.data[symbol][self.data[symbol].index(row) + 1:]
             #--------------Output
             output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -396,8 +420,8 @@ class Logic_BackTest:
             obj.status = 'open'
             result_database:model_output = self.management_orm.add(model=model_back_order_db, item=obj)
             #-------------- Orders
-            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' AND status='open'").data
-            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' AND status='close'").data
+            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and count='{self.count}' AND status='open'").data
+            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and count='{self.count}' AND status='close'").data
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = result_database.status
@@ -457,8 +481,8 @@ class Logic_BackTest:
             cmd = f"UPDATE back_order SET date_close='{date}', price_close={price_close}, profit={profit}, status='close' WHERE id='{id}'"
             result_database:model_output = self.management_sql.db.execute(cmd=cmd)
             #-------------- Orders
-            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' AND status='open'").data
-            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' AND status='close'").data
+            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and count='{self.count}' AND status='open'").data
+            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and count='{self.count}' AND status='close'").data
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = result_database.status
@@ -502,12 +526,12 @@ class Logic_BackTest:
             date= item.get("date")
             #-------------- Action
             for order in self.list_order_open :
-                order_symbol = order[6]
-                order_id = order[0]
-                order_action = order[7]
-                order_amount = order[8]
-                price_open = order[11]
-                item = {"id":order_id, "symbol":order_symbol, "action":order_action, "amount":order_amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
+                id = order[0]
+                symbol = order[10]
+                action = order[11]
+                amount = order[12]
+                price_open = order[5]
+                item = {"id":id, "symbol":symbol, "action":action, "amount":amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
                 self.order_close(item =item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -559,6 +583,81 @@ class Logic_BackTest:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = None
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [order_detaile]
+    def order_detaile(self, execute_id) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Detaile
+        detaile = []
+        
+        try:
+            #--------------Data
+            cmd = f"SELECT max(count) FROM back_order WHERE execute_id={execute_id}"
+            max_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+            #--------------Items
+            if max_count:
+                for i in range(max_count):
+                    i += 1
+                    cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM back_order WHERE execute_id={execute_id} and count={i}"
+                    data = self.management_sql.db.items(cmd=cmd).data[0]
+                    date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
+                    date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
+                    all_count = data[2]
+                    profit = f"{data[3]:.{2}f}"
+                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and count={i} and status='open'"
+                    open_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and count={i} and status='close'"
+                    close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    cmd = f"SELECT count(id) FROM back_order  WHERE execute_id={execute_id} and count={i} and status='close'"
+                    close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    cmd = f"SELECT min(profit), max(profit), min(loss), max(loss) FROM back_execute_detaile WHERE execute_id={execute_id} and count={i}"
+                    data = self.management_sql.db.items(cmd=cmd).data[0]
+                    profit_min = f"{data[0]:.{2}f}"
+                    profit_max = f"{data[1]:.{2}f}"
+                    loss_max = f"{data[2]:.{2}f}"
+                    loss_min = f"{data[3]:.{2}f}"
+                    detaile.append({
+                        "count":i,
+                        "date_from":date_from,
+                        "date_to":date_to,
+                        "all_count":all_count,
+                        "profit":profit,
+                        "open_count":open_count,
+                        "close_count":close_count,
+                        "profit_min":profit_min,
+                        "profit_max":profit_max,
+                        "loss_min":loss_min,
+                        "loss_max":loss_max
+                    })
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = detaile
+            output.message=execute_id
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
