@@ -596,6 +596,44 @@ class Logic_BackTest:
         #--------------Return
         return output
     
+    #-------------------------- [order_count]
+    def order_count(self, execute_id) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            cmd = f"SELECT max(count) FROM back_order WHERE execute_id={execute_id}"
+            max_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+            if max_count is None : max_count = 0
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = max_count
+            output.message=max_count
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return max_count
+    
     #-------------------------- [order_detaile]
     def order_detaile(self, execute_id) -> model_output:
         #-------------- Description

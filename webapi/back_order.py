@@ -67,10 +67,11 @@ def disable(id):
 def status(id): 
     return data_orm.status(model=model_db, id=id)
 
-#-------------------------- [Dead]
-@route.get("/dead/{id}", description="dead", response_model=model_output)
-def dead(id): 
-    return data_orm.dead(model=model_db, id=id)
+#-------------------------- [count]
+@route.get("/count/{id}", description="count", response_model=int)
+def count(id): 
+    result = logic_backtest.order_count(execute_id=id)
+    return result
 
 #-------------------------- [Detaile]
 @route.get("/detaile/{id}", description="detaile", response_model=model_output)
