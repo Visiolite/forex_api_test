@@ -375,7 +375,7 @@ class Implementation:
                     sl_pips=1000,
                     limit_trade=-1,
                     limit_profit=10,
-                    limit_loss=-1000,
+                    limit_loss=-100,
                     params=""
                 )
                 self.data_orm.add(model=model, item=item)
@@ -473,12 +473,12 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=1, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=2, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=3, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=4, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=5, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=6, account_id=1, count=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=1, account_id=1, count=1, date_from="2025-11-01 00:00:00", date_to="2025-12-20 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=2, account_id=1, count=1, date_from="2025-11-01 00:00:00", date_to="2025-12-20 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=3, account_id=1, count=1, date_from="2025-11-01 00:00:00", date_to="2025-12-20 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=4, account_id=1, count=1, date_from="2025-11-01 00:00:00", date_to="2025-12-20 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=5, account_id=1, count=1, date_from="2025-11-01 00:00:00", date_to="2025-12-20 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=6, account_id=1, count=1, date_from="2025-11-01 00:00:00", date_to="2025-12-20 00:00:00"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

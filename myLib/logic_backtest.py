@@ -186,34 +186,38 @@ class Logic_BackTest:
                     date = row[1]
                     ask = row[2]
                     bid = row[3]
-                    #---Check TP/SL
-                    check_tp_sl = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
-                    for item in check_tp_sl :
-                        item = self.order_close(item = item).data
-                        if order_open_accept:
-                            order_id = item.get("id")
-                            result_strategy:model_output = self.strategy.order_close(order_detaile=item)
-                            for item in result_strategy.data :
-                                item["father_id"] = order_id
-                                item["date"] = date
-                                item["ask"] = ask
-                                item["bid"] = bid
-                                self.action(items=result_strategy.data)
-                    #---Check limit
-                    check_limit_status, check_limit_param  = self.check_limit(ask, bid, date)
-                    if not check_limit_status:
-                        if check_limit_param == 'trade':
-                            order_open_accept = False
-                        if check_limit_param == 'profit':
-                            order_open_accept = False
-                        if check_limit_param == 'loss':
-                            result_strategy:model_output = self.strategy.stop()
-                            for item in result_strategy.data :
-                                item["father_id"] = -1
-                                item["date"] = date
-                                item["ask"] = ask
-                                item["bid"] = bid
-                                self.action(items=result_strategy.data)
+                    #---Check orders
+                    if len(self.list_order_open) > 0:
+                        #---Check TP/SL
+                        check_tp_sl = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
+                        for item in check_tp_sl :
+                            item = self.order_close(item = item).data
+                            if order_open_accept:
+                                order_id = item.get("id")
+                                result_strategy:model_output = self.strategy.order_close(order_detaile=item)
+                                for item in result_strategy.data :
+                                    item["father_id"] = order_id
+                                    item["date"] = date
+                                    item["ask"] = ask
+                                    item["bid"] = bid
+                                    self.action(items=result_strategy.data)
+                        #---Check limit
+                        check_limit_status, check_limit_param  = self.check_limit(ask, bid, date)
+                        if not check_limit_status:
+                            if check_limit_param == 'trade':
+                                order_open_accept = False
+                            if check_limit_param == 'profit':
+                                order_open_accept = False
+                            if check_limit_param == 'loss':
+                                result_strategy:model_output = self.strategy.stop()
+                                for item in result_strategy.data :
+                                    item["father_id"] = -1
+                                    item["date"] = date
+                                    item["ask"] = ask
+                                    item["bid"] = bid
+                                    self.action(items=result_strategy.data)
+                    else:
+                        self.data[symbol].pop(0)
             #--------------Output
             output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
