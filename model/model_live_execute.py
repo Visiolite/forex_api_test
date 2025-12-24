@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------- Location
-# models/model_live_execute.py
+# model/model_live_execute.py
 
 #--------------------------------------------------------------------------------- Description
 # model_live_execute
@@ -23,7 +23,7 @@ class model_live_execute_db(BaseModel_db):
     account_id = Column(Integer, default=1)
     date_from = Column(DateTime, default='2025-01-01 00:00:00')
     date_to = Column(DateTime, default='2030-01-01 00:00:00')
-    count = Column(Integer, default=1)
+    step = Column(Integer, default=1)
     status = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
@@ -42,9 +42,9 @@ class model_live_execute_py(BaseModel_py):
     name : str = ''
     strategy_item_id : int = 1
     account_id : int = 1
-    date_from : datetime = datetime.strptime('2025-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')    
+    date_from : datetime = datetime.strptime('2025-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
     date_to : datetime = datetime.strptime('2030-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
-    count : int = 1
+    step : int = 1
     status : str = ''
     description : Optional[str] = ''
     enable : bool = True

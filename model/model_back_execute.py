@@ -23,7 +23,7 @@ class model_back_execute_db(BaseModel_db):
     account_id = Column(Integer, default=0)
     date_from = Column(DateTime, default='2025-01-01 00:00:00')
     date_to = Column(DateTime, default='2030-01-01 00:00:00')
-    count = Column(Integer, default=1)
+    step = Column(Integer, default=1)
     status = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
@@ -45,6 +45,6 @@ class model_back_execute_py(BaseModel_py):
     date_from : Optional[str] = ''
     date_to : Optional[str] = ''
     status : str = ''
-    count : int = 1
+    step : int = 1
     description : Optional[str] = ''
     enable : bool = True

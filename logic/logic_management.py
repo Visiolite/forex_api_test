@@ -122,7 +122,7 @@ class Logic_Management:
         #--------------Data
         table = "live_execute" if mode == "live" else "back_execute"
         #--------------Action
-        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.limit_trade, strategy_item.limit_profit, strategy_item.limit_loss, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.count, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = {id}"
+        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.limit_trade, strategy_item.limit_profit, strategy_item.limit_loss, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.step, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = {id}"
         result:model_output = self.data_sql.db.items(cmd=cmd)
         #--------------Data
         if result.status and len(result.data) > 0 :
@@ -139,7 +139,7 @@ class Logic_Management:
             output["date_from"] = result.data[0][10]
             output["date_to"] = result.data[0][11]
             output["account_id"] = result.data[0][12]
-            output["count"] = result.data[0][13]
+            output["step"] = result.data[0][13]
             output["status"] = result.data[0][14]
         #--------------Return
         return output
@@ -211,7 +211,7 @@ class Logic_Management:
         return output
     
     #-------------------------- [live_action]
-    def live_action(self, execute_id=None, action="start", order_detaile=None) -> model_output:
+    def live_action(self, count=1, execute_id=None, action="start", order_detaile=None) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : model_output

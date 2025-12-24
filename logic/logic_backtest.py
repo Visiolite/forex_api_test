@@ -26,7 +26,7 @@ class Logic_BackTest:
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.execute_id = execute_id
-        self.count = 1
+        self.step = 1
         #--------------------Instance
         #---management_orm
         self.management_orm = management_orm if management_orm else Data_Orm(database=database_management)
@@ -75,14 +75,14 @@ class Logic_BackTest:
             self.date_to = execute_detaile.get("date_to")
             strategy_name = execute_detaile.get("strategy_name")
             symbols = execute_detaile.get("symbols", "").split(',')
-            count = execute_detaile.get("count")
+            count = execute_detaile.get("step")
             #--------------Count
-            cmd = f"SELECT MAX(count) FROM back_order WHERE execute_id='{self.execute_id}'"
+            cmd = f"SELECT MAX(step) FROM back_order WHERE execute_id='{self.execute_id}'"
             count_history = self.management_sql.db.items(cmd=cmd).data[0][0]
             if count_history:
-                self.count = count+1
+                self.step = count+1
             else:
-                self.count = 1
+                self.step = 1
             #--------------Strategy
             self.strategy = self.logic_management.get_strategy_instance(strategy_name, execute_detaile).data
             #--------------Data
@@ -100,7 +100,7 @@ class Logic_BackTest:
                 #--------------Next
                 result_next:model_output = self.next()
                 #--------------Increase count
-                self.count += 1
+                self.step += 1
                 #--------------Database
                 cmd = f"UPDATE back_execute SET status='stop' WHERE id={self.execute_id}"
                 result_database:model_output = self.management_sql.db.execute(cmd=cmd)
@@ -343,7 +343,7 @@ class Logic_BackTest:
             if (abs(profit_close-self.account_profit)>1 or abs(profit_open-self.account_loss)>1) :
                 self.account_profit = profit_close
                 self.account_loss = profit_open
-                cmd = f"INSERT INTO back_execute_detaile (date,execute_id,count,profit,loss) VALUES('{date}', {self.execute_id}, {self.count}, {profit_close}, {profit_open})"
+                cmd = f"INSERT INTO back_execute_detaile (date,execute_id,step,profit,loss) VALUES('{date}', {self.execute_id}, {self.step}, {profit_close}, {profit_open})"
                 self.management_sql.db.execute(cmd=cmd)
         #--------------Return
         output = result, param
@@ -408,7 +408,7 @@ class Logic_BackTest:
             obj.father_id = father_id
             obj.date_open = date
             obj.execute_id = self.execute_id
-            obj.count = self.count
+            obj.step = self.step
             obj.symbol = symbol
             obj.action = action
             obj.amount = amount
@@ -420,8 +420,8 @@ class Logic_BackTest:
             obj.status = 'open'
             result_database:model_output = self.management_orm.add(model=model_back_order_db, item=obj)
             #-------------- Orders
-            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and count='{self.count}' AND status='open'").data
-            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and count='{self.count}' AND status='close'").data
+            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
+            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = result_database.status
@@ -481,8 +481,8 @@ class Logic_BackTest:
             cmd = f"UPDATE back_order SET date_close='{date}', price_close={price_close}, profit={profit}, status='close' WHERE id='{id}'"
             result_database:model_output = self.management_sql.db.execute(cmd=cmd)
             #-------------- Orders
-            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and count='{self.count}' AND status='open'").data
-            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and count='{self.count}' AND status='close'").data
+            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
+            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = result_database.status

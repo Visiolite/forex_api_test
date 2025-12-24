@@ -20,7 +20,7 @@ class model_back_execute_detaile_db(BaseModel_db):
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime)
     execute_id = Column(Integer, default=0)
-    count = Column(Integer, default=0)
+    step = Column(Integer, default=0)
     profit = Column(Float, default=0)
     loss = Column(Float, default=0)
     #---Display
@@ -36,6 +36,6 @@ class model_back_execute_detaile_py(BaseModel_py):
     id : int = 0
     date : Optional[str] = ''
     execute_id : int = 0
-    count : int = 0
+    step : int = 0
     profit : float = 0
     loss : float = 0
