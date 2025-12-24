@@ -7,7 +7,6 @@
 #--------------------------------------------------------------------------------- Import
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from sqlalchemy.inspection import inspect
-from sqlalchemy.sql import func
 from myLib.database_orm import BaseModel as BaseModel_db
 from pydantic import BaseModel as BaseModel_py
 from typing import Optional
@@ -20,12 +19,12 @@ class model_back_execute_db(BaseModel_db):
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, default='')
-    strategy_item_id = Column(Integer, default=0)
+    strategy_item_id = Column(Integer, default=1)
     account_id = Column(Integer, default=0)
-    date_from = Column(DateTime, default=func.now(), server_default=func.now())
-    date_to = Column(DateTime, default=func.now(), server_default=func.now())
-    status = Column(String, default='')
+    date_from = Column(DateTime, default='2025-01-01 00:00:00')
+    date_to = Column(DateTime, default='2030-01-01 00:00:00')
     count = Column(Integer, default=1)
+    status = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
     #---Display

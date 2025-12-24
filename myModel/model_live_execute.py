@@ -18,8 +18,9 @@ class model_live_execute_db(BaseModel_db):
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, default='')
-    strategy_item_id = Column(Integer, default=0)
-    account_id = Column(Integer, default=0)
+    strategy_item_id = Column(Integer, default=1)
+    account_id = Column(Integer, default=1)
+    count = Column(Integer, default=1)
     status = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
@@ -32,8 +33,9 @@ class model_live_execute_db(BaseModel_db):
 class model_live_execute_py(BaseModel_py):
     id : int = 0
     name : str = ''
-    strategy_item_id : int = 0
-    account_id : int = 0
+    strategy_item_id : int = 1
+    account_id : int = 1
+    count : int = 1
     status : str = ''
     description : Optional[str] = ''
     enable : bool = True
