@@ -5,13 +5,13 @@
 # This is route for live_order
 
 #--------------------------------------------------------------------------------- Import
-from myLib.utils import model_output
-from myLib.logic_global import database_management
+from logic.logic_util import model_output
+from logic.logic_global import database_management
 from fastapi import APIRouter, Request
 from myModel.model_live_order import model_live_order_py as model_py
 from myModel.model_live_order import model_live_order_db as model_db
-from myLib.data_orm import Data_Orm
-from myLib.logic_management import Logic_Management
+from logic.data_orm import Data_Orm
+from logic.logic_management import Logic_Management
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]

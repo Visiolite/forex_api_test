@@ -196,18 +196,18 @@ debug:
     create: {log: false, verbose: false, model: "Database_Orm"}
     truncate: {log: false, verbose: false, model: "Database_Orm"}
     drop: {log: false, verbose: false, model: "Database_Orm"}
-  Implementation:
-    create_all_table: {log: false, verbose: true, model: "Implementation"}
-    truncate_all_table: {log: false, verbose: true, model: "Implementation"}
-    instrument: {log: false, verbose: true, model: "Implementation"}
-    account: {log: false, verbose: true, model: "Implementation"}
-    strategy: {log: false, verbose: true, model: "Implementation"}
-    strategy_item: {log: false, verbose: true, model: "Implementation"}
-    live_execute: {log: false, verbose: true, model: "Implementation"}
-    live_order: {log: false, verbose: true, model: "Implementation"}
-    back_execute: {log: false, verbose: true, model: "Implementation"}
-    back_order: {log: false, verbose: true, model: "Implementation"}
-    create_instrument_timeframe_table: {log: false, verbose: true, model: "Implementation_Data"}
+  Logic_Implementation:
+    create_all_table: {log: false, verbose: true, model: "Logic_Implementation"}
+    truncate_all_table: {log: false, verbose: true, model: "Logic_Implementation"}
+    instrument: {log: false, verbose: true, model: "Logic_Implementation"}
+    account: {log: false, verbose: true, model: "Logic_Implementation"}
+    strategy: {log: false, verbose: true, model: "Logic_Implementation"}
+    strategy_item: {log: false, verbose: true, model: "Logic_Implementation"}
+    live_execute: {log: false, verbose: true, model: "Logic_Implementation"}
+    live_order: {log: false, verbose: true, model: "Logic_Implementation"}
+    back_execute: {log: false, verbose: true, model: "Logic_Implementation"}
+    back_order: {log: false, verbose: true, model: "Logic_Implementation"}
+    create_instrument_timeframe_table: {log: false, verbose: true, model: "Logic_Implementation_Data"}
   Logic_Management:
     order_close: {log: false, verbose: false, model: "Logic_Management"}
     order_detaile: {log: false, verbose: false, model: "Logic_Management"}

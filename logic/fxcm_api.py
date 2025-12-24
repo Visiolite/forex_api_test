@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/fxcm_api.py
+# logic/fxcm_api.py
 
 #--------------------------------------------------------------------------------- Description
 # fxcm_api
@@ -7,15 +7,15 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 import pandas as pd
-from myLib.logic_global import debug, log_instance, data_instance
-from myLib.utils import model_output, sort
-from myLib.log import Log
+from logic.logic_global import debug, log_instance, data_instance
+from logic.logic_util import model_output, sort
+from logic.logic_log import Logic_Log
 from forexconnect import ForexConnect, fxcorepy
 
 #--------------------------------------------------------------------------------- Action
 class Fxcm_API:
     #--------------------------------------------- init
-    def __init__(self, account_info:dict, log:Log=None):
+    def __init__(self, account_info:dict, log:Logic_Log=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.id = account_info.get("username")

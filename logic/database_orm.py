@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/database_orm.py
+# logic/database_orm.py
 
 #--------------------------------------------------------------------------------- Description
 # database_orm
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from myLib.logic_global import debug, log_instance
-from myLib.utils import model_output, sort
-from myLib.log import Log
+from logic.logic_global import debug, log_instance
+from logic.logic_util import model_output, sort
+from logic.logic_log import Logic_Log
 from sqlalchemy import create_engine, null, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -23,7 +23,7 @@ class Database_Orm:
     def __init__(self, server, host, port, username, password, database, log=log_instance):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.log:Log = log
+        self.log:Logic_Log = log
         #--------------------Engine
         if server == "postgresql":
             self.engine = create_engine(f"postgresql://{username}:{password}@{host}:{port}/{database}", echo=False, pool_size=25, max_overflow=50)

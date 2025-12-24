@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/logic_global.py
+# logic/logic_global.py
 
 #--------------------------------------------------------------------------------- Description
 # logic_global
@@ -23,13 +23,13 @@ def load_config():
 
 #-------------------------- load_log
 def load_log():
-    from myLib.log import Log
-    return Log(config=config)
+    from logic.logic_log import Logic_Log
+    return Logic_Log(config=config)
 
 #-------------------------- load_data
 def load_data():
-    from myLib.data_orm import Data_Orm
-    from myLib.data_sql import Data_SQL
+    from logic.data_orm import Data_Orm
+    from logic.data_sql import Data_SQL
     data_instance = {}
     #---Management
     data_instance['management_orm'] = Data_Orm(database=database_management)
@@ -50,9 +50,9 @@ def load_data():
 
 #-------------------------- load_forex_api
 def load_forex_api():
-    from myLib.logic_live import Logic_Live
+    from logic.logic_live import Logic_Live
     from myModel.model_account import model_account_db
-    from myLib.data_orm import Data_Orm
+    from logic.data_orm import Data_Orm
     data_orm = Data_Orm(database=database_management)
     forex_accounts:list[model_account_db] = data_orm.items(model=model_account_db, enable=True).data
     for account in forex_accounts:
@@ -63,7 +63,7 @@ def load_forex_api():
 
 #-------------------------- load_instrument
 def load_instrument():
-    from myLib.data_orm import Data_Orm
+    from logic.data_orm import Data_Orm
     from myModel.model_instrument import model_instrument_db
     db:Data_Orm = data_instance["management_orm"]
     result= db.items(model=model_instrument_db, enable=True)

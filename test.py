@@ -1,5 +1,5 @@
-from myLib.logic_global import config, load_forex_api, list_close
-from myLib.logic_backtest import Logic_BackTest
+from logic.logic_global import config, load_forex_api, list_close
+from logic.logic_backtest import Logic_BackTest
 logic = Logic_BackTest(execute_id=6)
 logic.run()
 # items= {"id":1, "action":"buy", "amount":10000, "price_open":1.16917, "ask":1.16927, "bid":1.16927}

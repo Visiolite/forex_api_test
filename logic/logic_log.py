@@ -1,16 +1,16 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/log.py
+# logic/logic_log.py
 
 #--------------------------------------------------------------------------------- Description
-# Log
+# Logic_Log
 
 #--------------------------------------------------------------------------------- Import
 import inspect, re
 from datetime import datetime as dt
-from myLib.utils import sort
+from logic.logic_util import sort
 
 #--------------------------------------------------------------------------------- Action
-class Log:
+class Logic_Log:
     #------------------------------------------------------------------- [ Constructor ]
     def __init__(self, config, db=None):
         #-------------- Variable

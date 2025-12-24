@@ -13,7 +13,7 @@ logging.getLogger("root").setLevel(logging.CRITICAL)
 #--------------------------------------------- Other
 import uvicorn
 import threading
-from myLib.logic_global import config, load_forex_api, list_close
+from logic.logic_global import config, load_forex_api, list_close
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from webapi import *
@@ -56,7 +56,7 @@ app.add_middleware(
 # @app.on_event("startup")
 # async def startup_event():
 #     global listener_close, listener_close_execute, listener_thread, listener_execute_thread
-#     from myLib.logic_global import forex_apis
+#     from logic.logic_global import forex_apis
     
 #     # Start Listen_Close
 #     listener_close = Listen_Close(forex=forex_apis[1], items=list_close)

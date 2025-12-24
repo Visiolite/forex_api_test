@@ -5,15 +5,15 @@
 # Implement
 
 #--------------------------------------------------------------------------------- Import
-from myLib.logic_global import log_instance
-from myLib.implementation import Implementation
+from logic.logic_global import log_instance
+from logic.logic_implementation import Logic_Implementation
 
 #--------------------------------------------------------------------------------- Log
 log_instance.fileClear()
 log_instance.table(drop=True, create=True, add=True)
 
 #--------------------------------------------------------------------------------- Implementation_Management
-IM = Implementation()
+IM = Logic_Implementation()
 IM.create_all_table()
 IM.truncate_all_table()
 IM.account(drop=True, create=True,truncate=True, add=True)

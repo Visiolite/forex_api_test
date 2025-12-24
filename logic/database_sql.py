@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/database_sql.py
+# logic/database_sql.py
 
 #--------------------------------------------------------------------------------- Description
 # database_sql
@@ -7,9 +7,9 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 import psycopg2
-from myLib.logic_global import debug, log_instance
-from myLib.utils import model_output, sort
-from myLib.log import Log
+from logic.logic_global import debug, log_instance
+from logic.logic_util import model_output, sort
+from logic.logic_log import Logic_Log
 
 #--------------------------------------------------------------------------------- Action
 class Database_SQL:
@@ -17,7 +17,7 @@ class Database_SQL:
     def __init__(self, server, host, port, username, password, database, log=log_instance):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.log:Log = log
+        self.log:Logic_Log = log
         self.server = server
         self.host = host
         self.port = port

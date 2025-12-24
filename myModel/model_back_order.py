@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime, Sequence
 from sqlalchemy.inspection import inspect
-from myLib.database_orm import BaseModel as BaseModel_db
+from logic.database_orm import BaseModel as BaseModel_db
 from pydantic import BaseModel as BaseModel_py
 from typing import Optional
 from datetime import datetime

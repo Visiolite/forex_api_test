@@ -1,23 +1,23 @@
 #--------------------------------------------------------------------------------- Location
-# code/myLib/implementation.py
+# code/logic/logic_implementation.py
 
 #--------------------------------------------------------------------------------- Description
-# Implementation
+# Logic_Implementation
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from myLib.logic_global import config, debug, log_instance, data_instance, forex_apis
-from myLib.utils import model_output, sort
-from myLib.log import Log
-from myLib.data_orm import Data_Orm
-from myLib.data_sql import Data_SQL
-from myLib.logic_live import Logic_Live
+from logic.logic_global import config, debug, log_instance, data_instance, forex_apis
+from logic.logic_util import model_output, sort
+from logic.logic_log import Logic_Log
+from logic.data_orm import Data_Orm
+from logic.data_sql import Data_SQL
+from logic.logic_live import Logic_Live
 from myModel import *
 
 #--------------------------------------------------------------------------------- Managemnet
-class Implementation:
+class Logic_Implementation:
     #-------------------------- [Init]
-    def __init__(self, data_orm:Data_Orm=None, data_sql:Data_SQL=None, log:Log=None):
+    def __init__(self, data_orm:Data_Orm=None, data_sql:Data_SQL=None, log:Logic_Log=None):
         #-------------- Variable
         self.this_class = self.__class__.__name__
         #-------------- Instance
@@ -119,7 +119,7 @@ class Implementation:
         if useDefaultSymbols :
             defaultSymbols = cfgData.get("defaultSymbols")
         else:
-            from myLib.logic_global import load_forex_api
+            from logic.logic_global import load_forex_api
             load_forex_api()
             forex:Logic_Live = forex_apis[2]
             offers = forex.get_table("OFFERS").data

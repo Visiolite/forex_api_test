@@ -1,18 +1,18 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/logic_management.py
+# logic/logic_management.py
 
 #--------------------------------------------------------------------------------- Description
 # logic_management
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
-from myLib.logic_global import debug, log_instance, data_instance, forex_apis, Strategy_Run
-from myLib.utils import model_output, sort
-from myLib.log import Log
-from myLib.data_orm import Data_Orm
-from myLib.data_sql import Data_SQL
-from myLib.logic_live import Logic_Live
-from myLib.logic_backtest import Logic_BackTest
+from logic.logic_global import debug, log_instance, data_instance, forex_apis, Strategy_Run
+from logic.logic_util import model_output, sort
+from logic.logic_log import Logic_Log
+from logic.data_orm import Data_Orm
+from logic.data_sql import Data_SQL
+from logic.logic_live import Logic_Live
+from logic.logic_backtest import Logic_BackTest
 from myModel import *
 from myStrategy import *
 
@@ -22,7 +22,7 @@ class Logic_Management:
     def __init__(self,
         data_orm:Data_Orm=None,
         data_sql:Data_SQL=None,
-        log:Log=None
+        log:Logic_Log=None
         ):
         #-------------- Variable
         self.this_class = self.__class__.__name__

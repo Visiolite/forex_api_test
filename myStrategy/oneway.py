@@ -6,13 +6,13 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from myLib.utils import model_output
-from myLib.logic_global import debug, log_instance, data_instance
-from myLib.utils import sort
-from myLib.log import Log
-from myLib.data_orm import Data_Orm
-from myLib.data_sql import Data_SQL
-from myLib.fxcm_api import Fxcm_API
+from logic.logic_util import model_output
+from logic.logic_global import debug, log_instance, data_instance
+from logic.logic_util import sort
+from logic.logic_log import Logic_Log
+from logic.data_orm import Data_Orm
+from logic.data_sql import Data_SQL
+from logic.fxcm_api import Fxcm_API
 from myModel.model_live_order import model_live_order_db
 
 #--------------------------------------------------------------------------------- Action
@@ -25,7 +25,7 @@ class OneWay:
             forex:Fxcm_API=None,
             data_orm:Data_Orm=None, 
             data_sql:Data_SQL=None,
-            log:Log=None
+            log:Logic_Log=None
         ):
         #-------------- Variable
         self.this_class = self.__class__.__name__

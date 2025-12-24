@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/data_sql.py
+# logic/data_sql.py
 
 #--------------------------------------------------------------------------------- Description
 # data_sql
 
 #--------------------------------------------------------------------------------- Import
-from myLib.logic_global import config, debug, log_instance
-from myLib.utils import sort, get_tbl_name
-from myLib.log import Log
-from myLib.database_sql import Database_SQL
+from logic.logic_global import config, debug, log_instance
+from logic.logic_util import sort, get_tbl_name
+from logic.logic_log import Logic_Log
+from logic.database_sql import Database_SQL
 
 #--------------------------------------------------------------------------------- Action
 class Data_SQL:
@@ -16,7 +16,7 @@ class Data_SQL:
     def __init__(self, database, log=log_instance):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.log:Log = log
+        self.log:Logic_Log = log
         #--------------------Data
         database_cfg = config.get("database", {}).get(database, {})
         #--------------------Instance

@@ -1,16 +1,16 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/logic_backtest.py
+# logic/logic_backtest.py
 
 #--------------------------------------------------------------------------------- Description
 # logic_backtest
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from myLib.logic_global import debug, list_instrument, log_instance, data_instance, Strategy_Run, database_management, database_data
-from myLib.utils import model_output, sort, get_tbl_name
-from myLib.log import Log
-from myLib.data_sql import Data_SQL
-from myLib.data_orm import Data_Orm
+from logic.logic_global import debug, list_instrument, log_instance, data_instance, Strategy_Run, database_management, database_data
+from logic.logic_util import model_output, sort, get_tbl_name
+from logic.logic_log import Logic_Log
+from logic.data_sql import Data_SQL
+from logic.data_orm import Data_Orm
 from myModel.model_back_order import model_back_order_db
 
 #--------------------------------------------------------------------------------- Action
@@ -21,7 +21,7 @@ class Logic_BackTest:
             management_sql:Data_SQL=None, 
             management_orm:Data_Orm=None, 
             data_sql:Data_SQL=None, 
-            log:Log=None
+            log:Logic_Log=None
         ):
         #--------------------Variable
         self.this_class = self.__class__.__name__
@@ -65,7 +65,7 @@ class Logic_BackTest:
         #---general
         data_params = []
         #---logic_management
-        from myLib.logic_management import Logic_Management
+        from logic.logic_management import Logic_Management
         self.logic_management = Logic_Management(data_orm=self.management_orm, data_sql=self.management_sql)
 
         try:

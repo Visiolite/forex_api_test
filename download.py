@@ -7,10 +7,10 @@
 #--------------------------------------------------------------------------------- Import
 import sys
 from datetime import datetime
-from myLib.utils import model_output
-from myLib.logic_global import config
-from myLib.utils import parse_cli_args, format_dict_block, to_bool
-from myLib.logic_live import Logic_Live
+from logic.logic_util import model_output
+from logic.logic_global import config
+from logic.logic_util import parse_cli_args, format_dict_block, to_bool
+from logic.logic_live import Logic_Live
 
 #--------------------------------------------------------------------------------- Debug
 this_class = "Download"

@@ -6,14 +6,14 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from myLib.logic_global import debug, log_instance, Strategy_Run
-from myLib.utils import model_output, sort
-from myLib.log import Log
+from logic.logic_global import debug, log_instance, Strategy_Run
+from logic.logic_util import model_output, sort
+from logic.logic_log import Logic_Log
 
 #--------------------------------------------------------------------------------- Action
 class Floating:
     #--------------------------------------------- init
-    def __init__(self, params:dict=None, log:Log=None):
+    def __init__(self, params:dict=None, log:Logic_Log=None):
         #-------------- Variable
         self.this_class = self.__class__.__name__
         self.params = params
