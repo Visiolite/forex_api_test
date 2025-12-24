@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------- Location
-# myStrategy/OneWay.py
+# strategy/OneWay.py
 
 #--------------------------------------------------------------------------------- Description
 # OneWay
@@ -13,7 +13,7 @@ from logic.logic_log import Logic_Log
 from logic.data_orm import Data_Orm
 from logic.data_sql import Data_SQL
 from logic.fxcm_api import Fxcm_API
-from myModel.model_live_order import model_live_order_db
+from model.model_live_order import model_live_order_db
 
 #--------------------------------------------------------------------------------- Action
 class OneWay:

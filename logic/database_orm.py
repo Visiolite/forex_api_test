@@ -230,7 +230,7 @@ class Database_Orm:
 
         try:
             #--------------Action
-            import myModel
+            import model
             BaseModel.metadata.create_all(self.engine)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)

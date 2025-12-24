@@ -13,8 +13,8 @@ from logic.data_orm import Data_Orm
 from logic.data_sql import Data_SQL
 from logic.logic_live import Logic_Live
 from logic.logic_backtest import Logic_BackTest
-from myModel import *
-from myStrategy import *
+from model import *
+from strategy import *
 
 #--------------------------------------------------------------------------------- Class
 class Logic_Management:

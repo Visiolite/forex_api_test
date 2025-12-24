@@ -11,7 +11,7 @@ from logic.logic_util import model_output, sort, get_tbl_name
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm
-from myModel.model_back_order import model_back_order_db
+from model.model_back_order import model_back_order_db
 
 #--------------------------------------------------------------------------------- Action
 class Logic_BackTest:

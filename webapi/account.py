@@ -8,8 +8,8 @@
 from logic.logic_util import model_output
 from logic.logic_global import database_management
 from fastapi import APIRouter, Request
-from myModel.model_account import model_account_py as model_py
-from myModel.model_account import model_account_db as model_db
+from model.model_account import model_account_py as model_py
+from model.model_account import model_account_db as model_db
 from logic.data_orm import Data_Orm
 from logic.logic_global import forex_apis
 

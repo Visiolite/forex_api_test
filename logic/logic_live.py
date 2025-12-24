@@ -12,7 +12,7 @@ from logic.logic_util import model_output, sort, get_tbl_name, format_dict_block
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.fxcm_api import Fxcm_API
-from myModel import *
+from model import *
 
 #--------------------------------------------------------------------------------- Action
 class Logic_Live:

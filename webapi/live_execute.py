@@ -9,8 +9,8 @@ import time
 from logic.logic_util import model_output
 from logic.logic_global import database_management
 from fastapi import APIRouter, Request
-from myModel.model_live_execute import model_live_execute_py as model_py
-from myModel.model_live_execute import model_live_execute_db as model_db
+from model.model_live_execute import model_live_execute_py as model_py
+from model.model_live_execute import model_live_execute_db as model_db
 from logic.data_orm import Data_Orm
 from logic.logic_management import Logic_Management
 

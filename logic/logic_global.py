@@ -51,7 +51,7 @@ def load_data():
 #-------------------------- load_forex_api
 def load_forex_api():
     from logic.logic_live import Logic_Live
-    from myModel.model_account import model_account_db
+    from model.model_account import model_account_db
     from logic.data_orm import Data_Orm
     data_orm = Data_Orm(database=database_management)
     forex_accounts:list[model_account_db] = data_orm.items(model=model_account_db, enable=True).data
@@ -64,7 +64,7 @@ def load_forex_api():
 #-------------------------- load_instrument
 def load_instrument():
     from logic.data_orm import Data_Orm
-    from myModel.model_instrument import model_instrument_db
+    from model.model_instrument import model_instrument_db
     db:Data_Orm = data_instance["management_orm"]
     result= db.items(model=model_instrument_db, enable=True)
     if result.status : 

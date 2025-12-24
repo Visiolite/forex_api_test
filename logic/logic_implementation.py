@@ -12,7 +12,7 @@ from logic.logic_log import Logic_Log
 from logic.data_orm import Data_Orm
 from logic.data_sql import Data_SQL
 from logic.logic_live import Logic_Live
-from myModel import *
+from model import *
 
 #--------------------------------------------------------------------------------- Managemnet
 class Logic_Implementation:
