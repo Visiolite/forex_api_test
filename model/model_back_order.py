@@ -32,8 +32,6 @@ class model_back_order_db(BaseModel_db):
     amount = Column(Integer, default=0)
     tp = Column(Float, default=0.0)
     sl = Column(Float, default=0.0)
-    ask = Column(Float, default=0.0)
-    bid = Column(Float, default=0.0)
     order_id = Column(Integer, Sequence("back_order_order_id_seq"), nullable=False)
     trade_id = Column(Integer, Sequence("back_order_trade_id_seq"), nullable=False)
     description = Column(String, default='')
@@ -64,8 +62,6 @@ class model_back_order_py(BaseModel_py):
     amount : int = 0
     tp : float = 0
     sl : float = 0
-    ask : float = 0
-    bid : float = 0
     order_id : int = 0
     trade_id : int = 0
     description : Optional[str] = ''

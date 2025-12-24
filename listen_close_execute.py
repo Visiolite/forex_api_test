@@ -21,9 +21,11 @@ class Listen_Close_Execute:
         while True:
             for item in self.items:
                 #print(f"Trade Execute : {item['order_id']} | {item['profit']} | {item['trade_id']} |")
+                date_close = item.get("date_close")
                 order_id = item.get("order_id")
                 trade_id = item.get("trade_id")
                 profit = item.get("profit")
-                self.logic_management.order_close(order_id=order_id, trade_id=trade_id, profit=profit)
+                price_close = item.get("price_close")
+                self.logic_management.live_order_close(order_id=order_id, trade_id=trade_id, profit=profit, date_close=date_close, price_close=price_close)
                 self.items.remove(item)
             time.sleep(self.sleep_time )

@@ -17,6 +17,8 @@ from logic.logic_global import config, load_forex_api, list_close
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from webapi import *
+from listen_close import Listen_Close
+from listen_close_execute import Listen_Close_Execute
 
 #--------------------------------------------------------------------------------- Variable
 title = config.get("webapi", {}).get("title", {})
@@ -48,31 +50,31 @@ app.add_middleware(
 )
 
 #--------------------------------------------------------------------------------- Listeners
-# listener_close = None
-# listener_close_execute = None
-# listener_thread = None
-# listener_execute_thread = None
+listener_close = None
+listener_close_execute = None
+listener_thread = None
+listener_execute_thread = None
 
-# @app.on_event("startup")
-# async def startup_event():
-#     global listener_close, listener_close_execute, listener_thread, listener_execute_thread
-#     from logic.logic_global import forex_apis
+@app.on_event("startup")
+async def startup_event():
+    global listener_close, listener_close_execute, listener_thread, listener_execute_thread
+    from logic.logic_global import forex_apis
     
-#     # Start Listen_Close
-#     listener_close = Listen_Close(forex=forex_apis[1], items=list_close)
-#     listener_thread = threading.Thread(target=listener_close.start, daemon=True)
-#     listener_thread.start()
+    # Start Listen_Close
+    listener_close = Listen_Close(forex=forex_apis[2], items=list_close)
+    listener_thread = threading.Thread(target=listener_close.start, daemon=True)
+    listener_thread.start()
     
-#     # Start Listen_Close_Execute
-#     listener_close_execute = Listen_Close_Execute(items=list_close, sleep_time=0.25)
-#     listener_execute_thread = threading.Thread(target=listener_close_execute.start, daemon=True)
-#     listener_execute_thread.start()
+    # Start Listen_Close_Execute
+    listener_close_execute = Listen_Close_Execute(items=list_close, sleep_time=0.25)
+    listener_execute_thread = threading.Thread(target=listener_close_execute.start, daemon=True)
+    listener_execute_thread.start()
 
-# @app.on_event("shutdown")
-# async def shutdown_event():
-#     global listener_close
-#     if listener_close:
-#         listener_close.stop()
+@app.on_event("shutdown")
+async def shutdown_event():
+    global listener_close
+    if listener_close:
+        listener_close.stop()
         
 #--------------------------------------------------------------------------------- Route
 routes = [
@@ -88,4 +90,5 @@ routes = [
 for router, prefix, tags in routes : app.include_router(router, prefix=prefix, tags=tags)
 
 #--------------------------------------------------------------------------------- Run
-if __name__ == "__main__" : uvicorn.run(app, host=host, port=port, log_level="info")
+if __name__ == "__main__" : 
+    uvicorn.run(app, host=host, port=port, log_level="info")

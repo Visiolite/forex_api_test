@@ -475,7 +475,7 @@ class Logic_Live:
             #--------------Database
             if result.status:
                 order_id, bid, ask, tp, sl, price_open, date_open = result.data
-                cmd = f"INSERT INTO live_order (execute_id, order_id, step, father_id, date_open, price_open, symbol, action, amount, bid, ask, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', '{step}', '{father_id}', '{date_open}', '{price_open}', '{symbol}', '{action}', {amount}, {bid}, {ask}, {tp}, {sl}, 'open', '', 0.0, True)"
+                cmd = f"INSERT INTO live_order (execute_id, order_id, step, father_id, date_open, price_open, symbol, action, amount, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', '{step}', '{father_id}', '{date_open}', '{price_open}', '{symbol}', '{action}', {amount}, {tp}, {sl}, 'open', '', 0.0, True)"
                 self.management_sql.db.execute(cmd=cmd)
             #--------------Output
             output = result
