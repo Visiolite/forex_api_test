@@ -8,7 +8,7 @@
 import inspect, time
 from datetime import timedelta
 from logic.logic_global import debug, log_instance, data_instance, Strategy_Run, Strategy_Action, forex_apis
-from logic.logic_util import model_output, sort, get_tbl_name, format_dict_block, get_strategy_instance
+from logic.logic_util import model_output, sort, get_tbl_name, format_dict_block
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.fxcm_api import Fxcm_API
@@ -733,7 +733,7 @@ class Logic_Live:
                 step = order_detaile["step"]
                 father_id = order_detaile["father_id"]
             #--------------strategy
-            strategy = get_strategy_instance(strategy_name, execute_detaile).data
+            strategy = self.get_strategy_instance(strategy_name, execute_detaile).data
             #--------------Action
             if action == Strategy_Action.START : 
                 result:model_output = strategy.start()
@@ -928,5 +928,18 @@ class Logic_Live:
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- get_strategy_instance
+    def get_strategy_instance(self, name, execute_detaile)-> model_output:
+        #-------------- Variable
+        output = model_output()
+        #-------------- Action
+        strategy_class = globals().get(name)
+        if strategy_class and callable(strategy_class):
+            output.data = strategy_class(params=execute_detaile)
+        else:
+            output.status = False
         #--------------Return
         return output
