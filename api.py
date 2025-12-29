@@ -84,8 +84,7 @@ routes = [
     (instrument, f"/{key}/instrument", ["Instrument"]),
     (strategy, f"/{key}/strategy", ["Strategy"]),
     (strategy_item, f"/{key}/strategy_item", ["Strategy Item"]),
-    (live_execute, f"/{key}/live_execute", ["Live Execute"]),
-    (live_order, f"/{key}/live_order", ["Live Order"]),
+    (livee, f"/{key}/live", ["Live"]),
     (back, f"/{key}/back", ["Back"]),
 ]
 for router, prefix, tags in routes : app.include_router(router, prefix=prefix, tags=tags)

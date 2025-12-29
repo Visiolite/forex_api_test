@@ -1,16 +1,16 @@
 #--------------------------------------------------------------------------------- location
-# webapi/live_order.py
+# webapi/live_execute.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for live_order
+# This is route for live_execute
 
 #--------------------------------------------------------------------------------- Import
-import time
 from logic.logic_util import model_output
-from logic.logic_global import database_management
+from logic.logic_global import database_management, Strategy_Action
 from fastapi import APIRouter, Request
-from model.model_live_order import model_live_order_py as model_py
-from model.model_live_order import model_live_order_db as model_db
+from model.model_live_execute import model_live_execute_py as model_py
+from model.model_live_execute import model_live_execute_db as model_db
+from model.model_live_order import model_live_order_db as model_order_db
 from logic.data_orm import Data_Orm
 from logic.logic_live import Logic_Live
 
@@ -25,7 +25,6 @@ logic_live = Logic_Live()
 def add(item:model_py) : 
     item = item.dict()
     if 'id' in item : del item['id']
-    if 'date' in item : del item['date']
     output:model_output = data_orm.add(model=model_db, item=model_db(**item))
     return output
 
@@ -33,13 +32,10 @@ def add(item:model_py) :
 @route.get("/items", description="items", response_model=model_output)
 def items(request: Request) : 
     filters = dict(request.query_params)
-    output:model_output = data_orm.items(model=model_db, order_by={"status":"desc","date":"desc"}, **filters)
+    output:model_output = data_orm.items(model=model_db, **filters)
     if output.status : 
         data = []
-        for item in output.data : 
-            i = item.toDict()
-            #i["amount"] = i["amount"]/ 100000 
-            data.append(i)
+        for item in output.data : data.append(item.toDict())
         output.data = data
     return output
 
@@ -50,43 +46,67 @@ def update(item: model_py):
 
 #-------------------------- [Delete]
 @route.delete("/{id}", description="delete", response_model=model_output)
-def delete(id): 
+def delete(id:int): 
     return data_orm.delete(model=model_db, id=id)
 
 #-------------------------- [Enable]
 @route.get("/enable/{id}", description="enable", response_model=model_output)
-def enable(id): 
+def enable(id:int): 
     return data_orm.enable(model=model_db, id=id)
 
 #-------------------------- [Disable]
 @route.get("/disable/{id}", description="disable", response_model=model_output)
-def disable(id): 
+def disable(id:int): 
     return data_orm.disable(model=model_db, id=id)
 
 #-------------------------- [Status]
 @route.get("/status/{id}", description="status", response_model=model_output)
-def status(id): 
+def status(id:int): 
     return data_orm.status(model=model_db, id=id)
+
+#-------------------------- [start]
+@route.get("/start/{execute_id}", description="start", response_model=model_output)
+def start(execute_id:int):
+    output:model_output = logic_live.strategy_action(execute_id=execute_id, action=Strategy_Action.START)
+    return output
+
+#-------------------------- [end]
+@route.get("/stop/{execute_id}", description="stop", response_model=model_output)
+def stop(execute_id:int):
+    output:model_output = logic_live.strategy_action(execute_id=execute_id, action=Strategy_Action.STOP)
+    return output
 
 #-------------------------- [order_clear]
 @route.get("/order_clear/{id}", description="order_clear", response_model=model_output)
-def order_clear(id): 
+def order_clear(id:int): 
     return logic_live.order_clear(execute_id=id)
 
-#-------------------------- [count]
-@route.get("/order_count/{id}", description="order_count", response_model=int)
-def order_count(id): 
-    result = logic_live.order_count(execute_id=id)
+#-------------------------- [order_truncate]
+@route.get("/order_truncate", description="order_truncate", response_model=model_output)
+def order_truncate(): 
+    return logic_live.order_truncate()
+
+#-------------------------- [execute_step]
+@route.get("/execute_step/{id}", description="execute_step", response_model=int)
+def execute_step(id:int): 
+    result = logic_live.execute_step(execute_id=id)
     return result
 
-#-------------------------- [Detaile]
-@route.get("/detaile", description="detaile", response_model=model_output)
-def detaile(request: Request) : 
-    start_time = time.time()
+#-------------------------- [action_detaile]
+@route.get("/action_detaile/{execute_id}", description="action_detaile", response_model=model_output)
+def action_detaile(execute_id:int): 
+    result = logic_live.action_detaile(execute_id=execute_id)
+    return result
+
+#-------------------------- [order_items]
+@route.get("/order_items", description="order_items", response_model=model_output)
+def order_items(request: Request) : 
     filters = dict(request.query_params)
-    id = int(filters.get('execute_id'))
-    output = logic_live.execute_order_detaile(id=id)
-    output.time = f"{(time.time() - start_time):.3f}",
+    output:model_output = data_orm.items(model=model_order_db, order_by={"id":"asc",}, **filters)
+    if output.status : 
+        data = []
+        for item in output.data : 
+            i = item.toDict()
+            data.append(i)
+        output.data = data
     return output
-
-

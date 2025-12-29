@@ -775,10 +775,10 @@ class Logic_Live:
                             for order in orders.data : order_ids.append(order[0])
                             if len(order_ids)>0 :
                                 order_result:model_output = self.order_close(order_ids=order_ids)
-                    #--------------database
-                    if order_result.status:
-                        cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
-                        self.management_sql.db.execute(cmd=cmd)
+                #--------------database
+                if order_result.status:
+                    cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
+                    self.management_sql.db.execute(cmd=cmd)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None
@@ -935,5 +935,269 @@ class Logic_Live:
             output.data = strategy_class(params=execute_detaile)
         else:
             output.status = False
+        #--------------Return
+        return output
+    
+    #-------------------------- [execute_step]
+    def execute_step(self, execute_id) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            cmd = f"SELECT max(step) FROM live_order WHERE execute_id={execute_id}"
+            max_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+            if max_step is None : max_step = 0
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = max_step
+            output.message=max_step
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return max_step
+
+    #-------------------------- [order_clear]
+    def order_clear(self, execute_id) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Acion
+            cmd = f"DELETE FROM live_order WHERE execute_id={execute_id}"
+            self.management_sql.db.execute(cmd=cmd)
+            cmd = f"DELETE FROM live_execute_detaile WHERE execute_id={execute_id}"
+            self.management_sql.db.execute(cmd=cmd)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = None
+            output.message=None
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [order_truncate]
+    def order_truncate(self) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Acion
+            self.management_orm.truncate_all_table()
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = None
+            output.message=None
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [action_detaile]
+    def action_detaile(self, execute_id) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Detaile
+        detaile = []
+        
+        try:
+            cmd = f"SELECT max(step) FROM live_order WHERE execute_id={execute_id}"
+            max_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+            if max_step:
+                #--------------All
+                cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM live_order WHERE execute_id={execute_id}"
+                data = self.management_sql.db.items(cmd=cmd).data[0]
+                date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
+                date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
+                trade_all = data[2]
+                profit_all = data[3]
+                #--------------Profit
+                cmd = f"SELECT sum(profit) FROM live_order WHERE execute_id={execute_id} and profit>0"
+                profit_positive = self.management_sql.db.items(cmd=cmd).data[0][0]
+                if not profit_positive : profit_positive = 0
+                cmd = f"SELECT sum(profit) FROM live_order WHERE execute_id={execute_id} and profit<0"
+                profit_negative = self.management_sql.db.items(cmd=cmd).data[0][0]
+                if not profit_negative : profit_negative = 0
+                #--------------Trade: open/close
+                cmd = f"SELECT count(id) FROM live_order WHERE execute_id={execute_id} and status='open'"
+                trade_open = self.management_sql.db.items(cmd=cmd).data[0][0]
+                cmd = f"SELECT count(id) FROM live_order WHERE execute_id={execute_id} and status='close'"
+                trade_close = self.management_sql.db.items(cmd=cmd).data[0][0]
+                #--------------Trade: sell/buy
+                cmd = f"SELECT count(id) FROM live_order WHERE execute_id={execute_id} and action='buy'"
+                trade_buy = self.management_sql.db.items(cmd=cmd).data[0][0]
+                cmd = f"SELECT count(id) FROM live_order WHERE execute_id={execute_id} and action='sell'"
+                trade_sell = self.management_sql.db.items(cmd=cmd).data[0][0]
+                #--------------Detaile
+                cmd = f"SELECT min(profit_close), max(profit_close), max(profit_open), min(profit_open) FROM live_execute_detaile WHERE execute_id={execute_id}"
+                data = self.management_sql.db.items(cmd=cmd).data
+                profit_close_min = f"{data[0][0]:.{2}f}" if data[0][0] else ''
+                profit_close_max = f"{data[0][1]:.{2}f}" if data[0][1] else ''
+                profit_open_min = f"{data[0][2]:.{2}f}" if data[0][2] else ''
+                profit_open_max = f"{data[0][3]:.{2}f}" if data[0][3] else ''
+                #--------------Param
+                param = f""
+                #--------------Add
+                detaile.append({
+                    "step":'All',
+                    "date_from":date_from,
+                    "date_to":date_to,
+                    "trade_all":f"{trade_all}",
+                    "trade_open":f"{trade_open}",
+                    "trade_close":f"{trade_close}",
+                    "trade_buy":f"{trade_buy}",
+                    "trade_sell":f"{trade_sell}",
+                    "profit_all":f"{profit_all:.{2}f}",
+                    "profit_positive":f"{profit_positive:.{2}f}",
+                    "profit_negative":f"{profit_negative:.{2}f}",
+                    "profit_close_min":profit_close_min,
+                    "profit_close_max":profit_close_max,
+                    "profit_open_min":profit_open_min,
+                    "profit_open_max":profit_open_max,
+                    "param":param
+                })
+                #--------------Items
+                for i in range(max_step):
+                    i += 1
+                    #--------------All
+                    cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM live_order WHERE execute_id={execute_id} and step={i}"
+                    data = self.management_sql.db.items(cmd=cmd).data[0]
+                    date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
+                    date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
+                    trade_all = data[2]
+                    profit_all = data[3]
+                    #--------------Profit
+                    cmd = f"SELECT sum(profit) FROM live_order WHERE execute_id={execute_id} and profit>0 and step={i}"
+                    profit_positive = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    if not profit_positive : profit_positive = 0
+                    cmd = f"SELECT sum(profit) FROM live_order WHERE execute_id={execute_id} and profit<0 and step={i}"
+                    profit_negative = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    if not profit_negative : profit_negative = 0
+                    #--------------Trade: open/close
+                    cmd = f"SELECT count(id) FROM live_order WHERE execute_id={execute_id} and status='open' and step={i}"
+                    trade_open = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    cmd = f"SELECT count(id) FROM live_order WHERE execute_id={execute_id} and status='close' and step={i}"
+                    trade_close = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    #--------------Trade: sell/buy
+                    cmd = f"SELECT count(id) FROM live_order WHERE execute_id={execute_id} and action='buy' and step={i}"
+                    trade_buy = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    cmd = f"SELECT count(id) FROM live_order WHERE execute_id={execute_id} and action='sell' and step={i}"
+                    trade_sell = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    #--------------Detaile
+                    cmd = f"SELECT min(profit_close), max(profit_close), max(profit_open), min(profit_open) FROM live_execute_detaile WHERE execute_id={execute_id} and step={i}"
+                    data = self.management_sql.db.items(cmd=cmd).data
+                    profit_close_min = f"{data[0][0]:.{2}f}" if data[0][0] else ''
+                    profit_close_max = f"{data[0][1]:.{2}f}" if data[0][1] else ''
+                    profit_open_min = f"{data[0][2]:.{2}f}" if data[0][2] else ''
+                    profit_open_max = f"{data[0][3]:.{2}f}" if data[0][3] else ''
+                    #--------------Param
+                    cmd = f"SELECT param FROM live_execute_detaile WHERE execute_id={execute_id} and step={i} and param !=''"
+                    param = self.management_sql.db.items(cmd=cmd).data
+                    param = param[0] if len(param)> 0 else ""
+                    #--------------Add
+                    detaile.append({
+                        "step":f'{i}',
+                        "date_from":date_from,
+                        "date_to":date_to,
+                        "trade_all":f"{trade_all}",
+                        "trade_open":f"{trade_open}",
+                        "trade_close":f"{trade_close}",
+                        "trade_buy":f"{trade_buy}",
+                        "trade_sell":f"{trade_sell}",
+                        "profit_all":f"{profit_all:.{2}f}",
+                        "profit_positive":f"{profit_positive:.{2}f}",
+                        "profit_negative":f"{profit_negative:.{2}f}",
+                        "profit_close_min":profit_close_min,
+                        "profit_close_max":profit_close_max,
+                        "profit_open_min":profit_open_min,
+                        "profit_open_max":profit_open_max,
+                        "param":param
+                    })
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = detaile
+            output.message=execute_id
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
