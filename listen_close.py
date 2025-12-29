@@ -19,8 +19,9 @@ class CloseTradesListener(TableListener):
     def on_added(self, row_id, row):
         item = {"date_close": row.close_time, "order_id": row.open_order_id, "trade_id": row.trade_id, "profit": row.gross_pl, "price_close": row.close_rate}
         self.parent.items.append(item)
-        print(f"Trade closed  : {item}")
-
+        date = row.close_time.strftime('%Y-%m-%d %H:%M:%S')
+        value = f"{date} | {row.open_order_id} | {row.trade_id} | {row.gross_pl} | {row.close_rate}"
+        print(f"Trade closed  : {value}")
 #--------------------------------------------------------------------------------- Class
 class Listen_Close:
     #--------------------------------------------- __init__

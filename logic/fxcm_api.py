@@ -353,7 +353,7 @@ class Fxcm_API:
                     order_id = getattr(response, "order_id", None) if response else None
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = order_id, bid, ask, tp, sl, price_open, date_open
+            output.data = order_id, tp, sl, price_open, date_open
             output.message = f"{execute_id} | {order_id} | {symbol} | {action} | {amount} | {price_open} | {bid} | {ask} | {tp} | {sl}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)

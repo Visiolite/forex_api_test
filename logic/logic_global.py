@@ -50,17 +50,20 @@ def load_data():
 
 #-------------------------- load_forex_api
 def load_forex_api():
-    from logic.logic_live import Logic_Live
+    #---Import
     from model.model_account import model_account_db
     from logic.data_orm import Data_Orm
-    data_orm = Data_Orm(database=database_management)
-    forex_accounts:list[model_account_db] = data_orm.items(model=model_account_db, enable=True).data
+    from logic.fxcm_api import Fxcm_API
+    #---Instance
+    db:Data_Orm  = data_instance["management_orm"]
+    #---Action
+    forex_accounts:list[model_account_db] = db.items(model=model_account_db, enable=True).data
     for account in forex_accounts:
-        if account.name !="Back-Test":
-            logic_forex = Logic_Live(account_info=account.toDict())
-            forex_apis[account.id] = logic_forex
-            logic_forex.login()
-
+        if account.name !="Back-Test" and account.broker.lower() == "fxcm":
+            fxcm_api = Fxcm_API(account_info=account.toDict())
+            forex_apis[account.id] = fxcm_api
+            fxcm_api.login()
+            
 #-------------------------- load_instrument
 def load_instrument():
     from logic.data_orm import Data_Orm

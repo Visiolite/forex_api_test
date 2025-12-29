@@ -18,23 +18,15 @@ from strategy import *
 #--------------------------------------------------------------------------------- Action
 class Logic_Live:
     #--------------------------------------------- init
-    def __init__(self, account_info:dict=None, data_sql:Data_SQL=None, management_sql:Data_SQL=None, log:Logic_Log=None):
+    def __init__(self, account_id:int=None, data_sql:Data_SQL=None, management_sql:Data_SQL=None, log:Logic_Log=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.account_info = account_info
-        self.api_name = None
         #--------------------Instance
         self.management_sql = management_sql if management_sql else data_instance["management_sql"]
         self.data_sql = data_sql if data_sql else data_instance["data_sql"]
         self.log = log if log else log_instance
         #--------------------Api
-        if account_info:
-            if self.account_info.get("broker").lower() == "fxcm":
-                self.api = Fxcm_API(account_info=self.account_info)
-                self.api_name = "Fxcm_API"
-            else:
-                self.api = Fxcm_API(account_info=self.account_info)
-                self.api_name = "Fxcm_API"
+        if account_id: self.api:Fxcm_API = forex_apis[account_id]
 
     #--------------------------------------------- login
     def login(self):
@@ -455,9 +447,9 @@ class Logic_Live:
         return output
     
     #--------------------------------------------- order_open
-    def order_open(self, symbol, action, amount, tp_pips, sl_pips, execute_id, step, father_id):
+    def order_open(self, item:dict):
         #-------------- Description
-        # IN     : order_id
+        # IN     : item
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -472,11 +464,20 @@ class Logic_Live:
         output.method_name = this_method
         
         try:
+            #--------------Data
+            symbol = item["symbol"]
+            action = item["action"]
+            amount = item["amount"]
+            tp_pips = item["tp_pips"]
+            sl_pips = item["sl_pips"]
+            execute_id = item["execute_id"]
+            father_id = item["father_id"]
+            step = item["step"]
             #--------------Action
             result:model_output = self.api.order_open(symbol, action, amount, tp_pips, sl_pips, execute_id)
             #--------------Database
             if result.status:
-                order_id, bid, ask, tp, sl, price_open, date_open = result.data
+                order_id, tp, sl, price_open, date_open = result.data
                 cmd = f"INSERT INTO live_order (execute_id, order_id, step, father_id, date_open, price_open, symbol, action, amount, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', {step}, {father_id}, '{date_open}', {price_open}, '{symbol}', '{action}', {amount}, {tp}, {sl}, 'open', '', 0.0, True)"
                 self.management_sql.db.execute(cmd=cmd)
             #--------------Output
@@ -723,50 +724,47 @@ class Logic_Live:
                 account_id = execute_detaile["account_id"]
             else:
                 execute_id = order_detaile["execute_id"]
-                step = order_detaile["step"]
-                father_id = order_detaile["father_id"]
                 execute_detaile = self.execute_detaile(id=execute_id)
                 strategy_name = execute_detaile["strategy_name"]
                 account_id = execute_detaile["account_id"]
+            #--------------Api
+            self.api:Fxcm_API = forex_apis[account_id]
             #--------------strategy
             strategy = self.get_strategy_instance(strategy_name, execute_detaile).data
             #--------------Action
+            #---START
             if action == Strategy_Action.START : 
                 result:model_output = strategy.start()
-                cmd = f"SELECT MAX(step) FROM live_order WHERE execute_id='{execute_id}'"
+                cmd = f"SELECT MAX(step) FROM live_order WHERE execute_id={execute_id}"
                 step = self.management_sql.db.items(cmd=cmd).data[0][0]
                 step = step + 1 if step else 1
-                father_id=0
-            elif action == Strategy_Action.STOP : 
-                result:model_output = strategy.stop()
+                for item in result.data:
+                    item["step"] = step
+                    item["father_id"] = 0
+                    item["execute_id"] = execute_id
+            #---ORDER_CLOSE
             elif action == Strategy_Action.ORDER_CLOSE : 
                 result:model_output = strategy.order_close(order_detaile)
+                for item in result.data:
+                    item["step"] = order_detaile["step"]
+                    item["father_id"] = order_detaile["id"]
+                    item["execute_id"] = execute_id
+            #---STOP
+            elif action == Strategy_Action.STOP : 
+                result:model_output = strategy.stop()
+            #---PRICE_CHANGE
             elif action == Strategy_Action.PRICE_CHANGE : 
                 result:model_output = strategy.price_change(order_detaile)
             #--------------Action
             if result.status:
-                forex:Logic_Live = forex_apis[account_id]
                 for item in result.data:
+                    #---Parameters
                     run = item.get("run")
                     state = item.get("state")
-                    #--------------order_open
+                    #---order_open
                     if run == Strategy_Run.ORDER_OPEN :
-                        #---Action
-                        order_result:model_output = forex.order_open(
-                            action=item.get("action"), 
-                            symbol=item.get("symbol"),
-                            amount=item.get("amount"),
-                            tp_pips=item.get("tp_pips"),
-                            sl_pips=item.get("sl_pips"),
-                            execute_id=execute_id,
-                            step=step,
-                            father_id=id,
-                        )
-                        #---Database
-                        if order_result.status:
-                            cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
-                            self.management_sql.db.execute(cmd=cmd)
-                    #--------------close_all_order
+                        order_result:model_output = self.order_open(item = item)
+                    #---close_all_order
                     if run == Strategy_Run.ORDER_CLOSE_ALL:
                         #---Data
                         order_ids = []
@@ -776,11 +774,11 @@ class Logic_Live:
                         if orders.status:
                             for order in orders.data : order_ids.append(order[0])
                             if len(order_ids)>0 :
-                                #-Database
-                                cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
-                                self.management_sql.db.execute(cmd=cmd)
-                                #-forex 
-                                order_result:model_output = forex.order_close(order_ids=order_ids)
+                                order_result:model_output = self.order_close(order_ids=order_ids)
+                    #--------------database
+                    if order_result.status:
+                        cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
+                        self.management_sql.db.execute(cmd=cmd)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None
@@ -835,16 +833,16 @@ class Logic_Live:
         table1 = "live_execute" 
         table2 = "live_order"
         #--------------Action
-        cmd = f"SELECT strategy.name, strategy_item.id,{table1}.status, {table1}.id, {table1}.account_id, {table2}.execute_id, {table2}.step, {table2}.father_id, {table2}.date_open, {table2}.price_open, {table2}.date_close, {table2}.price_close, {table2}.profit, {table2}.status,{table2}.symbol, {table2}.action, {table2}.amount, {table2}.tp, {table2}.sl, {table2}.trade_id, {table2}.enable FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table1} ON strategy_item.id = {table1}.strategy_item_id JOIN {table2} ON {table1}.id = {table2}.execute_id WHERE {table2}.order_id='{order_id}'"
+        cmd = f"SELECT strategy.name, strategy_item.id, {table1}.status, {table1}.id, {table1}.account_id, {table2}.id, {table2}.step, {table2}.father_id, {table2}.date_open, {table2}.price_open, {table2}.date_close, {table2}.price_close, {table2}.profit, {table2}.status,{table2}.symbol, {table2}.action, {table2}.amount, {table2}.tp, {table2}.sl, {table2}.trade_id, {table2}.enable FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table1} ON strategy_item.id = {table1}.strategy_item_id JOIN {table2} ON {table1}.id = {table2}.execute_id WHERE {table2}.order_id='{order_id}'"
         result:model_output = self.management_sql.db.items(cmd=cmd)
         #--------------Data
         if result.status and len(result.data) > 0 :
             output["strategy_name"] = result.data[0][0]
             output["strategy_item_id"] = result.data[0][1]
             output["execute_status"] = result.data[0][2]
-            output["id"] = result.data[0][3]
+            output["execute_id"] = result.data[0][3]
             output["account_id"] = result.data[0][4]
-            output["execute_id"] = result.data[0][5]
+            output["id"] = result.data[0][5]
             output["step"] = result.data[0][6]
             output["father_id"] = result.data[0][7]
             output["date_open"] = result.data[0][8]

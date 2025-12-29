@@ -68,15 +68,11 @@ def status(id:int):
 #-------------------------- [start]
 @route.get("/start/{id}", description="start", response_model=model_output)
 def start(id:int):
-    start_time = time.time()
     output:model_output = logic_live.strategy_action(execute_id=id, action=Strategy_Action.START)
-    output.time = f"{(time.time() - start_time):.3f}",
     return output
 
 #-------------------------- [end]
 @route.get("/stop/{id}", description="stop", response_model=model_output)
 def stop(id:int):
-    start_time = time.time()
     output:model_output = logic_live.strategy_action(execute_id=id, action=Strategy_Action.STOP)
-    output.time = f"{(time.time() - start_time):.3f}",
     return output

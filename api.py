@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from webapi import *
 from listen_close import Listen_Close
 from listen_close_execute import Listen_Close_Execute
+from logic.logic_live import Logic_Live
 
 #--------------------------------------------------------------------------------- Variable
 title = config.get("webapi", {}).get("title", {})
@@ -54,6 +55,7 @@ listener_close = None
 listener_close_execute = None
 listener_thread = None
 listener_execute_thread = None
+logic_live = Logic_Live(account_id=2)
 
 @app.on_event("startup")
 async def startup_event():
@@ -61,7 +63,7 @@ async def startup_event():
     from logic.logic_global import forex_apis
     
     # Start Listen_Close
-    listener_close = Listen_Close(forex=forex_apis[2], items=list_close)
+    listener_close = Listen_Close(forex=logic_live, items=list_close)
     listener_thread = threading.Thread(target=listener_close.start, daemon=True)
     listener_thread.start()
     
