@@ -14,13 +14,13 @@ from model.model_back_execute import model_back_execute_py as model_py
 from model.model_back_execute import model_back_execute_db as model_db
 from model.model_back_order import model_back_order_db as model_back_order_db
 from logic.data_orm import Data_Orm
-from logic.logic_backtest import Logic_BackTest
+from logic.logic_back import Logic_Back
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
 data_orm = Data_Orm(database=database_management)
-logic_backtest = Logic_BackTest()
+logic_back = Logic_Back()
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
@@ -70,31 +70,31 @@ def status(id:int):
 @route.get("/start/{execute_id}", description="start", response_model=model_output)
 def start(execute_id:int):
     start_time = time.time()
-    logic_backtest.execute_id = execute_id
-    output:model_output = logic_backtest.run()
+    logic_back.execute_id = execute_id
+    output:model_output = logic_back.run()
     output.time = sort(f"{(time.time() - start_time):.3f}", 3)
     return output
 
 #-------------------------- [back_clear]
 @route.get("/back_clear/{id}", description="back_clear", response_model=model_output)
 def back_clear(id:int): 
-    return logic_backtest.order_clear(execute_id=id)
+    return logic_back.order_clear(execute_id=id)
 
 #-------------------------- [back_truncate]
 @route.get("/back_truncate", description="back_truncate", response_model=model_output)
 def back_truncate(): 
-    return logic_backtest.order_truncate()
+    return logic_back.order_truncate()
 
 #-------------------------- [order_step]
 @route.get("/order_step/{id}", description="order_step", response_model=int)
 def order_step(id:int): 
-    result = logic_backtest.order_step(execute_id=id)
+    result = logic_back.order_step(execute_id=id)
     return result
 
 #-------------------------- [action_detaile]
 @route.get("/action_detaile/{execute_id}", description="action_detaile", response_model=model_output)
 def action_detaile(execute_id:int): 
-    result = logic_backtest.action_detaile(execute_id=execute_id)
+    result = logic_back.action_detaile(execute_id=execute_id)
     return result
 
 #-------------------------- [order_items]

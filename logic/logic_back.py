@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------- Location
-# logic/logic_backtest.py
+# logic/logic_back.py
 
 #--------------------------------------------------------------------------------- Description
-# logic_backtest
+# logic_back
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
@@ -17,7 +17,7 @@ from strategy import *
 from model import *
 
 #--------------------------------------------------------------------------------- Action
-class Logic_BackTest:
+class Logic_Back:
     #--------------------------------------------- init
     def __init__(self, 
             execute_id=None,

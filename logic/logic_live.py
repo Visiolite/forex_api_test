@@ -12,16 +12,29 @@ from logic.logic_global import debug, log_instance, data_instance, Strategy_Run,
 from logic.logic_util import model_output, sort, get_tbl_name, format_dict_block
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
+from logic.data_orm import Data_Orm
 from logic.fxcm_api import Fxcm_API
 from strategy import *
+from model.model_live_execute import model_live_execute_py 
+from model.model_live_execute import model_live_execute_db 
+from model.model_live_order import model_live_order_py 
+from model.model_live_order import model_live_order_db
 
 #--------------------------------------------------------------------------------- Action
 class Logic_Live:
     #--------------------------------------------- init
-    def __init__(self, account_id:int=None, data_sql:Data_SQL=None, management_sql:Data_SQL=None, log:Logic_Log=None):
+    def __init__(
+            self, 
+            account_id:int=None,
+            data_sql:Data_SQL=None,
+            management_sql:Data_SQL=None,
+            management_orm:Data_Orm=None,
+            log:Logic_Log=None
+        ):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         #--------------------Instance
+        self.management_orm = management_orm if management_orm else data_instance["management_orm"]
         self.management_sql = management_sql if management_sql else data_instance["management_sql"]
         self.data_sql = data_sql if data_sql else data_instance["data_sql"]
         self.log = log if log else log_instance
@@ -1189,6 +1202,52 @@ class Logic_Live:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile
             output.message=execute_id
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [order_item]
+    def order_item(self, **filters) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Data
+            result:model_output = self.management_orm.items(model=model_live_order_db, order_by={"id":"asc",}, **filters)
+            #--------------Action
+            if result.status : 
+                data = []
+                for item in result.data : 
+                    i = item.toDict()
+                    data.append(i)
+                result.data = data
+            else:
+                result.data = []
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = result.data 
+            output.message=None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log

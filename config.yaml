@@ -226,11 +226,11 @@ debug:
     order_open: {log: false, verbose: false, model: "Logic_Live"}
     order_close: {log: false, verbose: false, model: "Logic_Live"}
     order_close_all: {log: false, verbose: false, model: "Logic_Live"}
-  Logic_BackTest:
-    run: {log: false, verbose: true, model: "Logic_BackTest"}
-    start: {log: false, verbose: true, model: "Logic_BackTest"}
-    order_open: {log: false, verbose: true, model: "Logic_BackTest"}
-    order_close: {log: false, verbose: true, model: "Logic_BackTest"}
+  Logic_Back:
+    run: {log: false, verbose: true, model: "Logic_Back"}
+    start: {log: false, verbose: true, model: "Logic_Back"}
+    order_open: {log: false, verbose: true, model: "Logic_Back"}
+    order_close: {log: false, verbose: true, model: "Logic_Back"}
   Fxcm_API:
     login: {log: false, verbose: true, model: "Fxcm_API"}
     logout: {log: false, verbose: true, model: "Fxcm_API"}

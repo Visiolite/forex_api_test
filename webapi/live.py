@@ -98,15 +98,9 @@ def action_detaile(execute_id:int):
     result = logic_live.action_detaile(execute_id=execute_id)
     return result
 
-#-------------------------- [order_items]
-@route.get("/order_items", description="order_items", response_model=model_output)
-def order_items(request: Request) : 
+#-------------------------- [order_item]
+@route.get("/order_item", description="order_item", response_model=model_output)
+def order_item(request: Request) : 
     filters = dict(request.query_params)
-    output:model_output = data_orm.items(model=model_order_db, order_by={"id":"asc",}, **filters)
-    if output.status : 
-        data = []
-        for item in output.data : 
-            i = item.toDict()
-            data.append(i)
-        output.data = data
-    return output
+    result = logic_live.order_item(**filters)
+    return result
