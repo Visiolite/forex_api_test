@@ -491,7 +491,7 @@ class Logic_Live:
             #--------------Database
             if result.status:
                 order_id, tp, sl, price_open, date_open = result.data
-                cmd = f"INSERT INTO live_order (execute_id, order_id, step, father_id, date_open, price_open, symbol, action, amount, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', {step}, {father_id}, '{date_open}', {price_open}, '{symbol}', '{action}', {amount}, {tp}, {sl}, 'open', '', 0.0, True)"
+                cmd = f"INSERT INTO live_order (execute_id, order_id, step, father_id, date_open, price_open, price_close, symbol, action, amount, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', {step}, {father_id}, '{date_open}', {price_open}, 0.0, '{symbol}', '{action}', {amount}, {tp}, {sl}, 'open', '', 0.0, True)"
                 self.management_sql.db.execute(cmd=cmd)
             #--------------Output
             output = result
@@ -1092,8 +1092,8 @@ class Logic_Live:
                 #--------------All
                 cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM live_order WHERE execute_id={execute_id}"
                 data = self.management_sql.db.items(cmd=cmd).data[0]
-                date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
-                date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
+                date_from = data[0].strftime('%Y-%m-%d %H:%M:%S') if data[0] else ''
+                date_to = data[1].strftime('%Y-%m-%d %H:%M:%S') if data[1] else ''
                 trade_all = data[2]
                 profit_all = data[3]
                 #--------------Profit
@@ -1147,8 +1147,8 @@ class Logic_Live:
                     #--------------All
                     cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM live_order WHERE execute_id={execute_id} and step={i}"
                     data = self.management_sql.db.items(cmd=cmd).data[0]
-                    date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
-                    date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
+                    date_from = data[0].strftime('%Y-%m-%d %H:%M:%S') if data[0] else ''
+                    date_to = data[1].strftime('%Y-%m-%d %H:%M:%S') if data[1] else ''
                     trade_all = data[2]
                     profit_all = data[3]
                     #--------------Profit
