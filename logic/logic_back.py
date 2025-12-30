@@ -198,43 +198,64 @@ class Logic_Back:
         output.method_name = this_method
         #-------------- Output
         order_open_accept = True
+        price_data = {}
 
         try:
             #--------------Action
             for symbol in self.data:
                 for row in self.data[symbol]:
+                    #---data
                     date = row[1]
                     ask = row[2]
                     bid = row[3]
-                    if len(self.list_order_open) > 0:
-                        #---check_tp_sl
-                        check_tp_sls = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
-                        for check_tp_sl in check_tp_sls :
-                            #---order_close
-                            order_close = self.order_close(item=check_tp_sl).data
-                            #---check_limit
-                            check_limit_status, check_limit_param  = self.check_limit(symbol, ask, bid, date)
-                            if not check_limit_status:
-                                order_open_accept = False
-                                if check_limit_param == 'loss':
-                                    result_strategy:model_output = self.strategy.stop()
-                                    for item in result_strategy.data :
-                                        item["father_id"] = order_close.get("id")
-                                        item["date"] = date
-                                        item["ask"] = ask
-                                        item["bid"] = bid
-                                        self.action(items=result_strategy.data)
-                            #---keep
-                            if order_open_accept:
-                                result_strategy:model_output = self.strategy.order_close(order_detaile=check_tp_sl)
+                    price_data[symbol]={'date': date, 'ask': ask, 'bid': bid}
+                    #---check_tp_sl
+                    check_tp_sls = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
+                    for check_tp_sl in check_tp_sls :
+                        order_close = self.order_close(item=check_tp_sl).data
+                        #---check_limit
+                        check_limit_status, check_limit_param  = self.check_limit(symbol, ask, bid, date)
+                        if not check_limit_status:
+                            order_open_accept = False
+                            if check_limit_param == 'loss':
+                                result_strategy:model_output = self.strategy.stop()
                                 for item in result_strategy.data :
                                     item["father_id"] = order_close.get("id")
                                     item["date"] = date
                                     item["ask"] = ask
                                     item["bid"] = bid
                                     self.action(items=result_strategy.data)
-                    else:
-                         break
+                        #---keep
+                        if order_open_accept:
+                            result_strategy:model_output = self.strategy.order_close(order_detaile=check_tp_sl)
+                            for item in result_strategy.data :
+                                item["father_id"] = order_close.get("id")
+                                item["date"] = date
+                                item["ask"] = ask
+                                item["bid"] = bid
+                                self.action(items=result_strategy.data)
+
+                    #---check_limit
+                    if len(check_tp_sls)==0:    
+                        check_limit_status, check_limit_param  = self.check_limit(symbol, ask, bid, date)
+                        if not check_limit_status:
+                            order_open_accept = False
+                            if check_limit_param == 'loss':
+                                result_strategy:model_output = self.strategy.stop()
+                                for item in result_strategy.data :
+                                    item["father_id"] = order_close.get("id")
+                                    item["date"] = date
+                                    item["ask"] = ask
+                                    item["bid"] = bid
+                                    self.action(items=result_strategy.data)
+                    #---Price_change
+                    result_strategy_price_change:model_output = self.strategy.price_change(price_data=price_data, order_close=self.order_close, order_open=self.order_open)
+                    for item in result_strategy_price_change.data :
+                        item["father_id"] = 0
+                        item["date"] = date
+                        item["ask"] = ask
+                        item["bid"] = bid
+                        self.action(items=result_strategy_price_change.data)
                 if len(self.data[symbol])>1 : self.data[symbol] = self.data[symbol][self.data[symbol].index(row) + 1:]
             #--------------Output
             output = result

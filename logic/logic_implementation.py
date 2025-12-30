@@ -377,6 +377,20 @@ class Logic_Implementation:
                 )
                 self.data_orm.add(model=model, item=item)
                 #-------------- Floating
+                #XAU/USD
+                item =model(
+                    name='XAU/USD',
+                    strategy_id=3,
+                    symbols='XAU/USD',
+                    actions='buy,sell',
+                    amount=1,
+                    tp_pips=400, 
+                    sl_pips=200,
+                    limit_trade=-1,
+                    limit_profit=1000,
+                    limit_loss=-1000,
+                    params="{'time_start':'16:30:00', 'time_end':'16:32:00', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell'}")
+                self.data_orm.add(model=model, item=item)
                 #US30
                 item =model(
                     name='US30',
@@ -389,7 +403,7 @@ class Logic_Implementation:
                     limit_trade=-1,
                     limit_profit=1000,
                     limit_loss=-1000,
-                    params="")
+                    params="{'time_start':'16:30:00', 'time_end':'16:32:00', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell'}")
                 self.data_orm.add(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -435,13 +449,13 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -486,13 +500,13 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

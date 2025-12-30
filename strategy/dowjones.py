@@ -9,6 +9,7 @@ import inspect, time
 from logic.logic_global import debug, log_instance, Strategy_Run
 from logic.logic_util import model_output, sort
 from logic.logic_log import Logic_Log
+from datetime import datetime
 
 #--------------------------------------------------------------------------------- Action
 class Dowjones:
@@ -29,11 +30,12 @@ class Dowjones:
         self.limit_profit = int(self.params.get("limit_profit"))
         self.limit_loss = int(self.params.get("limit_loss"))
         self.params = self.params.get("params")
-        self.time = self.params.get("time")
-        self.time = self.params.get("change_pip")
-        self.time = self.params.get("order_pip")
-        self.time = self.params.get("down")
-        self.time = self.params.get("up")
+        self.time_start = datetime.strptime(self.params.get("time_start"), "%H:%M:%S").time()
+        self.time_end = datetime.strptime(self.params.get("time_end"), "%H:%M:%S").time()
+        self.change_pip = self.params.get("change_pip")
+        self.order_pip = self.params.get("order_pip")
+        self.down = self.params.get("down")
+        self.up = self.params.get("up")
         
     #--------------------------------------------- start
     def start(self):
@@ -56,18 +58,7 @@ class Dowjones:
         
         try:
             #--------------Action
-            for symbol in self.symbols :
-                for action in self.actions :
-                    item = {
-                        "run": Strategy_Run.ORDER_OPEN, 
-                        "state": this_method,
-                        "action": action, 
-                        "symbol": symbol, 
-                        "amount": self.amount, 
-                        "tp_pips": self.tp_pips, 
-                        "sl_pips": self.sl_pips
-                        }
-                    items.append(item)
+            pass
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = items
@@ -150,30 +141,12 @@ class Dowjones:
         items = []
 
         try:
-            #--------------Data
-            symbol = order_detaile.get("symbol")
-            action = order_detaile.get("action")
-            amount = order_detaile.get("amount")
-            profit = order_detaile.get("profit")
-            trade_id = order_detaile.get("trade_id")
-            #--------------Rule
-            if profit < 0 :
-                action = "sell" if action == "buy" else "buy"
             #--------------Action
-            item = {
-                "run": Strategy_Run.ORDER_OPEN,
-                "state": this_method,
-                "symbol": symbol, 
-                "action": action, 
-                "amount": amount, 
-                "tp_pips": self.tp_pips, 
-                "sl_pips": self.sl_pips
-            }
-            items.append(item)
+            pass
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = items
-            output.message = f"{trade_id} | {action}:{profit} | {symbol},{amount},{self.tp_pips},{self.sl_pips}"
+            output.message = None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
@@ -188,7 +161,7 @@ class Dowjones:
         return output
 
     #--------------------------------------------- price_change
-    def price_change(self, price_detailes, order_detailes):
+    def price_change(self, price_data, order_close, order_open):
         #-------------- Description
         # IN     : execute_id
         # OUT    : 
@@ -207,9 +180,18 @@ class Dowjones:
         items = []
 
         try:
-            #--------------Data
+            for symbol in self.symbols:
+                #--------------Data
+                date = price_data[symbol].get("date")
+                ask = price_data[symbol].get("ask")
+                bid = price_data[symbol].get("bid")
+                #--------------Check time
+                if self.time_start <= date.time() <= self.time_end:
+                    pass
             #--------------Rule
+
             #--------------Action
+
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = items
