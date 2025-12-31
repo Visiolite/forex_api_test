@@ -17,30 +17,31 @@ class Dowjones:
     def __init__(self, params:dict=None, log:Logic_Log=None):
         #-------------- Variable
         self.this_class = self.__class__.__name__
-        self.params = params
         #-------------- Instance
         self.log = log if log else log_instance
         #-------------- Params
-        self.symbols = self.params.get("symbols").split(',')
-        self.actions = self.params.get("actions").split(',')
-        self.amount = self.params.get("amount")
-        self.tp_pips = self.params.get("tp_pips")
-        self.sl_pips = self.params.get("sl_pips")
-        self.limit_trade = int(self.params.get("limit_trade"))
-        self.limit_profit = int(self.params.get("limit_profit"))
-        self.limit_loss = int(self.params.get("limit_loss"))
-        self.params = self.params.get("params")
+        self.symbols = params.get("symbols").split(',')
+        self.actions = params.get("actions").split(',')
+        self.amount = params.get("amount")
+        self.tp_pips = params.get("tp_pips")
+        self.sl_pips = params.get("sl_pips")
+        self.limit_trade = int(params.get("limit_trade"))
+        self.limit_profit = int(params.get("limit_profit"))
+        self.limit_loss = int(params.get("limit_loss"))
+        self.params = params.get("params")
         self.time_start = datetime.strptime(self.params.get("time_start"), "%H:%M:%S").time()
         self.time_end = datetime.strptime(self.params.get("time_end"), "%H:%M:%S").time()
         self.change_pip = self.params.get("change_pip")
         self.order_pip = self.params.get("order_pip")
         self.down = self.params.get("down")
         self.up = self.params.get("up")
+        #-------------- Variable
+        self.set_order = None
+        self.set_price = None
+        self.date = None
         self.ask = None
         self.bid = None
         self.price = None
-        self.set_price = False
-        self.date = None
         
     #--------------------------------------------- start
     def start(self):
@@ -63,7 +64,6 @@ class Dowjones:
         
         try:
             #--------------Action
-            pass
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = items
@@ -147,7 +147,6 @@ class Dowjones:
 
         try:
             #--------------Action
-            pass
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = items
@@ -168,7 +167,7 @@ class Dowjones:
     #--------------------------------------------- price_change
     def price_change(self, price_data, order_close, order_open):
         #-------------- Description
-        # IN     : execute_id
+        # IN     : 
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -183,45 +182,44 @@ class Dowjones:
         output.method_name = this_method
         #--------------Variable
         items = []
-
+        #--------------Action
         try:
             for symbol in self.symbols:
-                #--------------Data
+                #---------Date
                 date = price_data[symbol].get("date")
-                ask = price_data[symbol].get("ask")
-                bid = price_data[symbol].get("bid")
-                digits = list_instrument.get(symbol, {}).get("digits")
-                #--------------Check time
-                
-                if self.time_start <= date.time() <= self.time_end:
-                    if not self.set_price:
-                        self.set_price = True
-                        self.ask = ask
-                        self.bid = bid
-                        self.date = date
-                    disagreement = ask - self.ask
-
-
-                    if ask - self.ask >= self.change_pip:
-                        item = {
-                            "run": Strategy_Run.ORDER_CLOSE,
-                            "state": this_method,
-                            "symbol": symbol,
-                            "action": "sell",
-                            "price": bid,
-                            "amount": self.amount,
-                            "tp_pips": self.tp_pips,
-                            "sl_pips": self.sl_pips,
-                            "description": f"Price Change Up {self.change_pip} pips"
-                        }
-                        items.append(item)
-                        self.ask = ask
-
-                    print(date)
-            #--------------Rule
-
-            #--------------Action
-
+                if (self.set_order is None) or (self.set_order is False) or ( date.date()> self.date.date()):
+                    #---------Time
+                    if self.time_start <= date.time() <= self.time_end:
+                        #---Data
+                        ask = price_data[symbol].get("ask")
+                        bid = price_data[symbol].get("bid")
+                        digits = list_instrument.get(symbol, {}).get("digits")
+                        #---Set_Price
+                        if not self.set_price:
+                            self.set_order = False
+                            self.set_price = True
+                            self.ask = ask
+                            self.bid = bid
+                            self.date = date
+                        #---Check_Price
+                        if self.set_price: 
+                            disagreement = abs((ask - self.ask) * (10 ** digits))
+                            if disagreement >= self.change_pip:
+                                self.set_order = True
+                                self.set_price = False
+                                action = self.up if ask > self.ask else self.down
+                                item = {
+                                    "run": Strategy_Run.ORDER_PENDING,
+                                    "state": this_method,
+                                    "symbol": symbol, 
+                                    "action": action, 
+                                    "amount": self.amount, 
+                                    "ask": self.ask+self.order_pip,
+                                    "bid": self.bid-self.order_pip, 
+                                    "tp_pips": self.tp_pips, 
+                                    "sl_pips": self.sl_pips
+                                }
+                                items.append(item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = items

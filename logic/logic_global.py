@@ -86,6 +86,7 @@ class Strategy_Action(str, Enum):
 class Strategy_Run(str, Enum):
     ORDER_OPEN = "order_open"
     ORDER_CLOSE = "order_close"
+    ORDER_PENDING = "order_pending"
     ORDER_CLOSE_ALL= "order_close_all"
 
 class Order_Action(str, Enum):

@@ -11,7 +11,6 @@ from logic.logic_util import model_output, sort, get_tbl_name
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm
-from model import model_back_execute_detaile
 from model.model_back_order import model_back_order_db
 from strategy import *
 from model import *
@@ -19,7 +18,8 @@ from model import *
 #--------------------------------------------------------------------------------- Action
 class Logic_Back:
     #--------------------------------------------- init
-    def __init__(self, 
+    def __init__(
+            self, 
             execute_id=None,
             management_sql:Data_SQL=None, 
             management_orm:Data_Orm=None, 
@@ -29,7 +29,6 @@ class Logic_Back:
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.execute_id = execute_id
-        self.step = 1
         #--------------------Instance
         #---management_orm
         self.management_orm = management_orm if management_orm else Data_Orm(database=database_management)
@@ -63,19 +62,17 @@ class Logic_Back:
         #-------------- Output
         output = model_output()
         output.class_name = self.this_class
-        output.method_name = this_method
-        #-------------- Variable
-        data_params = []
-
+        output.method_name = this_method        
+        #-------------- Action
         try:
-            #--------------Detaile
+            #------Detaile
             execute_detaile:model_output = self.execute_detaile(id=self.execute_id)
             self.date_from = execute_detaile.get("date_from")
             self.date_to = execute_detaile.get("date_to")
             strategy_name = execute_detaile.get("strategy_name")
             symbols = execute_detaile.get("symbols", "").split(',')
             step = execute_detaile.get("step")
-            #--------------Count
+            #------Step and Date
             cmd = f"SELECT MAX(step),max(date_close) FROM back_order WHERE execute_id={self.execute_id}"
             data = self.management_sql.db.items(cmd=cmd).data
             if data[0][0]:
@@ -83,33 +80,34 @@ class Logic_Back:
                 self.date_from = data[0][1]
             else:
                 self.step = 1
-            #--------------Strategy
+            #------Strategy
             self.strategy = self.get_strategy_instance(strategy_name, execute_detaile).data
-            #--------------Data
+            #------Data
+            data_params = []
             for symbol in symbols : data_params.append({"symbol": symbol, "date_from":self.date_from, "date_to": self.date_to})
             self.data = self.get_data(params=data_params).data
-            #--------------Action
+            #------Do
             for i in range(step):
-                #--------------Variable
+                #---Variable
                 self.account_profit_close = 0
                 self.account_profit_open = 0
                 self.list_order_open = []
                 self.list_order_close = []
-                #--------------Start
+                #---Start
                 result_start:model_output = self.start()
-                #--------------Next
+                #---Next
                 result_next:model_output = self.next()
-                #--------------Step
+                #---Step
                 self.step += 1
-                #--------------Database
+                #---Database
                 cmd = f"UPDATE back_execute SET status='stop' WHERE id={self.execute_id}"
                 result_database:model_output = self.management_sql.db.execute(cmd=cmd)
-                #--------------Output
+                #---Output
                 output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                output.message = f"{result_start.status} | {result_next.status}"
-                #--------------Verbose
+                output.message = f"{result_start.status} | {result_next.status} | {result_database.status}"
+                #---Verbose
                 if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
-                #--------------Log
+                #---Log
                 if log : self.log.log(log_model, output)
         except Exception as e:  
             #--------------Error
@@ -123,7 +121,7 @@ class Logic_Back:
     #--------------------------------------------- start
     def start(self):
         #-------------- Description
-        # IN     : order_id
+        # IN     :
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -139,36 +137,38 @@ class Logic_Back:
         #-------------- Variable
         keep = False
         state = None
-
+        #-------------- Action
         try:
-            #--------------Data
+            #------Data
             result_strategy:model_output = self.strategy.start()
-            #--------------Items
-            for item in result_strategy.data :
-                if len(self.data[item.get("symbol")])>0:
-                    item["father_id"] = 0
-                    item["date"] = self.data[item.get("symbol")][0][1]
-                    item["ask"] = self.data[item.get("symbol")][0][2]
-                    item["bid"] = self.data[item.get("symbol")][0][3]
-                    self.data[item.get("symbol")].pop(0)
-                    state = item.get("state")
-                    keep = True
-                else:
-                    keep = False
-            #--------------Action
+            #------Items
+            if result_strategy.status :
+                for item in result_strategy.data :
+                    symbol = item.get("symbol")
+                    if len(self.data[symbol])>0:
+                        item["father_id"] = 0
+                        item["date"] = self.data[symbol][0][1]
+                        item["ask"] = self.data[symbol][0][2]
+                        item["bid"] = self.data[symbol][0][3]
+                        self.data[symbol].pop(0)
+                        state = item.get("state")
+                        keep = True
+                    else:
+                        keep = False
+            #------Action
             if keep :
                 result_action:model_output = self.action(items=result_strategy.data)
-            #--------------Database
+            #------Database
             if keep :
                 cmd = f"UPDATE back_execute SET status='{state}' WHERE id={self.execute_id}"
                 result_database:model_output = self.management_sql.db.execute(cmd=cmd)
-            #--------------Output
+            #------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None
             output.message = None
-            #--------------Verbose
+            #------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
-            #--------------Log
+            #------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
             #--------------Error
@@ -236,7 +236,7 @@ class Logic_Back:
                                 self.action(items=result_strategy.data)
 
                     #---check_limit
-                    if len(check_tp_sls)==0:    
+                    if len(check_tp_sls)==0:
                         check_limit_status, check_limit_param  = self.check_limit(symbol, ask, bid, date)
                         if not check_limit_status:
                             order_open_accept = False
@@ -250,12 +250,11 @@ class Logic_Back:
                                     self.action(items=result_strategy.data)
                     #---Price_change
                     result_strategy_price_change:model_output = self.strategy.price_change(price_data=price_data, order_close=self.order_close, order_open=self.order_open)
-                    for item in result_strategy_price_change.data :
-                        item["father_id"] = 0
-                        item["date"] = date
-                        item["ask"] = ask
-                        item["bid"] = bid
-                        self.action(items=result_strategy_price_change.data)
+                    if result_strategy_price_change.status:
+                        for item in result_strategy_price_change.data :
+                            item["father_id"] = -1
+                            item["date"] = date
+                            self.action(items=result_strategy_price_change.data)
                 if len(self.data[symbol])>1 : self.data[symbol] = self.data[symbol][self.data[symbol].index(row) + 1:]
             #--------------Output
             output = result
@@ -281,6 +280,7 @@ class Logic_Back:
         for item in items :
             run = item.get("run")
             if run == Strategy_Run.ORDER_OPEN : output:model_output =self.order_open(item=item)
+            if run == Strategy_Run.ORDER_PENDING : output:model_output =self.order_pending(item=item)
             if run == Strategy_Run.ORDER_CLOSE : output:model_output = self.order_close(item=item)
             if run == Strategy_Run.ORDER_CLOSE_ALL : output:model_output = self.order_close_all(item=item)
         #--------------Return
@@ -382,6 +382,81 @@ class Logic_Back:
     
     #--------------------------------------------- order_open
     def order_open(self, item:dict)-> model_output:
+        #-------------- Description
+        # IN     :
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #-------------- Data
+            father_id = item.get("father_id")
+            symbol = item.get("symbol")
+            action = item.get("action")
+            amount = item.get("amount")
+            tp_pips = item.get("tp_pips")
+            sl_pips = item.get("sl_pips")
+            ask = item.get("ask")
+            bid = item.get("bid")
+            date = item.get("date")
+            #-------------- TP/SL
+            if tp_pips or sl_pips:
+                point_size = list_instrument[symbol]["point_size"]
+                digits = list_instrument[symbol]["digits"]
+                if action == "buy":
+                    price_open = ask
+                    tp = float(f"{ask + tp_pips * point_size:.{digits}f}")
+                    sl = float(f"{bid - sl_pips * point_size:.{digits}f}")
+                elif action == "sell":
+                    price_open = bid
+                    tp = float(f"{bid - tp_pips * point_size:.{digits}f}")
+                    sl = float(f"{ask + sl_pips * point_size:.{digits}f}")
+            #-------------- Action
+            obj = model_back_order_db()
+            obj.father_id = father_id
+            obj.date_open = date
+            obj.execute_id = self.execute_id
+            obj.step = self.step
+            obj.symbol = symbol
+            obj.action = action
+            obj.amount = amount
+            obj.price_open = price_open
+            obj.tp = tp
+            obj.sl = sl
+            obj.status = 'open'
+            result_database:model_output = self.management_orm.add(model=model_back_order_db, item=obj)
+            #-------------- Orders
+            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
+            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.status = result_database.status
+            output.data = None
+            output.message = f"{symbol} | {action} | {amount} | {price_open} | {tp} | {sl}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- order_pending
+    def order_pending(self, item:dict)-> model_output:
         #-------------- Description
         # IN     :
         # OUT    : 
