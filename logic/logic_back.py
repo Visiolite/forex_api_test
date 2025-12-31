@@ -208,8 +208,8 @@ class Logic_Back:
                 for row in self.data[symbol]:
                     #------data
                     date = row[1]
-                    ask = row[2]
-                    bid = row[3]
+                    ask = float(row[2])
+                    bid = float(row[3])
                     price_data[symbol]={'date': date, 'ask': ask, 'bid': bid}
                     #------check_tp_sl
                     check_tp_sls = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
@@ -477,14 +477,16 @@ class Logic_Back:
             if tp_pips or sl_pips:
                 point_size = list_instrument[symbol]["point_size"]
                 digits = list_instrument[symbol]["digits"]
+                tp_pips = tp_pips / (10 ** digits)
+                sl_pips = sl_pips / (10 ** digits)
                 if action == "buy":
                     price_open = ask
-                    tp = float(f"{ask + tp_pips * point_size:.{digits}f}")
-                    sl = float(f"{bid - sl_pips * point_size:.{digits}f}")
+                    tp = float(f"{ask + tp_pips:.{digits}f}")
+                    sl = float(f"{bid - sl_pips:.{digits}f}")
                 elif action == "sell":
                     price_open = bid
-                    tp = float(f"{bid - tp_pips * point_size:.{digits}f}")
-                    sl = float(f"{ask + sl_pips * point_size:.{digits}f}")
+                    tp = float(f"{bid - tp_pips:.{digits}f}")
+                    sl = float(f"{ask + sl_pips:.{digits}f}")
             #-------------- Action
             obj = model_back_order_db()
             obj.father_id = father_id
