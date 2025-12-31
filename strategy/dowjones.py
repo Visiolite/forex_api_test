@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from logic.logic_global import debug, log_instance, Strategy_Run
+from logic.logic_global import debug, log_instance, Strategy_Run, list_instrument
 from logic.logic_util import model_output, sort
 from logic.logic_log import Logic_Log
 from datetime import datetime
@@ -36,6 +36,11 @@ class Dowjones:
         self.order_pip = self.params.get("order_pip")
         self.down = self.params.get("down")
         self.up = self.params.get("up")
+        self.ask = None
+        self.bid = None
+        self.price = None
+        self.set_price = False
+        self.date = None
         
     #--------------------------------------------- start
     def start(self):
@@ -185,9 +190,34 @@ class Dowjones:
                 date = price_data[symbol].get("date")
                 ask = price_data[symbol].get("ask")
                 bid = price_data[symbol].get("bid")
+                digits = list_instrument.get(symbol, {}).get("digits")
                 #--------------Check time
+                
                 if self.time_start <= date.time() <= self.time_end:
-                    pass
+                    if not self.set_price:
+                        self.set_price = True
+                        self.ask = ask
+                        self.bid = bid
+                        self.date = date
+                    disagreement = ask - self.ask
+
+
+                    if ask - self.ask >= self.change_pip:
+                        item = {
+                            "run": Strategy_Run.ORDER_CLOSE,
+                            "state": this_method,
+                            "symbol": symbol,
+                            "action": "sell",
+                            "price": bid,
+                            "amount": self.amount,
+                            "tp_pips": self.tp_pips,
+                            "sl_pips": self.sl_pips,
+                            "description": f"Price Change Up {self.change_pip} pips"
+                        }
+                        items.append(item)
+                        self.ask = ask
+
+                    print(date)
             #--------------Rule
 
             #--------------Action
