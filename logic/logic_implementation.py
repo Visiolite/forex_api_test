@@ -398,12 +398,12 @@ class Logic_Implementation:
                     symbols='US30',
                     actions='buy,sell',
                     amount=1,
-                    tp_pips=400, 
-                    sl_pips=200,
+                    tp_pips=4000, 
+                    sl_pips=2000,
                     limit_trade=-1,
                     limit_profit=1000,
                     limit_loss=-1000,
-                    params="{'time_start':'16:30:00', 'time_end':'16:32:00', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell'}")
+                    params="{'time_start':'14:30:00', 'time_end':'14:32:00', 'change_pip': 1000, 'order_pip': 500, 'down': 'buy', 'up': 'sell'}")
                 self.data_orm.add(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -507,6 +507,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=8, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -556,22 +557,22 @@ class Logic_Implementation:
                                 CREATE TABLE IF NOT EXISTS {tblName} (
                                     id SERIAL UNIQUE NOT NULL,
                                     date TIMESTAMP UNIQUE NOT NULL PRIMARY KEY,
-                                    bid real,
-                                    ask real                            
+                                    bid numeric(6,12),
+                                    ask numeric(6,12)                            
                                 )"""
                         else:                  
                             query = f"""
                                 CREATE TABLE IF NOT EXISTS {tblName} (
                                     id SERIAL UNIQUE NOT NULL,
                                     date TIMESTAMP UNIQUE NOT NULL PRIMARY KEY,
-                                    bidopen real,
-                                    bidclose real,
-                                    bidhigh real,
-                                    bidlow real,
-                                    askopen real,
-                                    askclose real,
-                                    askhigh real,
-                                    asklow real,
+                                    bidopen numeric(6,12),
+                                    bidclose numeric(6,12),
+                                    bidhigh numeric(6,12),
+                                    bidlow numeric(6,12),
+                                    askopen numeric(6,12),
+                                    askclose numeric(6,12),
+                                    askhigh numeric(6,12),
+                                    asklow numeric(6,12),
                                     tickqty smallint
                                 )"""
                         if drop:

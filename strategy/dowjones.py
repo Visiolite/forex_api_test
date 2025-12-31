@@ -191,8 +191,8 @@ class Dowjones:
                     #---------Time
                     if self.time_start <= date.time() <= self.time_end:
                         #---Data
-                        ask = price_data[symbol].get("ask")
-                        bid = price_data[symbol].get("bid")
+                        ask = float(price_data[symbol].get("ask"))
+                        bid = float(price_data[symbol].get("bid"))
                         digits = list_instrument.get(symbol, {}).get("digits")
                         #---Set_Price
                         if not self.set_price:
@@ -214,8 +214,8 @@ class Dowjones:
                                     "symbol": symbol, 
                                     "action": action, 
                                     "amount": self.amount, 
-                                    "ask": self.ask+self.order_pip,
-                                    "bid": self.bid-self.order_pip, 
+                                    "ask": self.ask+(self.order_pip / (10 ** digits)),
+                                    "bid": self.bid-(self.order_pip / (10 ** digits)), 
                                     "tp_pips": self.tp_pips, 
                                     "sl_pips": self.sl_pips
                                 }

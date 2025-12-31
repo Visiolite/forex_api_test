@@ -363,6 +363,241 @@ END $$;
 SELECT * FROM temp_date_range;
 ```
 
+<!-------------------------- Data Type -->
+Data Type t
+```sql
+DO $$
+DECLARE
+    r record;
+BEGIN
+    FOR r IN
+        SELECT schemaname, tablename
+        FROM pg_tables
+        WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
+          AND tablename LIKE '%_t1%'
+    LOOP
+        BEGIN
+            -- bid
+            EXECUTE format(
+                'ALTER TABLE %I.%I ALTER COLUMN bid TYPE numeric(12,6) USING bid::numeric',
+                r.schemaname, r.tablename
+            );
+
+            -- ask
+            EXECUTE format(
+                'ALTER TABLE %I.%I ALTER COLUMN ask TYPE numeric(12,6) USING ask::numeric',
+                r.schemaname, r.tablename
+            );
+
+            RAISE NOTICE 'Converted bid/ask: %.%', r.schemaname, r.tablename;
+
+        EXCEPTION
+            WHEN undefined_column THEN
+                RAISE NOTICE 'SKIP (no bid/ask): %.%', r.schemaname, r.tablename;
+
+            WHEN others THEN
+                RAISE NOTICE 'FAILED on %.% : %', r.schemaname, r.tablename, SQLERRM;
+        END;
+    END LOOP;
+END $$;
+```
+```sql
+DO $$
+DECLARE
+    sym    text;
+    tf     text;
+    prefix text;
+    tbl    text;
+BEGIN
+    FOR sym IN
+        SELECT unnest(ARRAY[
+            'EUR/USD','EUR/GBP','EUR/CHF','EUR/JPY','EUR/AUD','EUR/CAD','EUR/NZD',
+            'GBP/USD','GBP/JPY','GBP/CHF','GBP/NZD','GBP/AUD','GBP/CAD',
+            'AUD/USD','AUD/CAD','AUD/JPY','AUD/NZD','AUD/CHF',
+            'NZD/USD','NZD/JPY','NZD/CHF','NZD/CAD',
+            'USD/JPY','USD/CHF','USD/CAD',
+            'CAD/JPY','CAD/CHF',
+            'CHF/JPY',
+            'USOil','UKOil','XAU/USD','XAG/USD',
+            'US30'
+        ])
+    LOOP
+        prefix := lower(replace(sym, '/', ''));
+
+        FOR tf IN
+            SELECT unnest(ARRAY['t1'])
+        LOOP
+            tbl := prefix || '_' || tf;
+
+            BEGIN
+                -- convert bid (ROUND to 2 decimals, then store as numeric(18,8))
+                EXECUTE format(
+                    'ALTER TABLE %I ALTER COLUMN bid TYPE numeric(18,8) USING bid::numeric',
+                    tbl
+                );
+
+                -- convert ask (ROUND to 2 decimals, then store as numeric(18,8))
+                EXECUTE format(
+                    'ALTER TABLE %I ALTER COLUMN ask TYPE numeric(6,8) USING ask::numeric',
+                    tbl
+                );
+
+                RAISE NOTICE 'Converted bid/ask to numeric(6,8) with rounding: %', tbl;
+
+            EXCEPTION
+                WHEN undefined_table THEN
+                    RAISE NOTICE 'SKIP (table not found): %', tbl;
+
+                WHEN undefined_column THEN
+                    RAISE NOTICE 'SKIP (missing bid/ask column): %', tbl;
+
+                WHEN others THEN
+                    RAISE NOTICE 'FAILED on % : %', tbl, SQLERRM;
+            END;
+
+        END LOOP;
+    END LOOP;
+END $$;
+```
+
+<!-------------------------- Data Type -->
+Data Type orher
+```sql
+DO $$
+DECLARE
+    r record;
+BEGIN
+    FOR r IN
+        SELECT schemaname, tablename
+        FROM pg_tables
+        WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
+          AND (
+              tablename LIKE '%\_w1'  ESCAPE '\'
+           OR tablename LIKE '%\_d1'  ESCAPE '\'
+           OR tablename LIKE '%\_h8'  ESCAPE '\'
+           OR tablename LIKE '%\_h6'  ESCAPE '\'
+           OR tablename LIKE '%\_h4'  ESCAPE '\'
+           OR tablename LIKE '%\_h3'  ESCAPE '\'
+           OR tablename LIKE '%\_h2'  ESCAPE '\'
+           OR tablename LIKE '%\_h1'  ESCAPE '\'
+           OR tablename LIKE '%\_m30' ESCAPE '\'
+           OR tablename LIKE '%\_m15' ESCAPE '\'
+           OR tablename LIKE '%\_m5'  ESCAPE '\'
+           OR tablename LIKE '%\_m1'  ESCAPE '\'
+          )
+    LOOP
+        BEGIN
+            EXECUTE format(
+                'ALTER TABLE %I.%I
+                   ALTER COLUMN bidopen  TYPE numeric(12,6) USING bidopen::numeric,
+                   ALTER COLUMN bidclose TYPE numeric(12,6) USING bidclose::numeric,
+                   ALTER COLUMN bidhigh  TYPE numeric(12,6) USING bidhigh::numeric,
+                   ALTER COLUMN bidlow   TYPE numeric(12,6) USING bidlow::numeric,
+                   ALTER COLUMN askopen  TYPE numeric(12,6) USING askopen::numeric,
+                   ALTER COLUMN askclose TYPE numeric(12,6) USING askclose::numeric,
+                   ALTER COLUMN askhigh  TYPE numeric(12,6) USING askhigh::numeric,
+                   ALTER COLUMN asklow   TYPE numeric(12,6) USING asklow::numeric',
+                r.schemaname, r.tablename
+            );
+
+            RAISE NOTICE 'Converted OHLC columns: %.%', r.schemaname, r.tablename;
+
+        EXCEPTION
+            WHEN undefined_column THEN
+                RAISE NOTICE 'SKIP (missing OHLC columns): %.%', r.schemaname, r.tablename;
+
+            WHEN others THEN
+                RAISE NOTICE 'FAILED on %.% : %', r.schemaname, r.tablename, SQLERRM;
+        END;
+    END LOOP;
+END $$;
+```
+```sql
+DO $$
+DECLARE
+    sym    text;
+    tf     text;
+    prefix text;
+    tbl    text;
+BEGIN
+    FOR sym IN
+        SELECT unnest(ARRAY[
+            'EUR/USD','EUR/GBP','EUR/CHF','EUR/JPY','EUR/AUD','EUR/CAD','EUR/NZD',
+            'GBP/USD','GBP/JPY','GBP/CHF','GBP/NZD','GBP/AUD','GBP/CAD',
+            'AUD/USD','AUD/CAD','AUD/JPY','AUD/NZD','AUD/CHF',
+            'NZD/USD','NZD/JPY','NZD/CHF','NZD/CAD',
+            'USD/JPY','USD/CHF','USD/CAD',
+            'CAD/JPY','CAD/CHF',
+            'CHF/JPY',
+            'USOil','UKOil','XAU/USD','XAG/USD',
+            'US30'
+        ])
+    LOOP
+        prefix := lower(replace(sym, '/', ''));
+
+        FOR tf IN
+            SELECT unnest(ARRAY[
+                'w1','d1','h8','h6','h4','h3','h2','h1','m30','m15','m5','m1'
+            ])
+        LOOP
+            tbl := prefix || '_' || tf;
+
+            BEGIN
+                -- BID OHLC (round to 5 decimals, then store as numeric(18,8))
+                EXECUTE format(
+                    'ALTER TABLE %I ALTER COLUMN bidopen  TYPE numeric(18,8) USING bidopen::numeric',
+                    tbl
+                );
+                EXECUTE format(
+                    'ALTER TABLE %I ALTER COLUMN bidclose TYPE numeric(18,8) USING bidclose::numeric',
+                    tbl
+                );
+                EXECUTE format(
+                    'ALTER TABLE %I ALTER COLUMN bidhigh  TYPE numeric(18,8) USING bidhigh::numeric',
+                    tbl
+                );
+                EXECUTE format(
+                    'ALTER TABLE %I ALTER COLUMN bidlow   TYPE numeric(18,8) USING bidlow::numeric',
+                    tbl
+                );
+
+                -- ASK OHLC (round to 5 decimals, then store as numeric(18,8))
+                EXECUTE format(
+                    'ALTER TABLE %I ALTER COLUMN askopen  TYPE numeric(18,8) USING askopen::numeric',
+                    tbl
+                );
+                EXECUTE format(
+                    'ALTER TABLE %I ALTER COLUMN askclose TYPE numeric(18,8) USING askclose::numeric',
+                    tbl
+                );
+                EXECUTE format(
+                    'ALTER TABLE %I ALTER COLUMN askhigh  TYPE numeric(18,8) USING askhigh::numeric',
+                    tbl
+                );
+                EXECUTE format(
+                    'ALTER TABLE %I ALTER COLUMN asklow   TYPE numeric(18,8) USING asklow::numeric',
+                    tbl
+                );
+
+                RAISE NOTICE 'Fixed OHLC bid/ask rounding: %', tbl;
+
+            EXCEPTION
+                WHEN undefined_table THEN
+                    RAISE NOTICE 'SKIP (table not found): %', tbl;
+
+                WHEN undefined_column THEN
+                    RAISE NOTICE 'SKIP (missing OHLC column): %', tbl;
+
+                WHEN others THEN
+                    RAISE NOTICE 'FAILED on % : %', tbl, SQLERRM;
+            END;
+
+        END LOOP;
+    END LOOP;
+END $$;
+```
+
+
 
 <!--------------------------------------------------------------------------------- Config --->
 <br><br>
