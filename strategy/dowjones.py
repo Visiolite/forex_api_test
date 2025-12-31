@@ -69,7 +69,7 @@ class Dowjones:
             output.data = items
             output.message = None
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -112,7 +112,7 @@ class Dowjones:
             output.data = items
             output.message = output.status
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             output.data = items
             output.message = None
             #--------------Log
@@ -152,7 +152,7 @@ class Dowjones:
             output.data = items
             output.message = None
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -225,7 +225,7 @@ class Dowjones:
             output.data = items
             output.message = None
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  

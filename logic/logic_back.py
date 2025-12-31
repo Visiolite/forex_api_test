@@ -106,7 +106,7 @@ class Logic_Back:
                 output.time = sort(f"{(time.time() - start_time):.3f}", 3)
                 output.message = f"{result_start.status} | {result_next.status} | {result_database.status}"
                 #---Verbose
-                if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+                if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
                 #---Log
                 if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -167,7 +167,7 @@ class Logic_Back:
             output.data = None
             output.message = None
             #------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -260,7 +260,7 @@ class Logic_Back:
             output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -443,7 +443,7 @@ class Logic_Back:
             output.data = None
             output.message = f"{symbol} | {action} | {amount} | {price_open} | {tp} | {sl}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -515,10 +515,10 @@ class Logic_Back:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = result_database.status
-            output.data = None
-            output.message = f"{symbol} | {action} | {amount} | {price_open} | {tp} | {sl}"
+            output.data = item
+            output.message = f"{date} | {symbol} | {action} | {amount} | {price_open} | {tp} | {sl}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -577,9 +577,9 @@ class Logic_Back:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = result_database.status
             output.data = item
-            output.message = f"{id} | {symbol} | {action} | {profit}"
+            output.message = f"{date} | {symbol} | {action} | {profit}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -628,7 +628,7 @@ class Logic_Back:
             output.data = None
             output.message = len(self.list_order_open)
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -674,7 +674,7 @@ class Logic_Back:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = None
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -712,7 +712,7 @@ class Logic_Back:
             output.data = max_step
             output.message=max_step
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -752,7 +752,7 @@ class Logic_Back:
             output.data = None
             output.message=None
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -789,7 +789,7 @@ class Logic_Back:
             output.data = None
             output.message=None
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -938,7 +938,7 @@ class Logic_Back:
             output.data = detaile
             output.message=execute_id
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
