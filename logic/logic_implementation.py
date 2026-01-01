@@ -507,7 +507,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=8, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=8, account_id=1, step=1, date_from="2025-10-01 00:00:00", date_to="2026-01-01 23:59:59"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

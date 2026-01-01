@@ -109,20 +109,19 @@ class Logic_Back:
             #------Database
             cmd = f"UPDATE back_execute SET status='stop' WHERE id={self.execute_id}"
             result_database:model_output = self.management_sql.db.execute(cmd=cmd)
-            #------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = None
-            output.message = f"{self.execute_id} | {strategy_name} | {symbols} | {step} | {result_start.status} | {result_next.status} | {result_database.status}"
-            #------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-            #------Log
-            if log : self.log.log(log_model, output)
         except Exception as e:  
-            #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #------Output
+        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.data = None
+        output.message = f"{self.execute_id} | {strategy_name} | {symbols} | {step} | {result_start.status} | {result_next.status} | {result_database.status}"
+        #------Verbose
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        #------Log
+        if log : self.log.log(log_model, output)
         #--------------Return
         return output
 
@@ -163,20 +162,19 @@ class Logic_Back:
             #------Database
             cmd = f"UPDATE back_execute SET status='{Strategy_Action.START}' WHERE id={self.execute_id}"
             result_database:model_output = self.management_sql.db.execute(cmd=cmd)
-            #------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = None
-            output.message = f"{self.execute_id} | {result_strategy.status} | {result_action.status} | {result_database.status}"
-            #------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-            #------Log
-            if log : self.log.log(log_model, output)
         except Exception as e:  
-            #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #------Output
+        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.data = None
+        output.message = f"{self.execute_id} | {result_strategy.status} | {result_action.status} | {result_database.status}"
+        #------Verbose
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        #------Log
+        if log : self.log.log(log_model, output)
         #--------------Return
         return output
 
@@ -197,7 +195,7 @@ class Logic_Back:
         result = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        #-------------- Output
+        #-------------- Variable
         order_open_accept = True
         price_data = {}
         #--------------Action
@@ -261,7 +259,12 @@ class Logic_Back:
                                 item["bid"] = bid
                                 self.action(items=result_strategy.data)
                     #------Price_change
-                    result_strategy_price_change:model_output = self.strategy.price_change(price_data=price_data, order_close=self.order_close, order_open=self.order_open)
+                    result_strategy_price_change:model_output = self.strategy.price_change(
+                        price_data=price_data,
+                        order_close=self.order_close,
+                        order_open=self.order_open,
+                        order_pending=self.order_pending
+                    )
                     if result_strategy_price_change.status:
                         for item in result_strategy_price_change.data :
                             item["father_id"] = -1
@@ -280,19 +283,18 @@ class Logic_Back:
                                 self.action(items=result_strategy.data)
                 if len(self.data[symbol])>1 : 
                     self.data[symbol] = self.data[symbol][self.data[symbol].index(row) + 1:]
-            #--------------Output
-            output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
         except Exception as e:  
-            #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Output
+        output = result
+        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        #--------------Verbose
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        #--------------Log
+        if log : self.log.log(log_model, output)
         #--------------Return
         return output
     
@@ -403,6 +405,22 @@ class Logic_Back:
         #--------------Return
         output = profit
         return output
+
+    #--------------------------------------------- cal_tp_sl
+    def cal_tp_sl(self, symbol, action, ask, bid, tp_pips, sl_pips)-> model_output:
+
+        digits = list_instrument[symbol]["digits"]
+        spred = abs(ask-bid)
+        if action == "buy":
+            price_open = ask
+            tp = float(f"{bid + spred + (tp_pips / (10 ** digits)):.{digits}f}")
+            sl = float(f"{bid + spred - (sl_pips / (10 ** digits)):.{digits}f}")
+        elif action == "sell":
+            price_open = bid
+            tp = float(f"{ask - spred - (tp_pips / (10 ** digits)):.{digits}f}")
+            sl = float(f"{ask - spred + (sl_pips / (10 ** digits)):.{digits}f}")
+
+        return price_open, tp, sl
     
     #--------------------------------------------- order_open
     def order_open(self, item:dict)-> model_output:
@@ -582,14 +600,14 @@ class Logic_Back:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-
+        #-------------- Action
         try:
-            #-------------- Data
+            #------Data
             price_open = item.get("price_open")
             ask = item.get("ask")
             bid = item.get("bid")
             date= item.get("date")
-            #-------------- Action
+            #------Action
             for order in self.list_order_open :
                 id = order[0]
                 symbol = order[10]
@@ -598,20 +616,19 @@ class Logic_Back:
                 price_open = order[5]
                 item = {"id":id, "symbol":symbol, "action":action, "amount":amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
                 self.order_close(item =item)
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = None
-            output.message = len(self.list_order_open)
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
         except Exception as e:  
-            #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Output
+        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.data = None
+        output.message = len(self.list_order_open)
+        #--------------Verbose
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        #--------------Log
+        if log : self.log.log(log_model, output)
         #--------------Return
         return output
     
@@ -1003,19 +1020,3 @@ class Logic_Back:
             output.status = False
         #--------------Return
         return output
-    
-    #--------------------------------------------- cal_tp_sl
-    def cal_tp_sl(self, symbol, action, ask, bid, tp_pips, sl_pips)-> model_output:
-
-        digits = list_instrument[symbol]["digits"]
-        spred = abs(ask-bid)
-        if action == "buy":
-            price_open = ask
-            tp = float(f"{bid + spred + (tp_pips / (10 ** digits)):.{digits}f}")
-            sl = float(f"{bid + spred - (sl_pips / (10 ** digits)):.{digits}f}")
-        elif action == "sell":
-            price_open = bid
-            tp = float(f"{ask - spred - (tp_pips / (10 ** digits)):.{digits}f}")
-            sl = float(f"{ask - spred + (sl_pips / (10 ** digits)):.{digits}f}")
-
-        return price_open, tp, sl

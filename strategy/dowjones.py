@@ -174,13 +174,11 @@ class Dowjones:
         items = []
         #--------------Action
         try:
-            #---------Date
-            digits = list_instrument.get(symbol, {}).get("digits")
-            date = price_data[symbol].get("date")
-            ask = float(price_data[symbol].get("ask"))
-            bid = float(price_data[symbol].get("bid"))
-
             for symbol in self.symbols:
+                digits = list_instrument.get(symbol, {}).get("digits")
+                date = price_data[symbol].get("date")
+                ask = float(price_data[symbol].get("ask"))
+                bid = float(price_data[symbol].get("bid"))
                 if (self.set_order is None) or (self.set_order is False) or ( date.date()> self.date.date()):
                     #---------Time
                     if self.time_start <= date.time() <= self.time_end:                        
