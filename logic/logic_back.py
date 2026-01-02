@@ -216,6 +216,7 @@ class Logic_Back:
                     for order in self.list_order_open:
                         profit = self.cal_profit(price_open=order[5], action=order[11], amount=order[12], ask=ask, bid=bid)
                         for pm in self.profit_manager_items:
+                            percent = self.cal_percent_value(pm[3], profit)
                             print(pm)
                     #------pending_order
                     for order in self.list_order_pending:
@@ -407,11 +408,10 @@ class Logic_Back:
         return output
 
     #--------------------------------------------- cal_percent_value
-    def cal_percent_value(self, value_1, value_2)-> model_output:
+    def cal_percent_value(self, value_1, value_2)-> int:
         #--------------Action
-        result =0
+        output = (value_2 / value_1) * 100
         #--------------Return
-        output = result
         return output
     
     #--------------------------------------------- cal_profit
