@@ -35,6 +35,7 @@ class Dowjones:
         self.order_pip = self.params.get("order_pip")
         self.down = self.params.get("down")
         self.up = self.params.get("up")
+        self.pending_limit = self.params.get("pending_limit")
         #-------------- Variable
         self.set_order = None
         self.set_price = None
@@ -181,9 +182,9 @@ class Dowjones:
                 bid = float(price_data[symbol].get("bid"))
                 if (self.set_order is None) or (self.set_order is False) or ( date.date()> self.date.date()):
                     #---------Time
-                    if self.time_start <= date.time() <= self.time_end:                        
+                    if self.time_start <= date.time() <= self.time_end:
                         #---Set_Price
-                        if not self.set_price:
+                        if not self.set_price or date.date()> self.date.date():
                             self.set_order = False
                             self.set_price = True
                             self.ask = ask
@@ -199,6 +200,8 @@ class Dowjones:
                                 item = {
                                     "run": Strategy_Run.ORDER_PENDING,
                                     "state": this_method,
+                                    "date": date,
+                                    "pending_limit": self.pending_limit, 
                                     "symbol": symbol, 
                                     "action": action, 
                                     "amount": self.amount, 

@@ -6,6 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
+from datetime import datetime
 from logic.logic_global import Strategy_Action, debug, list_instrument, log_instance, Strategy_Run, database_management, database_data
 from logic.logic_util import model_output, sort, get_tbl_name
 from logic.logic_log import Logic_Log
@@ -212,16 +213,21 @@ class Logic_Back:
                         order_action = order["action"]
                         order_ask = order["ask"]
                         order_bid = order["bid"]
-                        if order_action=="buy":
-                            if ask>= order_ask:
-                                order["date"]=date
-                                self.order_open(order)
-                                self.list_order_pending.remove(order)
-                        if order_action =="sell":
-                            if bid<= order_bid:
-                                order["date"]=date
-                                self.order_open(order)
-                                self.list_order_pending.remove(order)
+                        order_date = order["date"]
+                        pending_limit = order["pending_limit"]
+                        if (date - order_date).seconds <= pending_limit:
+                            if order_action=="buy":
+                                if ask>= order_ask:
+                                    order["date"]=date
+                                    self.order_open(order)
+                                    self.list_order_pending.remove(order)
+                            if order_action =="sell":
+                                if bid<= order_bid:
+                                    order["date"]=date
+                                    self.order_open(order)
+                                    self.list_order_pending.remove(order)
+                        else:
+                            self.list_order_pending.remove(order)
                     #------check_limit
                     check_limit_status, check_limit_param  = self.check_limit(symbol, ask, bid, date)
                     if not check_limit_status:
