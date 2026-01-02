@@ -79,6 +79,10 @@ class Logic_Back:
             self.date_from = execute_detaile.get("date_from")
             self.date_to = execute_detaile.get("date_to")
             step = execute_detaile.get("step")
+            profit_manager_id = execute_detaile.get("profit_manager_id")
+            #------profit_manager
+            cmd = f"SELECT * FROM profit_manager_item WHERE profit_id={profit_manager_id}"
+            self.profit_manager_items = self.management_sql.db.items(cmd=cmd).data 
             #------Strategy
             self.strategy = self.get_strategy_instance(strategy_name, execute_detaile).data
             #------Step and Date
@@ -208,6 +212,11 @@ class Logic_Back:
                     ask = float(row[2])
                     bid = float(row[3])
                     price_data[symbol]={'date': date, 'ask': ask, 'bid': bid}
+                    #------profit_manager
+                    for order in self.list_order_open:
+                        profit = self.cal_profit(price_open=order[5], action=order[11], amount=order[12], ask=ask, bid=bid)
+                        for pm in self.profit_manager_items:
+                            print(pm)
                     #------pending_order
                     for order in self.list_order_pending:
                         order_action = order["action"]
@@ -367,7 +376,7 @@ class Logic_Back:
         #--------------check open order
         for item in self.list_order_open : 
             trade_count += 1
-            profit_open = profit_open + self.profit_calculate(item, ask, bid)
+            profit_open = profit_open + self.cal_profit(item[5], item[11], item[12], ask, bid)
             profit_open = float(f"{profit_open:.{2}f}")
         #--------------Trade
         if self.strategy.limit_trade !=-1 and trade_count >= self.strategy.limit_trade : 
@@ -397,13 +406,16 @@ class Logic_Back:
         output = result, param
         return output
 
-    #--------------------------------------------- profit_calculate
-    def profit_calculate(self, item, ask, bid)-> model_output:
-        #--------------Data
-        profit = 0
-        price_open = item[5]
-        action = item[11]
-        amount = item[12]
+    #--------------------------------------------- cal_percent_value
+    def cal_percent_value(self, value_1, value_2)-> model_output:
+        #--------------Action
+        result =0
+        #--------------Return
+        output = result
+        return output
+    
+    #--------------------------------------------- cal_profit
+    def cal_profit(self, price_open, action, amount,  ask, bid)-> model_output:
         #--------------Action
         if action == "buy" : profit = (bid - price_open) * amount
         if action == "sell" : profit = (price_open - ask) * amount
@@ -955,7 +967,7 @@ class Logic_Back:
         #--------------Data
         table = "back_execute"
         #--------------Action
-        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.limit_trade, strategy_item.limit_profit, strategy_item.limit_loss, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.step, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = {id}"
+        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.limit_trade, strategy_item.limit_profit, strategy_item.limit_loss, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.step, {table}.status, {table}.profit_manager_id FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = {id}"
         result:model_output = self.management_sql.db.items(cmd=cmd)
         #--------------Data
         if result.status and len(result.data) > 0 :
@@ -975,6 +987,7 @@ class Logic_Back:
             output["account_id"] = data[12]
             output["step"] = data[13]
             output["status"] = data[14]
+            output["profit_manager_id"] = data[15]
         #--------------Return
         return output
     

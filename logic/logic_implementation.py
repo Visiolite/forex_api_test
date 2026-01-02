@@ -500,14 +500,125 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=8, account_id=1, step=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=8, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- profit_manager
+    def profit_manager(self, drop=False, truncate=False,  create=True, add=True):
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Variable
+        model = model_profit_manager_db
+
+        try:
+            #-------------- Drop
+            if drop : self.data_orm.drop(model=model)
+            #-------------- Create
+            if create : self.data_orm.create(model=model)
+            #-------------- Truncate
+            if truncate : self.data_orm.truncate(model=model)
+            #-------------- Add
+            if add:
+                self.data_orm.add(model=model, item=model(name="PM-1-10", r_sl=1, r_tp=10))
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- profit_manager_item
+    def profit_manager_item(self, drop=False, truncate=False,  create=True, add=True):
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Variable
+        model = model_profit_manager_item_db
+
+        try:
+            #-------------- Drop
+            if drop : self.data_orm.drop(model=model)
+            #-------------- Create
+            if create : self.data_orm.create(model=model)
+            #-------------- Truncate
+            if truncate : self.data_orm.truncate(model=model)
+            #-------------- Add
+            if add:
+                #---TP
+                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-1", value=80, item="tp", item_value=100))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-2", value=160, item="tp", item_value=200))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-3", value=240, item="tp", item_value=300))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-4", value=320, item="tp", item_value=400))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-5", value=400, item="tp", item_value=500))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-6", value=480, item="tp", item_value=600))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-7", value=560, item="tp", item_value=700))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-8", value=640, item="tp", item_value=800))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-9", value=720, item="tp", item_value=900))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-10", value=800, item="tp", item_value=1000))
+                #---SL
+                self.data_orm.add(model=model, item=model(profit_id=1, name="sl-1", value=80, item="sl", item_value=-100))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="sl-2", value=160, item="sl", item_value=-200))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="sl-3", value=240, item="sl", item_value=-300))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="sl-4", value=320, item="sl", item_value=-400))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="sl-5", value=400, item="sl", item_value=-500))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="sl-6", value=480, item="sl", item_value=-600))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="sl-7", value=560, item="sl", item_value=-700))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="sl-8", value=640, item="sl", item_value=-800))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="sl-9", value=720, item="sl", item_value=-900))
+                self.data_orm.add(model=model, item=model(profit_id=1, name="sl-10", value=800, item="sl", item_value=-1000))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
