@@ -20,8 +20,8 @@ class model_profit_manager_item_db(BaseModel_db):
     profit_id = Column(Integer, default=1)
     name = Column(String, default='')
     value = Column(Integer, default=1)
-    item = Column(String, default='')
-    item_value = Column(Integer, default=1)
+    tp_value = Column(Integer, default=0)
+    sl_value = Column(Integer, default=0)
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
     #---Display
@@ -35,7 +35,7 @@ class model_profit_manager_item_py(BaseModel_py):
     profit_id : int = 1
     name : str = ''
     value : int = 1
-    item : str = ''
-    item_value : int = 1
+    tp_value : int = 0
+    sl_value : int = 0
     description : Optional[str] = ''
     enable : bool = True

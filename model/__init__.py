@@ -10,3 +10,4 @@ from .model_back_execute_detaile import model_back_execute_detaile_db, model_bac
 from .model_live_execute_detaile import model_live_execute_detaile_db, model_live_execute_detaile_py
 from .model_profit_manager import model_profit_manager_db, model_profit_manager_py
 from .model_profit_manager_item import model_profit_manager_item_db, model_profit_manager_item_py
+from .model_back_profit_manager_detaile import model_back_profit_manager_detaile_db, model_back_profit_manager_detaile_py

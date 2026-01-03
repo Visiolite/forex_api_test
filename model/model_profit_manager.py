@@ -18,8 +18,6 @@ class model_profit_manager_db(BaseModel_db):
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, default='')
-    r_sl = Column(Integer, default=1)
-    r_tp = Column(Integer, default=1)
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
     #---Display
@@ -31,7 +29,5 @@ class model_profit_manager_db(BaseModel_db):
 class model_profit_manager_py(BaseModel_py):
     id : int = 0
     name : str = ''
-    r_sl : int = 1
-    r_tp : int = 1
     description : Optional[str] = ''
     enable : bool = True

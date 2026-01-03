@@ -233,6 +233,7 @@ debug:
     order_open: {log: false, verbose: true, model: "Logic_Back"}
     order_pending: {log: false, verbose: true, model: "Logic_Back"}
     order_close: {log: false, verbose: true, model: "Logic_Back"}
+    profit_manager: {log: false, verbose: false, model: "Logic_Back"}
   Fxcm_API:
     login: {log: false, verbose: true, model: "Fxcm_API"}
     logout: {log: false, verbose: true, model: "Fxcm_API"}
