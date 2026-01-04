@@ -70,8 +70,8 @@ def status(id:int):
 @route.get("/start/{execute_id}", description="start", response_model=model_output)
 def start(execute_id:int):
     start_time = time.time()
-    logic_back.execute_id = execute_id
-    output:model_output = logic_back.run()
+    logic = Logic_Back(execute_id=execute_id)
+    output:model_output = logic.run()
     output.time = sort(f"{(time.time() - start_time):.3f}", 3)
     return output
 

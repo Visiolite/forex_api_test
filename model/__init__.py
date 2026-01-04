@@ -11,3 +11,4 @@ from .live_execute_detaile import model_live_execute_detaile_db, model_live_exec
 from .profit_manager import model_profit_manager_db, model_profit_manager_py
 from .profit_manager_item import model_profit_manager_item_db, model_profit_manager_item_py
 from .back_profit_manager_detaile import model_back_profit_manager_detaile_db, model_back_profit_manager_detaile_py
+from .money_management import model_money_management_db, model_money_management_py

@@ -22,6 +22,7 @@ class model_back_execute_db(BaseModel_db):
     strategy_item_id = Column(Integer, default=1)
     account_id = Column(Integer, default=0)
     profit_manager_id = Column(Integer, default=1)
+    money_management_id = Column(Integer, default=1)
     date_from = Column(DateTime, default='2025-01-01 00:00:00')
     date_to = Column(DateTime, default='2030-01-01 00:00:00')
     step = Column(Integer, default=1)
@@ -44,6 +45,7 @@ class model_back_execute_py(BaseModel_py):
     strategy_item_id : int = 1
     account_id : int = 0
     profit_manager_id : int = 1
+    money_management_id : int = 1
     date_from : datetime = datetime.strptime('2025-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
     date_to : datetime = datetime.strptime('2030-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
     step : int = 1
