@@ -5,6 +5,7 @@
 # logic_back
 
 #--------------------------------------------------------------------------------- Import
+from datetime import date
 import inspect, time, ast
 from logic.startup import Strategy_Action, Strategy_Run, debug, list_instrument, log_instance, database_management, database_data
 from logic.util import model_output, sort, get_tbl_name, time_change_utc_newyork, cal_price_pips, cal_size, cal_tp_sl, cal_movement, cal_percent_of_value, cal_value_of_percent, cal_profit
@@ -97,7 +98,7 @@ class Logic_Back:
             for i in range(step):
                 #---Run
                 output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                output.message = f"exi({self.execute_id}) | stg({strategy_name}) | sym({symbols}) | stp({step})"
+                output.message = f"exi({self.execute_id}) | stg({strategy_name}) | sym({symbols}) | stp({self.step})"
                 if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
                 #---Rest
                 self.strategy.balance = self.money_management[0]
@@ -117,8 +118,6 @@ class Logic_Back:
                 result_start:model_output = self.start()
                 #---Next
                 result_next:model_output = self.next()
-                #---Stop
-                result_stop:model_output = self.stop()
                 #---Step
                 self.step += 1
             #------Database
@@ -132,7 +131,7 @@ class Logic_Back:
         #------Output
         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
         output.data = None
-        output.message = f"{self.execute_id} | {strategy_name} | {symbols} | {step} | {result_start.status} | {result_next.status} | {result_database.status} | {result_stop.status}"
+        output.message = f"{self.execute_id} | {strategy_name} | {symbols} | {step} | {result_start.status} | {result_next.status} | {result_database.status}"
         #------Verbose
         if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #------Log
@@ -301,6 +300,15 @@ class Logic_Back:
                         self.action(items=result_strategy_price_change.data)
                 if len(self.data[symbol])>1 : 
                     self.data[symbol] = self.data[symbol][self.data[symbol].index(row) + 1:]
+                #--------------Stop
+                result_strategy:model_output = self.strategy.stop()
+                for item in result_strategy.data :
+                    item["date"] = date
+                    item["ask"] = ask
+                    item["bid"] = bid
+                    self.action(items=result_strategy.data)
+                self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
+                self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
@@ -543,6 +551,8 @@ class Logic_Back:
                 item["ask"] = ask
                 item["bid"] = bid
                 self.action(items=result_strategy.data)
+            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
+            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
         #--------------Loss
         loss = profit_open + profit_close
         if self.limit_loss !=-1 and loss<0 and loss <= self.limit_loss:
@@ -555,8 +565,10 @@ class Logic_Back:
                 item["ask"] = ask
                 item["bid"] = bid
                 self.action(items=result_strategy.data)
+            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
+            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
         #--------------Log
-        if not result: p = f"{param} | {date}"
+        if not result: param = f"{param} | {date}"
         if (self.account_profit_close != profit_close or self.account_profit_open != profit_open):
             if (abs(profit_close-self.account_profit_close)>1 or abs(profit_open-self.account_profit_open)>1) :
                 self.account_profit_close = profit_close
@@ -807,22 +819,28 @@ class Logic_Back:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
+        #-------------- Variable
+        output.data = []
+        #-------------- Data
+        date = item["date"]
+        ask = item["ask"] 
+        bid = item["bid"]
         #-------------- Action
         try:
-            #------Data
-            price_open = item.get("price_open")
-            ask = item.get("ask")
-            bid = item.get("bid")
-            date= item.get("date")
-            #------Action
             for order in self.list_order_open :
+                #------Data
                 id = order[0]
-                symbol = order[10]
+                price_open = order[5]
+                order_symbol = order[10]
                 action = order[11]
                 amount = order[12]
-                price_open = order[5]
-                item = {"id":id, "symbol":symbol, "action":action, "amount":amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
-                self.order_close(item =item)
+                item = {"id":id, "symbol":order_symbol, "action":action, "amount":amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
+                result = self.order_close(item=item).data
+                output.data.append(result)
+                profit =  result["profit"]
+                self.account_profit_close = self.account_profit_close + profit
+                self.account_balance = self.account_balance + profit
+                self.strategy.balance = self.account_balance
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}

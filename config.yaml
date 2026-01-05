@@ -230,6 +230,8 @@ debug:
   Logic_Back:
     run: {log: false, verbose: true, model: "Logic_Back"}
     start: {log: false, verbose: true, model: "Logic_Back"}
+    stop: {log: false, verbose: true, model: "Logic_Back"}
+    next: {log: false, verbose: true, model: "Logic_Back"}
     order_open: {log: false, verbose: true, model: "Logic_Back"}
     order_pending: {log: false, verbose: false, model: "Logic_Back"}
     order_close: {log: false, verbose: true, model: "Logic_Back"}
