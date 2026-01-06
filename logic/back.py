@@ -78,6 +78,7 @@ class Logic_Back:
             self.date_to = ed["date_to"]
             self.tp_pips = ed["tp_pips"]
             self.sl_pips = ed["sl_pips"]
+            self.trade_limit_profit= ed["trade_limit_profit"]
             #------Strategy
             self.strategy = self.get_strategy_instance(strategy_name, ed).data
             #------Step
@@ -101,19 +102,19 @@ class Logic_Back:
                 output.message = f"exi({self.execute_id}) | stg({strategy_name}) | sym({symbols}) | stp({self.step})"
                 if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
                 #---Rest
-                self.strategy.balance = self.money_management[0]
-                self.strategy.risk = self.money_management[1]
                 self.balance = self.money_management[0]
                 self.limit_profit = self.money_management[2]
                 self.limit_loss = self.money_management[3]
                 self.limit_trade = self.money_management[4]
                 self.limit_stop = self.money_management[5]
-                self.account_balance = self.money_management[0]
                 self.account_profit_close = 0
                 self.account_profit_open = 0
                 self.list_order_open = []
                 self.list_order_close = []
                 self.list_order_pending = []
+                self.keep = True
+                self.strategy.balance = self.money_management[0]
+                self.strategy.risk = self.money_management[1]
                 #---Start
                 result_start:model_output = self.start()
                 #---Next
@@ -256,59 +257,53 @@ class Logic_Back:
         check_tp_sls = []
         #--------------Action
         try:
-            for symbol in self.data:
-                self.digits = list_instrument[symbol]["digits"]
-                self.point_size = list_instrument[symbol]["point_size"]
-                for row in self.data[symbol]:
+            for self.symbol in self.data:
+                self.digits = list_instrument[self.symbol]["digits"]
+                self.point_size = list_instrument[self.symbol]["point_size"]
+                self.strategy.digits = self.digits 
+                self.strategy.point_size = self.point_size
+                for row in self.data[self.symbol]:
                     #------price_data
-                    date = row[1]
-                    ask = float(row[2])
-                    bid = float(row[3])
-                    self.price_data[symbol]={'digits': self.digits, 'point_size': self.point_size, 'date': date, 'ask': ask, 'bid': bid}
+                    self.date = row[1]
+                    self.ask = float(row[2])
+                    self.bid = float(row[3])
                     #------check_pending_order
                     if len(self.list_order_pending)>0 :
-                        self.check_pending_order(self.price_data)
+                        self.check_pending_order()
                     #------profit_manager
                     if len(self.list_order_open)>0 : 
-                        self.profit_manager(self.price_data)
+                        self.profit_manager()
                     #------check_tp_sl
                     if len(self.list_order_open)>0 : 
-                        check_tp_sls = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
+                        check_tp_sls = self.check_tp_sl(symbol=self.symbol, ask=self.ask, bid=self.bid, date=self.date)
                     #------check_limit
-                    self.check_limit(ask, bid, date, self.digits, self.point_size)
+                    self.check_limit(self.ask, self.bid, self.date, self.digits, self.point_size)
+                    if not self.keep : 
+                        break
                     #------order_close
                     if self.order_open_accept:
                         for check_tp_sl in check_tp_sls :
                             result_strategy:model_output = self.strategy.order_close(order_detaile=check_tp_sl)
                             for item in result_strategy.data :
                                 item["father_id"] = check_tp_sl.get("id")
-                                item["date"] = date
-                                item["ask"] = ask
-                                item["bid"] = bid
+                                item["date"] = self.date
+                                item["ask"] = self.ask
+                                item["bid"] = self.bid
                                 self.action(items=result_strategy.data)
                     #------Price_change
-                    result_strategy_price_change:model_output = self.strategy.price_change(
-                        price_data=self.price_data,
-                        order_close=self.order_close,
-                        order_open=self.order_open,
-                        order_pending=self.order_pending
-                    )
+                    result_strategy_price_change:model_output = self.strategy.price_change(symbol=self.symbol, ask=self.ask, bid=self.bid, date=self.date)
                     if result_strategy_price_change.status:
                         for item in result_strategy_price_change.data :
                             item["father_id"] = -1
                             item["state"] = Strategy_Action.PRICE_CHANGE
                         self.action(items=result_strategy_price_change.data)
-                if len(self.data[symbol])>1 : 
-                    self.data[symbol] = self.data[symbol][self.data[symbol].index(row) + 1:]
+                #--------------ReData       
+                if len(self.data[self.symbol])>1 : 
+                    self.data[self.symbol] = self.data[self.symbol][self.data[self.symbol].index(row) + 1:]
                 #--------------Stop
                 result_strategy:model_output = self.strategy.stop()
                 for item in result_strategy.data :
-                    item["date"] = date
-                    item["ask"] = ask
-                    item["bid"] = bid
                     self.action(items=result_strategy.data)
-                self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
-                self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
@@ -325,7 +320,7 @@ class Logic_Back:
         return output
 
     #--------------------------------------------- profit_manager
-    def profit_manager(self, price_data:dict)-> model_output:
+    def profit_manager(self)-> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -345,79 +340,71 @@ class Logic_Back:
         execute = False
         #-------------- Action
         try:
-            for item in price_data:
-                #------Data
-                symbol = item
-                digits = price_data[symbol]['digits']
-                point_size = price_data[symbol]['point_size']
-                date = price_data[symbol]['date']
-                ask = price_data[symbol]['ask']
-                bid = price_data[symbol]['bid']
-                #------Check
-                for order_open in self.list_order_open:
-                    order_symbol = order_open[10]
-                    if symbol == order_symbol :
-                        #---Order
-                        order_id = order_open[0]
-                        order_price_open = order_open[5]
-                        order_action = order_open[11]
-                        order_price_tp = order_open[13]
-                        order_price_sl = order_open[14]
-                        order_pm = order_open[16]
-                        #---Trend
-                        movement = cal_movement(order_action, order_price_open, ask, bid, digits, point_size)
-                        #---PM
-                        if movement>0:
-                            for pm in self.profit_manager_items:
-                                if pm[2] == order_pm : break
-                                value = pm[3]
-                                tp_value = pm[4]
-                                sl_value = pm[5]
-                                percent = cal_percent_of_value(self.tp_pips, movement)
-                                if percent >= value:
-                                    if tp_value and abs(tp_value)>0:
-                                        pips = cal_value_of_percent(self.tp_pips, abs(tp_value), digits, point_size)
-                                        if tp_value>0:
-                                            if order_action == "buy":
-                                                tp = cal_price_pips(order_price_tp, pips, digits, point_size)
-                                            else:
-                                                tp = cal_price_pips(order_price_tp, -pips, digits, point_size)
+            #------Check
+            for order_open in self.list_order_open:
+                order_symbol = order_open[10]
+                if self.symbol == order_symbol :
+                    #---Order
+                    order_id = order_open[0]
+                    order_price_open = order_open[5]
+                    order_action = order_open[11]
+                    order_price_tp = order_open[13]
+                    order_price_sl = order_open[14]
+                    order_pm = order_open[16]
+                    #---Trend
+                    movement = cal_movement(order_action, order_price_open, self.ask, self.bid, self.digits, self.point_size)
+                    #---PM
+                    if movement>0:
+                        for pm in self.profit_manager_items:
+                            if pm[2] == order_pm : break
+                            value = pm[3]
+                            tp_value = pm[4]
+                            sl_value = pm[5]
+                            percent = cal_percent_of_value(self.tp_pips, movement)
+                            if percent >= value:
+                                if tp_value and abs(tp_value)>0:
+                                    pips = cal_value_of_percent(self.tp_pips, abs(tp_value), self.digits, self.point_size)
+                                    if tp_value>0:
+                                        if order_action == "buy":
+                                            tp = cal_price_pips(order_price_tp, pips, self.digits, self.point_size)
                                         else:
-                                            if order_action == "buy":
-                                                tp = cal_price_pips(order_price_tp, -pips, digits, point_size)
-                                            else:
-                                                tp = cal_price_pips(order_price_tp, +pips, digits, point_size)
-                                        cmd = f"UPDATE back_order SET tp={tp}, profit_manager='{pm[2]}' WHERE id={order_id}"
-                                        self.management_sql.db.execute(cmd=cmd)
-                                        cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{date}', {order_id}, {ask}, {bid}, 'TP', {tp})"
-                                        self.management_sql.db.execute(cmd=cmd)
-                                        message = f"{date} | {symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | TP | old({order_price_tp}) | {pips} | new({tp})"
-                                        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                                        self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
-                                        execute = True
-                                    if sl_value and abs(sl_value)>0:
-                                        pips = cal_value_of_percent(self.sl_pips, abs(sl_value), digits, point_size)
-                                        if sl_value>0:
-                                            if order_action == "buy":
-                                                sl = cal_price_pips(order_price_sl, -pips, digits, point_size)
-                                            else:
-                                                sl = cal_price_pips(order_price_sl, pips, digits, point_size)
+                                            tp = cal_price_pips(order_price_tp, -pips, self.digits, self.point_size)
+                                    else:
+                                        if order_action == "buy":
+                                            tp = cal_price_pips(order_price_tp, -pips, self.digits, self.point_size)
                                         else:
-                                            if order_action == "buy":
-                                                sl = cal_price_pips(order_price_sl, pips, digits, point_size)
-                                            else:
-                                                sl = cal_price_pips(order_price_sl, -pips, digits, point_size)
-                                        cmd = f"UPDATE back_order SET sl={sl}, profit_manager='{pm[2]}' WHERE id={order_id}"
-                                        self.management_sql.db.execute(cmd=cmd)
-                                        cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{date}', {order_id}, {ask}, {bid}, 'SL', {sl})"
-                                        self.management_sql.db.execute(cmd=cmd)
-                                        message = f"{date} | {symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | SL | old({order_price_sl}) | {pips} | new({sl})"
-                                        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                                        self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
-                                        execute = True
-                                    if execute:
-                                        self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id={self.execute_id} and step={self.step} AND status='open'").data
-                                        break
+                                            tp = cal_price_pips(order_price_tp, +pips, self.digits, self.point_size)
+                                    cmd = f"UPDATE back_order SET tp={tp}, profit_manager='{pm[2]}' WHERE id={order_id}"
+                                    self.management_sql.db.execute(cmd=cmd)
+                                    cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{self.date}', {order_id}, {self.ask}, {self.bid}, 'TP', {tp})"
+                                    self.management_sql.db.execute(cmd=cmd)
+                                    message = f"{self.date} | {self.symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | TP | old({order_price_tp}) | {pips} | new({tp})"
+                                    output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                                    self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
+                                    execute = True
+                                if sl_value and abs(sl_value)>0:
+                                    pips = cal_value_of_percent(self.sl_pips, abs(sl_value), self.digits, self.point_size)
+                                    if sl_value>0:
+                                        if order_action == "buy":
+                                            sl = cal_price_pips(order_price_sl, -pips, self.digits, self.point_size)
+                                        else:
+                                            sl = cal_price_pips(order_price_sl, pips, self.digits, self.point_size)
+                                    else:
+                                        if order_action == "buy":
+                                            sl = cal_price_pips(order_price_sl, pips, self.digits, self.point_size)
+                                        else:
+                                            sl = cal_price_pips(order_price_sl, -pips, self.digits, self.point_size)
+                                    cmd = f"UPDATE back_order SET sl={sl}, profit_manager='{pm[2]}' WHERE id={order_id}"
+                                    self.management_sql.db.execute(cmd=cmd)
+                                    cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{self.date}', {order_id}, {self.ask}, {self.bid}, 'SL', {sl})"
+                                    self.management_sql.db.execute(cmd=cmd)
+                                    message = f"{self.date} | {self.symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | SL | old({order_price_sl}) | {pips} | new({sl})"
+                                    output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                                    self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
+                                    execute = True
+                                if execute:
+                                    self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id={self.execute_id} and step={self.step} AND status='open'").data
+                                    break
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
@@ -425,7 +412,7 @@ class Logic_Back:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-        output.message =  f"{date} | {len(output.data)}"
+        output.message =  f"{self.date} | {len(output.data)}"
         #--------------Verbose
         if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
@@ -434,7 +421,7 @@ class Logic_Back:
         return output
 
     #--------------------------------------------- check_pending_order
-    def check_pending_order(self, items:dict)-> model_output:
+    def check_pending_order(self)-> model_output:
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -453,44 +440,38 @@ class Logic_Back:
         output.data = []
         #-------------- Action
         try:
-            for item in items:
-                #------Data
-                symbol = item
-                date = items[symbol]['date']
-                ask = items[symbol]['ask']
-                bid = items[symbol]['bid']
-                #------Check
-                for order in self.list_order_pending:
-                    order_date = order["date"]
-                    order_action = order["action"]
-                    order_price = order["price"]
-                    order_amount = order["amount"]
-                    pending_limit = order["pending_limit"]
-                    if (date - order_date).seconds <= pending_limit:
-                        if order_action=="buy":
-                            if ask>= order_price:
-                                order["date"]=date
-                                order["ask"]=ask
-                                order["bid"]=bid
-                                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                                message = f"{date} | {symbol} | {sort(order_action, 4)} | amt({order_amount}) | prc({order_price}) | prc({ask}) | Active"
-                                self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
-                                output.data.append(order)
-                                self.order_open(order)
-                                self.list_order_pending.remove(order)
-                        if order_action =="sell":
-                            if bid<= order_price:
-                                order["date"]=date
-                                order["ask"]=ask
-                                order["bid"]=bid
-                                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                                message = f"{date} | {symbol} | {sort(order_action, 4)} | amt({order_amount}) | prc({order_price}) | prc({bid}) | Active"
-                                self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
-                                output.data.append(order)
-                                self.order_open(order)
-                                self.list_order_pending.remove(order)
-                    else:
-                        self.list_order_pending.remove(order)
+            #------Check
+            for order in self.list_order_pending:
+                order_date = order["date"]
+                order_action = order["action"]
+                order_price = order["price"]
+                order_amount = order["amount"]
+                pending_limit = order["pending_limit"]
+                if (self.date - order_date).seconds <= pending_limit:
+                    if order_action=="buy":
+                        if self.ask>= order_price:
+                            order["date"]=self.date
+                            order["ask"]=self.ask
+                            order["bid"]=self.bid
+                            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                            message = f"{self.date} | {self.symbol} | {sort(order_action, 4)} | amt({order_amount}) | prc({order_price}) | prc({self.ask}) | Active"
+                            self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
+                            output.data.append(order)
+                            self.order_open(order)
+                            self.list_order_pending.remove(order)
+                    if order_action =="sell":
+                        if self.bid<= order_price:
+                            order["date"]=self.date
+                            order["ask"]=self.ask
+                            order["bid"]=self.bid
+                            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                            message = f"{self.date} | {self.symbol} | {sort(order_action, 4)} | amt({order_amount}) | prc({order_price}) | prc({self.bid}) | Active"
+                            self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
+                            output.data.append(order)
+                            self.order_open(order)
+                            self.list_order_pending.remove(order)
+                else:
+                    self.list_order_pending.remove(order)
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
@@ -498,7 +479,7 @@ class Logic_Back:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-        output.message = f"{date} | {len(output.data)}"
+        output.message = f"{self.date} | {len(output.data)}"
         #--------------Verbose
         if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
@@ -510,39 +491,44 @@ class Logic_Back:
     def check_limit(self, ask, bid, date, digits, point_size)-> model_output:
         #--------------Variable
         result = True
-        param = None
+        param = ''
         profit_close = 0
         profit_open = 0
         trade_count = 0
         loss = 0
         param = ""
-        #--------------check close order
-        for item in self.list_order_close : 
+        #--------------Order:Open
+        for order in self.list_order_open :
+            profit_trade = cal_profit(action=order[11], amount=order[12], price_open=order[5], ask=ask, bid=bid, digits=digits, point_size=point_size)[0]
+            if self.trade_limit_profit!=-1 and profit_trade >= self.trade_limit_profit:
+                order_dict = self.order_to_dict(order = order)
+                order_dict["date"] = date
+                order_dict["ask"] = ask
+                order_dict["bid"] = bid
+                profit_trade = self.order_close(item=order_dict).data["profit"]
+            else:
+                trade_count += 1
+                profit_open = profit_open + profit_trade
+        #--------------Order:Close
+        for order in self.list_order_close : 
             trade_count += 1
-            profit_close = profit_close + item[8]
-            profit_close = float(f"{profit_close:.{2}f}")
-        #--------------check open order
-        for item in self.list_order_open : 
-            price_open = item[5]
-            action = item[11]
-            amount = item[12]
-            trade_count += 1
-            profit_open = profit_open + cal_profit(action, amount, price_open, ask, bid, digits, point_size)[0]
-            profit_open = float(f"{profit_open:.{2}f}")
-        #--------------Trade
-        if self.limit_trade !=-1 and trade_count >= self.limit_trade : 
+            profit_close = profit_close + order[8]
+        #--------------Check:Trade
+        if result and self.limit_trade !=-1 and trade_count >= self.limit_trade : 
             result = False
+            self.keep = False
             param = 'trade'
             self.order_open_accept = False
-        #--------------Stop
-        if self.limit_stop !=-1 and profit_close >= self.limit_stop:
+        #--------------Check:Stop
+        if result and self.limit_stop !=-1 and profit_close >= self.limit_stop:
             result = False
             param='stop'
             self.order_open_accept = False
-        #--------------Profit
+        #--------------Check:Profit
         profit = profit_open + profit_close
-        if self.limit_profit !=-1 and profit>0 and profit >= self.limit_profit:
+        if result and self.limit_profit !=-1 and profit >= self.limit_profit:
             result = False
+            self.keep = False
             param='profit'
             self.order_open_accept = False
             result_strategy:model_output = self.strategy.stop()
@@ -551,12 +537,11 @@ class Logic_Back:
                 item["ask"] = ask
                 item["bid"] = bid
                 self.action(items=result_strategy.data)
-            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
-            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
-        #--------------Loss
+        #--------------Check:Loss
         loss = profit_open + profit_close
-        if self.limit_loss !=-1 and loss<0 and loss <= self.limit_loss:
+        if result and self.limit_loss !=-1 and loss<0 and loss <= self.limit_loss:
             result = False
+            self.keep = False
             param='loss'
             self.order_open_accept = False
             result_strategy:model_output = self.strategy.stop()
@@ -565,8 +550,6 @@ class Logic_Back:
                 item["ask"] = ask
                 item["bid"] = bid
                 self.action(items=result_strategy.data)
-            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
-            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
         #--------------Log
         if not result: param = f"{param} | {date}"
         if (self.account_profit_close != profit_close or self.account_profit_open != profit_open):
@@ -607,16 +590,8 @@ class Logic_Back:
                 #------Fire
                 if fire :
                     item = {"id":id, "symbol":order_symbol, "action":action, "amount":amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
-                    result = self.order_close(item=item).data
-                    profit =  result["profit"]
-                    output.append(result)
-                    self.account_profit_close = self.account_profit_close + profit
-                    self.account_balance = self.account_balance + profit
-                    self.strategy.balance = self.account_balance
-        #-------------- Update
-        if fire:
-            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
-            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
+                    self.order_close(item=item).data
+                    output.append(item)
         #--------------Return
         return output
 
@@ -785,6 +760,12 @@ class Logic_Back:
             #------ Database
             cmd = f"UPDATE back_order SET date_close='{date}', price_close={price_close}, profit={profit}, status='close' WHERE id='{id}'"
             result_database:model_output = self.management_sql.db.execute(cmd=cmd)
+            #------ Upadte
+            self.balance = self.balance + profit
+            self.account_profit_close = self.account_profit_close + profit
+            self.strategy.balance = self.balance
+            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
+            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
         except Exception as e:  
             #--------------Error
             output.status = False
@@ -821,10 +802,6 @@ class Logic_Back:
         output.method_name = this_method
         #-------------- Variable
         output.data = []
-        #-------------- Data
-        date = item["date"]
-        ask = item["ask"] 
-        bid = item["bid"]
         #-------------- Action
         try:
             for order in self.list_order_open :
@@ -834,13 +811,13 @@ class Logic_Back:
                 order_symbol = order[10]
                 action = order[11]
                 amount = order[12]
-                item = {"id":id, "symbol":order_symbol, "action":action, "amount":amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
+                item = {"id":id, "symbol":order_symbol, "action":action, "amount":amount, "price_open":price_open, "ask":self.ask, "bid":self.bid, "date":self.date}
                 result = self.order_close(item=item).data
                 output.data.append(result)
                 profit =  result["profit"]
                 self.account_profit_close = self.account_profit_close + profit
-                self.account_balance = self.account_balance + profit
-                self.strategy.balance = self.account_balance
+                self.balance = self.balance + profit
+                self.strategy.balance = self.balance
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
@@ -1182,7 +1159,7 @@ class Logic_Back:
         #--------------Data
         table = "back_execute"
         #--------------Action
-        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.step, {table}.status, {table}.profit_manager_id, {table}.money_management_id FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = {id}"
+        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.step, {table}.status, {table}.profit_manager_id, {table}.money_management_id,strategy_item.limit_profit FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = {id}"
         result:model_output = self.management_sql.db.items(cmd=cmd)
         #--------------Data
         if result.status and len(result.data) > 0 :
@@ -1201,6 +1178,7 @@ class Logic_Back:
             output["status"] = data[11]
             output["profit_manager_id"] = data[12]
             output["money_management_id"] = data[13]
+            output["trade_limit_profit"] = data[14]
         #--------------Return
         return output
     
@@ -1250,5 +1228,39 @@ class Logic_Back:
             output.data = strategy_class(params=execute_detaile)
         else:
             output.status = False
+        #--------------Return
+        return output
+    #--------------------------------------------- order_to_dict
+    def order_to_dict(self, order)-> dict:
+        #-------------- Description
+        # IN     :
+        # OUT    : 
+        # Action :
+        #-------------- Output
+        output:dict = {}
+        #-------------- Action
+        output["id"] = order[0]
+        output["execute_id"] = order[1]
+        output["step"] = order[2]
+        output["father_id"] = order[3]
+        output["date_open"] = order[4]
+        output["price_open"] = order[5]
+        output["date_close"] = order[6]
+        output["price_close"] = order[7]
+        output["profit"] = order[8]
+        output["status"] = order[9]
+        output["symbol"] = order[10]
+        output["action"] = order[11]
+        output["amount"] = order[12]
+        output["tp"] = order[13]
+        output["sl"] = order[14]
+        output["spread"] = order[15]
+        output["profit_manager"] = order[16]
+        output["ask"] = order[17]
+        output["bid"] = order[18]
+        output["order_id"] = order[19]
+        output["trade_id"] = order[20]
+        output["description"] = order[21]
+        output["enable"] = order[22]
         #--------------Return
         return output

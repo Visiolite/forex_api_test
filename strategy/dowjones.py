@@ -42,6 +42,8 @@ class Dowjones:
         self.ask = None
         self.bid = None
         self.price = None
+        self.digits = None
+        self.point_size = None
         
     #--------------------------------------------- start
     def start(self):
@@ -155,7 +157,7 @@ class Dowjones:
         return output
 
     #--------------------------------------------- price_change
-    def price_change(self, price_data, order_close, order_open, order_pending):
+    def price_change(self, symbol, ask, bid, date):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -174,62 +176,54 @@ class Dowjones:
         items = []
         #--------------Action
         try:
-            for item in price_data:
-                #---------Data
-                symbol = item
-                digits = price_data[symbol]["digits"]
-                point_size = price_data[symbol]["point_size"]
-                date = price_data[symbol]["date"]
-                ask = price_data[symbol]["ask"]
-                bid = price_data[symbol]["bid"]
-                #---------Everyday
-                if (self.set_order is None) or (self.set_order is False) or ( date.date()> self.date.date()):
-                    ny_date = time_change_utc_newyork(date)
-                    #---------Time
-                    if self.time_start <= ny_date.time() <= self.time_end:
-                        #---Set_Price
-                        if not self.set_price or date.date()> self.date.date():
-                            self.set_order = False
-                            self.set_price = True
-                            self.ask = ask
-                            self.bid = bid
-                            self.date = date
-                        #---Check_Price
-                        if self.set_price: 
-                            movement = abs(ask - self.ask)
-                            if movement >= self.change_pip:
-                                self.set_order = True
-                                self.set_price = False
-                                action = self.up if ask > self.ask else self.down
-                                if action == "buy":
-                                    price = cal_price_pips(self.ask, -self.order_pip , digits, point_size)
-                                else:
-                                    price = cal_price_pips(self.bid, self.order_pip , digits, point_size)
-                                if self.risk > 0 :
-                                    amount = cal_size(balance=self.balance, price=price, pips=self.sl_pips, risk=self.risk, digits=digits, point_size=point_size)
-                                else:
-                                    amount = self.amount
-                                amount = float(f"{amount:.{2}f}")
-                                item = {
-                                    "run": Strategy_Run.ORDER_PENDING,
-                                    "date": date,
-                                    "symbol": symbol, 
-                                    "action": action, 
-                                    "amount": amount, 
-                                    "price": price,
-                                    "tp_pips": self.tp_pips, 
-                                    "sl_pips": self.sl_pips,
-                                    "pending_limit": self.pending_limit, 
-                                    "digits": digits, 
-                                    "point_size": point_size
-                                }
-                                items.append(item)
-                                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                                if action=="buy":
-                                    message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({self.ask}) | cpi({self.change_pip}) | prc({ask}) | opi({self.order_pip}) | prc({price})"
-                                else:
-                                    message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({self.bid}) | cpi({self.change_pip}) | prc({bid}) | opi({self.order_pip}) | prc({price})"
-                                self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
+            #---------Everyday
+            if (self.set_order is None) or (self.set_order is False) or ( date.date()> self.date.date()):
+                ny_date = time_change_utc_newyork(date)
+                #---------Time
+                if self.time_start <= ny_date.time() <= self.time_end:
+                    #---Set_Price
+                    if not self.set_price or date.date()> self.date.date():
+                        self.set_order = False
+                        self.set_price = True
+                        self.ask = ask
+                        self.bid = bid
+                        self.date = date
+                    #---Check_Price
+                    if self.set_price: 
+                        movement = abs(ask - self.ask)
+                        if movement >= self.change_pip:
+                            self.set_order = True
+                            self.set_price = False
+                            action = self.up if ask > self.ask else self.down
+                            if action == "buy":
+                                price = cal_price_pips(self.ask, -self.order_pip , self.digits, self.point_size)
+                            else:
+                                price = cal_price_pips(self.bid, self.order_pip , self.digits, self.point_size)
+                            if self.risk > 0 :
+                                amount = cal_size(balance=self.balance, price=price, pips=self.sl_pips, risk=self.risk, digits=self.digits, point_size=self.point_size)
+                            else:
+                                amount = self.amount
+                            amount = float(f"{amount:.{2}f}")
+                            item = {
+                                "run": Strategy_Run.ORDER_PENDING,
+                                "date": date,
+                                "symbol": symbol, 
+                                "action": action, 
+                                "amount": amount, 
+                                "price": price,
+                                "tp_pips": self.tp_pips, 
+                                "sl_pips": self.sl_pips,
+                                "pending_limit": self.pending_limit, 
+                                "digits": self.digits, 
+                                "point_size": self.point_size
+                            }
+                            items.append(item)
+                            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                            if action=="buy":
+                                message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({self.ask}) | cpi({self.change_pip}) | prc({ask}) | opi({self.order_pip}) | prc({price})"
+                            else:
+                                message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({self.bid}) | cpi({self.change_pip}) | prc({bid}) | opi({self.order_pip}) | prc({price})"
+                            self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}

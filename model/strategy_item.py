@@ -24,6 +24,7 @@ class model_strategy_item_db(BaseModel_db):
     amount = Column(Float, default=0.0)
     tp_pips = Column(Integer, default=0)
     sl_pips = Column(Integer, default=0)
+    limit_profit = Column(Float, default=-1)
     params = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
@@ -42,6 +43,7 @@ class model_strategy_item_py(BaseModel_py):
     amount : float = 0
     tp_pips : int = 0
     sl_pips : int = 0
+    limit_profit : float = -1
     params : str = ''
     description : Optional[str] = ''
     enable : bool = True
