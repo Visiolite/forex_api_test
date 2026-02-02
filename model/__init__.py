@@ -6,6 +6,7 @@ from .live_execute import model_live_execute_db, model_live_execute_py
 from .live_order import model_live_order_db, model_live_order_py
 from .back_execute import model_back_execute_db, model_back_execute_py
 from .back_order import model_back_order_db, model_back_order_py
+from .back_order_pending import model_back_order_pending_db, model_back_order_pending_py
 from .back_execute_detaile import model_back_execute_detaile_db, model_back_execute_detaile_py
 from .live_execute_detaile import model_live_execute_detaile_db, model_live_execute_detaile_py
 from .profit_manager import model_profit_manager_db, model_profit_manager_py

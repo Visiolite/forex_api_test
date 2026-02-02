@@ -31,6 +31,7 @@ IM.money_management(drop=False, create=False,truncate=True, add=True)
 
 db = Data_Orm(database=database_management)
 db.truncate(model=model_back_order_db)
+db.truncate(model=model_back_order_pending_db)
 db.truncate(model=model_back_execute_detaile_db)
 db.truncate(model=model_back_profit_manager_detaile_db)
 db.truncate(model=model_live_order_db)
