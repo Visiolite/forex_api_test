@@ -589,10 +589,10 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="0", balance=1000, risk=0, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
-                self.data_orm.add(model=model, item=model(name="5", balance=1000, risk=5, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
-                self.data_orm.add(model=model, item=model(name="10", balance=1000, risk=10, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
-                self.data_orm.add(model=model, item=model(name="15", balance=1000, risk=15, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
+                self.data_orm.add(model=model, item=model(name="0", balance=1000000, risk=0, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
+                self.data_orm.add(model=model, item=model(name="5", balance=1000000, risk=5, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
+                self.data_orm.add(model=model, item=model(name="10", balance=100000, risk=10, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
+                self.data_orm.add(model=model, item=model(name="15", balance=100000, risk=15, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

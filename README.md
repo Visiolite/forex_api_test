@@ -522,11 +522,6 @@ python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,
     CHeck Spred betting account
     --------------------------------
 
-
-
-
-
-
 <!--------------------------------------------------------------------------------- Database --->
 <br><br>
 

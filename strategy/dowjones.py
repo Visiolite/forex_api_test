@@ -387,8 +387,8 @@ class Dowjones:
             self.risk = self.money_management[1]
             #------Data
             table = get_tbl_name(self.symbol, "t1")
-            time_from_ny_to_utc = time_change_newyork_utc(datetime.combine(self.date_from.date(), self.time_start)).time()
-            time_to_ny_to_utc = time_change_newyork_utc(datetime.combine(self.date_to.date(), self.time_end)).time()
+            time_from_ny_to_utc = str(time_change_newyork_utc(datetime.combine(self.date_from.date(), self.time_start)).time())
+            time_to_ny_to_utc = str(time_change_newyork_utc(datetime.combine(self.date_from.date(), self.time_end)).time())
             cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' AND date::time BETWEEN '{time_from_ny_to_utc}' AND '{time_to_ny_to_utc}' ORDER BY date ASC"
             result = self.data_sql.db.items(cmd=cmd)
             if result.status == True : data = result.data
