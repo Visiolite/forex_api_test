@@ -51,6 +51,15 @@ Monitor
 ```bash
 ./cli.sh monitor
 ```
+<!-------------------------- Monitor -->
+Monitor
+```bash
+./cli.sh monitor
+```
+<!-------------------------- Database -->
+Database
+[Database](https://github.com/kashanimorteza/forex_api/blob/main/database.md)
+
 
 
 <!--------------------------------------------------------------------------------- Download --->
