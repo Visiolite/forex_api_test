@@ -515,3 +515,62 @@ python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,
 # Install
 [Python](https://github.com/kashanimorteza/python_document/blob/main/doc/install.md)  
 [Database](https://github.com/kashanimorteza/forex_api/blob/main/database.md)
+
+
+
+<!--------------------------------------------------------------------------------- Database --->
+<br><br>
+
+# Database
+<!-------------------------- Connect -->
+Connect
+```bash
+psql -d postgres
+```
+
+<!-------------------------- Create -->
+Create
+```bash
+CREATE DATABASE management WITH OWNER=forex;
+CREATE DATABASE log WITH OWNER=forex;
+```
+
+<!-------------------------- Permission -->
+Permission
+```bash
+\c management
+```
+```bash
+ALTER DATABASE management OWNER TO forex;
+ALTER SCHEMA public OWNER TO forex;
+GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
+GRANT USAGE ON SCHEMA public TO forex;
+GRANT CREATE ON SCHEMA public TO forex;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO forex;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO forex;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
+```
+
+
+
+<!--------------------------------------------------------------------------------- Openvpn --->
+<br><br>
+
+# Openvpn
+<!-------------------------- install -->
+Install
+```bash
+sudo apt update
+sudo apt install openvpn
+```
+<!-------------------------- transfer -->
+Transfer
+```bash
+rsync -avz /Users/morteza/Downloads/ID-DE2.ovpn root@192.168.1.100:/root/
+ssh root@192.168.1.100 "printf '448877\n990077\n' > /root/pass.txt"
+```
+<!-------------------------- connect -->
+Connect
+```bash
+sudo openvpn --config /root/ID-DE2.ovpn --auth-user-pass /root/pass.txt
+```
