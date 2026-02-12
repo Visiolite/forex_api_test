@@ -26,7 +26,7 @@ IM.live_execute(drop=False, create=False,truncate=True, add=True)
 IM.back_execute(drop=False, create=False,truncate=True, add=True)
 #IM.profit_manager(drop=False, create=False,truncate=True, add=True)
 #IM.profit_manager_item(drop=False, create=False,truncate=True, add=True)
-IM.money_management(drop=False, create=False,truncate=True, add=True)
+#IM.money_management(drop=False, create=False,truncate=True, add=True)
 #IM.create_instrument_timeframe_table(drop=False, create=True)
 
 db = Data_Orm(database=database_management)
