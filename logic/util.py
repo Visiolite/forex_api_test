@@ -101,6 +101,18 @@ def time_change_utc_newyork(date):
     #--------------Return
     return output
 
+#--------------------------------------------- time_change_newyork_utc
+def time_change_newyork_utc(time):
+    #--------------Action
+    utc = pytz.utc
+    ny = pytz.timezone("America/New_York")
+    ny_dt = ny.localize(time)
+    output = ny_dt.astimezone(utc)
+    #--------------Return
+    return output
+
+
+
 #--------------------------------------------- price_pips
 def cal_price_pips(price, pips, digits, point_size)-> float:
     #--------------Action

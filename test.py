@@ -1,8 +1,6 @@
-from logic.startup import config, load_forex_api, list_close
 from logic.back import Logic_Back
-logic = Logic_Back(execute_id=9)
-logic.run()
-# items= {"id":1, "action":"buy", "amount":10000, "price_open":1.16917, "ask":1.16927, "bid":1.16927}
-# logic.order_close(item =items)
-# items= {"id":2, "action":"sell", "amount":10000, "price_open":1.16903, "ask":1.16893, "bid":1.16893}
-# logic.order_close(item =items)
+from logic.util import model_output
+
+#--------------Instance
+logic_back = Logic_Back()
+logic_back.run(execute_id=9)

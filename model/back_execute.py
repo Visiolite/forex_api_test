@@ -25,7 +25,6 @@ class model_back_execute_db(BaseModel_db):
     money_management_id = Column(Integer, default=1)
     date_from = Column(DateTime, default='2025-01-01 00:00:00')
     date_to = Column(DateTime, default='2030-01-01 00:00:00')
-    step = Column(Integer, default=1)
     status = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
@@ -48,7 +47,6 @@ class model_back_execute_py(BaseModel_py):
     money_management_id : int = 1
     date_from : datetime = datetime.strptime('2025-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
     date_to : datetime = datetime.strptime('2030-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
-    step : int = 1
     status : str = ''
     description : Optional[str] = ''
     enable : bool = True
