@@ -123,7 +123,6 @@ class Logic_Implementation:
             load_forex_api()
             forex:Logic_Live = forex_apis[2]
             offers = forex.get_table("OFFERS").data
-
         try:
             #-------------- Drop
             if drop : self.data_orm.drop(model=model)

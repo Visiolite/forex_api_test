@@ -327,12 +327,25 @@ config_postgres()
 {
     #----------Header
     echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
-    #----------Data
+    #----------Role-1
     username=$(yq '.database.data.username' "$config_file" | tr -d '"')
     password=$(yq '.database.data.password' "$config_file" | tr -d '"')
     echo -e "${verbose_color}username: $username${ENDCOLOR}"
     echo -e "${verbose_color}password: $password${ENDCOLOR}"
-    #----------Role
+    echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE ROLE ${username} WITH LOGIN CREATEDB PASSWORD '${password}';\"${ENDCOLOR}"
+    sudo -u postgres psql -c "CREATE ROLE ${username} WITH LOGIN CREATEDB PASSWORD '${password}';"
+    #----------Role-2
+    username=$(yq '.database.management.username' "$config_file" | tr -d '"')
+    password=$(yq '.database.management.password' "$config_file" | tr -d '"')
+    echo -e "${verbose_color}username: $username${ENDCOLOR}"
+    echo -e "${verbose_color}password: $password${ENDCOLOR}"
+    echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE ROLE ${username} WITH LOGIN CREATEDB PASSWORD '${password}';\"${ENDCOLOR}"
+    sudo -u postgres psql -c "CREATE ROLE ${username} WITH LOGIN CREATEDB PASSWORD '${password}';"
+    #----------Role-3
+    username=$(yq '.database.log.username' "$config_file" | tr -d '"')
+    password=$(yq '.database.log.password' "$config_file" | tr -d '"')
+    echo -e "${verbose_color}username: $username${ENDCOLOR}"
+    echo -e "${verbose_color}password: $password${ENDCOLOR}"
     echo -e "${verbose_color}sudo -u postgres psql -c \"CREATE ROLE ${username} WITH LOGIN CREATEDB PASSWORD '${password}';\"${ENDCOLOR}"
     sudo -u postgres psql -c "CREATE ROLE ${username} WITH LOGIN CREATEDB PASSWORD '${password}';"
     #----------Database
