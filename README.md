@@ -1,6 +1,7 @@
 <!--------------------------------------------------------------------------------- Description --->
 # Description
-Live | History price download  
+History price download 
+Live price download  
 Auto-trading
 
 
@@ -40,8 +41,8 @@ Cli
 ```bash
 ./cli.sh
 ```
-<!-------------------------- Implement all -->
-Implement all
+<!-------------------------- Install and Implement all -->
+Install and Implement all
 ```bash
 ./cli.sh all
 ```
@@ -173,8 +174,8 @@ echo "" > /etc/resolv.conf
 echo "nameserver 185.51.200.2" > /etc/resolv.conf
 echo "nameserver 178.22.122.100" >> /etc/resolv.conf
 ```
-<!-------------------------- DNS -->
-User
+<!-------------------------- Nginx -->
+Nginx
 ```bash
 usermod -aG www-data morteza
 chown -R root:www-data /extra
@@ -550,7 +551,19 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO forex;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO forex;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
 ```
-
+```bash
+\c log
+```
+```bash
+ALTER DATABASE log OWNER TO forex;
+ALTER SCHEMA public OWNER TO forex;
+GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
+GRANT USAGE ON SCHEMA public TO forex;
+GRANT CREATE ON SCHEMA public TO forex;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO forex;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO forex;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
+```
 
 
 <!--------------------------------------------------------------------------------- Openvpn --->
