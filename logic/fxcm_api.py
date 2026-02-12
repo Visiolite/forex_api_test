@@ -96,7 +96,7 @@ class Fxcm_API:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = result
-            output.message= f"{self.type} | {self.id} | {self.name} | {self.balance} | {self.equity}" 
+            output.message= f"{self.type} | {self.id} | {self.name}" 
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
