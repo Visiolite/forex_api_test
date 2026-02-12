@@ -20,13 +20,11 @@ Auto-trading
 [github : gehtsoft](https://github.com/gehtsoft/forex-connect/tree/master/samples/Python)  
 
 
-
 <!--------------------------------------------------------------------------------- Requirements --->
 <br><br>
 
 # Requirements
-[Python](https://github.com/kashanimorteza/python_document/blob/main/doc/install.md)  
-[Database](https://github.com/kashanimorteza/forex_api/blob/main/database.md)
+[Database](https://github.com/kashanimorteza/forex_api/blob/main/document/database.md)
 
 
 
