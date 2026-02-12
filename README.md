@@ -1,6 +1,6 @@
 <!--------------------------------------------------------------------------------- Description --->
 # Description
-History price download 
+History price download  
 Live price download  
 Auto-trading
 
@@ -57,7 +57,6 @@ Monitor
 ./cli.sh monitor
 ```
 <!-------------------------- Database -->
-Database
 [Database](https://github.com/kashanimorteza/forex_api/blob/main/database.md)
 
 
