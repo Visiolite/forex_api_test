@@ -160,10 +160,14 @@ pg_dump --dbname=forex --verbose --no-owner --table=public.xauusd_t1 | pigz > ba
 <!-------------------------- simple -->
 simple
 ```bash
-sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f backup_2025-12-14.sql
+sudo mkdir -p /mnt/usb
+sudo mount /dev/sdb1 /mnt/usb
 ```
 ```bash
-sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f backup_xauusd_t1_2025-12-14.sql
+sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f /mnt/usb/backup_2025-12-31.sql
+```
+```bash
+sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f backup_xauusd_t1_2025-12-31.sql
 ```
 
 <!-------------------------- gzip -->
