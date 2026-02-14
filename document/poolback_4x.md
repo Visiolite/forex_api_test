@@ -2,17 +2,22 @@
 # poolback_4x
 
 <!--------------------------------------------------------------------------------- parameter --->
+<br><br>
+
 # parameter
-  name: poolback_4x
-  time_start: 00:00:00
-  time_end: 21:00:00
-  save_candle_data : 10
-  count : {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234}
-  time_frame: 1m
+```
+name: poolback_4x
+time_start: 00:00:00
+time_end: 21:00:00
+save_candle_data : 10
+count : {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234}
+time_frame: 1m
+```
 
 
 
 <!--------------------------------------------------------------------------------- action --->
+<br><br>
 # action
 
 ## data 
