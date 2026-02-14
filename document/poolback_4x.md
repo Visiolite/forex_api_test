@@ -16,16 +16,16 @@
 # action
 
 ## data 
-    action_1: gereftane dataye  tamame item haye count
-    action_2: mohasebeye average bar ase high va low 
-    action_3 : average[10] = {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234 }
+  action_1: gereftane dataye  tamame item haye count
+  action_2: mohasebeye average bar ase high va low 
+  action_3 : average[10] = {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234 }
 
 ## average: 
-    action_1: sa1[10]:average = (count_t_1 + count_k_1)/2
-    action_2: sa2[10]:average = (count_t_2 + count_k_2)/2
+  action_1: sa1[10]:average = (count_t_1 + count_k_1)/2
+  action_2: sa2[10]:average = (count_t_2 + count_k_2)/2
 
 ## candel_close: 
-    action_1: candel_close : price shoro minute
+  action_1: candel_close : price shoro minute
 
 ## switch_up_1: 
     #sa1 | sb1 
