@@ -1,3 +1,77 @@
+# poolback_4x
+
+## Parameters
+
+### Strategy Name
+
+Identifies the unique name of the strategy.
+
+``` yaml
+name: poolback_4x
+```
+
+------------------------------------------------------------------------
+
+### Time Zone
+
+Defines the reference time standard used by the system.
+
+``` yaml
+time: utc
+```
+
+------------------------------------------------------------------------
+
+### Trading Window
+
+Specifies when the strategy is allowed to operate.
+
+``` yaml
+time_start: 00:00:00
+time_end: 21:00:00
+```
+
+------------------------------------------------------------------------
+
+### Candle Storage
+
+Number of candles that will be stored for calculations.
+
+``` yaml
+save_candle_data: 10
+```
+
+------------------------------------------------------------------------
+
+### Indicator Counts
+
+Configuration values used for average and cloud calculations.
+
+``` yaml
+count:
+  count_t_1: 9
+  count_k_1: 26
+  count_sb_1: 78
+  count_t_2: 36
+  count_k_2: 104
+  count_sb_2: 234
+```
+
+------------------------------------------------------------------------
+
+### Time Frame
+
+Main candle timeframe of the strategy.
+
+``` yaml
+time_frame: 1m
+```
+
+
+
+
+
+
 <!--------------------------------------------------------------------------------- poolback_4x --->
 # poolback_4x
 
@@ -6,21 +80,39 @@
 
 ## parameter
 
-This is the name of strtegy
+This is the name
 ```
 name: poolback_4x
 ```
 
-This is the name of strtegy
+This is the region
 ```
 time: utc
 ```
 
-This is the name of strtegy
+This is the time
 ```
 time_start: 00:00:00
 time_end: 21:00:00
 ```
+
+This is the save_candle_data
+```
+save_candle_data : 10
+```
+
+This is the count
+```
+count : {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234}
+```
+
+This is the time_frame
+```
+time_frame: 1m
+```
+
+
+
 
 
 Description
