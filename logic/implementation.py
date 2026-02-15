@@ -239,9 +239,9 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add: 
+                self.data_orm.add(model=model, item=model(name='Dowjones', description='Every day at 16:30'))
                 self.data_orm.add(model=model, item=model(name='OneWay', description='Buy|Sell'))
                 self.data_orm.add(model=model, item=model(name='Floating', description='Buy&Sell   if p>0:same   if p<0:reverse'))
-                self.data_orm.add(model=model, item=model(name='Dowjones', description='Every day at 16:30'))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -286,11 +286,45 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
+                #-------------- Dowjones
+                #US30
+                item =model(
+                    name='US30',
+                    strategy_id=1,
+                    symbols='US30',
+                    actions='buy,sell',
+                    amount=1,
+                    tp_pips=40, 
+                    sl_pips=20,
+                    params="{'time_start':'09:30:00', 'time_end':'09:30:15', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell', 'pending_limit': 120}")
+                self.data_orm.add(model=model, item=item)
+                #XAU/USD
+                item =model(
+                    name='XAU/USD',
+                    strategy_id=1,
+                    symbols='XAU/USD',
+                    actions='buy,sell',
+                    amount=1,
+                    tp_pips=40, 
+                    sl_pips=20,
+                    params="{'time_start':'09:30:00', 'time_end':'09:30:15', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell', 'pending_limit': 120}")
+                self.data_orm.add(model=model, item=item)
+                #EUR/USD
+                item =model(
+                    name='EUR/USD',
+                    strategy_id=1,
+                    symbols='EUR/USD',
+                    actions='buy,sell',
+                    amount=1,
+                    tp_pips=40, 
+                    sl_pips=20,
+                    params="{'time_start':'09:30:00', 'time_end':'09:30:15', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell', 'pending_limit': 120}")
+                self.data_orm.add(model=model, item=item)
                 #-------------- OneWay
                 #XAU/USD
                 item = model(
                     name='Buy-XAUUSD', 
-                    strategy_id=1,
+                    strategy_id=2,
                     symbols='XAU/USD',
                     actions='buy',
                     amount=1,
@@ -301,7 +335,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=item)
                 item =model(
                     name='Sell-XAUUSD',
-                    strategy_id=1,
+                    strategy_id=2,
                     symbols='XAU/USD',
                     actions='sell',
                     amount=1,
@@ -313,7 +347,7 @@ class Logic_Implementation:
                 #EUR/USD
                 item =model(
                     name='Buy-EURUSD',
-                    strategy_id=1,
+                    strategy_id=2,
                     symbols='EUR/USD',
                     actions='buy',
                     amount=10000,
@@ -324,7 +358,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=item)
                 item =model(
                     name='Sell-EURUSD',
-                    strategy_id=1,
+                    strategy_id=2,
                     symbols='EUR/USD',
                     actions='sell',
                     amount=10000,
@@ -337,7 +371,7 @@ class Logic_Implementation:
                 #XAU/USD
                 item =model(
                     name='XAUUSD',
-                    strategy_id=2,
+                    strategy_id=3,
                     symbols='XAU/USD',
                     actions='buy,sell',
                     amount=1,
@@ -348,7 +382,7 @@ class Logic_Implementation:
                 #EUR/USD
                 item =model(
                     name='EURUSD',
-                    strategy_id=2,
+                    strategy_id=3,
                     symbols='EUR/USD',
                     actions='buy,sell',
                     amount=10000,
@@ -357,29 +391,7 @@ class Logic_Implementation:
                     params=""
                 )
                 self.data_orm.add(model=model, item=item)
-                #-------------- Dowjones
-                #XAU/USD
-                item =model(
-                    name='XAU/USD',
-                    strategy_id=3,
-                    symbols='XAU/USD',
-                    actions='buy,sell',
-                    amount=1,
-                    tp_pips=400, 
-                    sl_pips=200,
-                    params="{'time_start':'16:30:00', 'time_end':'16:32:00', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell'}")
-                self.data_orm.add(model=model, item=item)
-                #US30
-                item =model(
-                    name='US30',
-                    strategy_id=3,
-                    symbols='US30',
-                    actions='buy,sell',
-                    amount=1,
-                    tp_pips=40, 
-                    sl_pips=20,
-                    params="{'time_start':'09:30:00', 'time_end':'09:30:15', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell', 'pending_limit': 120}")
-                self.data_orm.add(model=model, item=item)
+
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -475,26 +487,28 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
+                #-------------- Dowjones
+                self.data_orm.add(model=model, item=model(name="2025", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-01-01 00:00:00", date_to="2026-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-12", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-11", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-11-01 00:00:00", date_to="2025-12-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-10", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-10-01 00:00:00", date_to="2025-11-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-09", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-09-01 00:00:00", date_to="2025-10-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-08", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-08-01 00:00:00", date_to="2025-09-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-07", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-07-01 00:00:00", date_to="2025-08-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-06", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-06-01 00:00:00", date_to="2025-07-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-05", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-05-01 00:00:00", date_to="2025-06-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-04", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-04-01 00:00:00", date_to="2025-05-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-03", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-03-01 00:00:00", date_to="2025-04-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-02", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-02-01 00:00:00", date_to="2025-03-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-01", strategy_item_id=1, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 00:00:00"))
+                #-------------- OneWay
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-01-01 00:00:00", date_to="2026-01-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-12", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-11", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-11-01 00:00:00", date_to="2025-12-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-10", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-10-01 00:00:00", date_to="2025-11-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-09", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-09-01 00:00:00", date_to="2025-10-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-08", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-08-01 00:00:00", date_to="2025-09-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-07", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-07-01 00:00:00", date_to="2025-08-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-06", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-06-01 00:00:00", date_to="2025-07-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-05", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-05-01 00:00:00", date_to="2025-06-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-04", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-04-01 00:00:00", date_to="2025-05-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-03", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-03-01 00:00:00", date_to="2025-04-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-02", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-02-01 00:00:00", date_to="2025-03-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-01", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -589,10 +603,10 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="0", balance=1000000, risk=0, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
-                self.data_orm.add(model=model, item=model(name="5", balance=1000000, risk=5, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
-                self.data_orm.add(model=model, item=model(name="10", balance=100000, risk=10, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
-                self.data_orm.add(model=model, item=model(name="15", balance=100000, risk=15, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
+                self.data_orm.add(model=model, item=model(name="0", balance=1000, risk=0, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
+                self.data_orm.add(model=model, item=model(name="5", balance=1000, risk=5, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
+                self.data_orm.add(model=model, item=model(name="10", balance=1000, risk=10, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
+                self.data_orm.add(model=model, item=model(name="15", balance=1000, risk=15, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
