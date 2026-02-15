@@ -40,6 +40,9 @@ class model_back_order_db(BaseModel_db):
     trade_id = Column(Integer, Sequence("back_order_trade_id_seq"), nullable=False)
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
+    balance = Column(Float, default=0.0)
+    equity = Column(Float, default=0.0)
+
     #---Display
     def __repr__(self) : return f"{self.toDict()}"
     #---Json
@@ -74,3 +77,5 @@ class model_back_order_py(BaseModel_py):
     trade_id : int = 0
     description : Optional[str] = ''
     enable : bool = True
+    balance : float = 0
+    equity : float = 0

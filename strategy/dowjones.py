@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from datetime import datetime, timedelta
+from datetime import datetime
 from logic.startup import debug, log_instance, list_instrument, Strategy_Run, Strategy_Action, Strategy_Run, database_management, database_data
 from logic.util import model_output, sort, time_change_newyork_utc, time_change_utc_newyork, cal_price_pips, cal_size, get_tbl_name
 from logic.log import Logic_Log
@@ -25,16 +25,15 @@ class Dowjones:
         self.this_class = self.__class__.__name__
         #--------------variable
         self.params = params
-        #--------------instance
         self.log = log if log else log_instance
-        #--------------strategy|items
+        #--------------strategy | items
         self.symbol = params["symbol"]
         self.actions = params["actions"].split(',')
         self.amount = params["amount"]
         self.tp_pips = params["tp_pips"]
         self.sl_pips = params["sl_pips"]
         self.trade_limit_profit= params["trade_limit_profit"]
-        #--------------strategy|params
+        #--------------strategy | params
         self.time_start = datetime.strptime(params["params"]["time_start"], "%H:%M:%S").time()
         self.time_end = datetime.strptime(params["params"]["time_end"], "%H:%M:%S").time()
         self.change_pip = params["params"]["change_pip"]
@@ -42,7 +41,7 @@ class Dowjones:
         self.down = params["params"]["down"]
         self.up = params["params"]["up"]
         self.pending_limit = params["params"]["pending_limit"]
-        #--------------execute|items
+        #--------------execute | items
         self.execute_id = params["execute_id"]
         self.date_from = params["date_from"]
         self.date_to = params["date_to"]
@@ -53,10 +52,11 @@ class Dowjones:
         self.point_size = list_instrument[self.symbol]["point_size"]
         #--------------database
         self.management_sql = None
-        self.data_sql = None
         self.management_orm = None
+        self.data_sql = None
         #--------------data
         self.balance = None
+        self.equity = None
         self.risk = None
         self.set_price = None
         self.set_order = None
@@ -217,9 +217,9 @@ class Dowjones:
             self,
             father_id:int, 
             step:int,
-            list_order_pending,
-            list_order_open,
-            list_order_close,
+            list_order_pending: list,
+            list_order_open:list,
+            list_order_close:list,
             symbol:str,
             date:datetime,
             ask:float,
@@ -334,11 +334,8 @@ class Dowjones:
             cmd = f"SELECT balance, risk, limit_profit, limit_loss, limit_trade, limit_stop FROM money_management WHERE id={self.money_management_id}"
             self.money_management = self.management_sql.db.items(cmd=cmd).data[0]
             self.balance = self.money_management[0]
+            self.equity = self.money_management[0]
             self.risk = self.money_management[1]
-            #------Data
-            table = get_tbl_name(self.symbol, "t1")
-            cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
-            data = self.data_sql.db.items(cmd=cmd).data
             #------Step
             step = self.management_sql.db.item(cmd=f"SELECT MAX(step) FROM back_order WHERE execute_id={self.execute_id}").data
             step = (step + 1) if step else 1
@@ -355,6 +352,10 @@ class Dowjones:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"exi({self.execute_id}) | sym({self.symbol}) | stp({step})"
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
+            #------Data
+            table = get_tbl_name(self.symbol, "t1")
+            cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
+            data = self.data_sql.db.items(cmd=cmd).data
             #------Start
             result= self.start(father_id=-1, step=step)
             if result.data : logic_back.action(items=result.data)
@@ -366,15 +367,20 @@ class Dowjones:
                 logic_back.ask = float(row[2])
                 logic_back.bid = float(row[3])
                 #------check_pending_order
-                if len(logic_back.list_order_pending)>0 : logic_back.check_pending_order()
-                #------profit_manager
-                if len(logic_back.list_order_open)>0 : logic_back.profit_manager()
+                if len(logic_back.list_order_pending)>0 : 
+                    logic_back.check_pending_order()
+                #------check_profit_manager
+                if len(logic_back.list_order_open)>0 : 
+                    logic_back.check_profit_manager()
                 #------check_tp_sl
-                if len(logic_back.list_order_open)>0 : result= logic_back.check_tp_sl()
-                #------balance_update
-                if logic_back.order_action_close : self.balance  = logic_back.balance_update(balance=self.balance)
+                if len(logic_back.list_order_open)>0 : 
+                    logic_back.check_tp_sl()
                 #------check_limit
-                if len(logic_back.list_order_open)>0 : result = logic_back.check_limit()
+                if len(logic_back.list_order_open)>0 : 
+                    logic_back.check_limit()
+                #------balance_update
+                self.balance = logic_back.balance
+                self.equity = logic_back.equity
                 #------strategy | order_action
                 if logic_back.order_open_accept and (logic_back.order_action_open or logic_back.order_action_close):
                     result = self.order_action(

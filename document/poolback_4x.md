@@ -5,6 +5,7 @@
 <br><br>
 
 ## parameter
+Description
 ```
 name: poolback_4x
 time: utc
@@ -13,6 +14,14 @@ time_end: 21:00:00
 save_candle_data : 10
 count : {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234}
 time_frame: 1m
+```
+
+Python
+```python
+if a>b :
+  pass
+else
+pass
 ```
 
 

@@ -22,6 +22,7 @@ class model_profit_manager_item_db(BaseModel_db):
     value = Column(Integer, default=1)
     tp_value = Column(Integer, default=0)
     sl_value = Column(Integer, default=0)
+    at_value = Column(Integer, default=0)
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
     #---Display
@@ -37,5 +38,6 @@ class model_profit_manager_item_py(BaseModel_py):
     value : int = 1
     tp_value : int = 0
     sl_value : int = 0
+    at_value : int = 0
     description : Optional[str] = ''
     enable : bool = True
