@@ -1,75 +1,3 @@
-## Parameters
-
-### Strategy Name
-
-Identifies the unique name of the strategy.
-
-``` puthon
-name=poolback_4x
-```
-
-------------------------------------------------------------------------
-
-### Time Zone
-
-Defines the reference time standard used by the system.
-
-``` yaml
-time: utc
-```
-
-------------------------------------------------------------------------
-
-### Trading Window
-
-Specifies when the strategy is allowed to operate.
-
-``` yaml
-time_start: 00:00:00
-time_end: 21:00:00
-```
-
-------------------------------------------------------------------------
-
-### Candle Storage
-
-Number of candles that will be stored for calculations.
-
-``` yaml
-save_candle_data: 10
-```
-
-------------------------------------------------------------------------
-
-### Indicator Counts
-
-Configuration values used for average and cloud calculations.
-
-``` yaml
-count:
-  count_t_1: 9
-  count_k_1: 26
-  count_sb_1: 78
-  count_t_2: 36
-  count_k_2: 104
-  count_sb_2: 234
-```
-
-------------------------------------------------------------------------
-
-### Time Frame
-
-Main candle timeframe of the strategy.
-
-``` yaml
-time_frame: 1m
-```
-
-
-
-
-
-
 <!--------------------------------------------------------------------------------- poolback_4x --->
 # poolback_4x
 
@@ -78,10 +6,36 @@ time_frame: 1m
 
 ## parameter
 
-This is the name
+<!----------------name--->
+### name
 ```
-name: poolback_4x
 ```
+
+```
+این پارامتر برای تعیین نام استراتژی می‌باشد
+```
+
+```python
+name=poolback_4x
+```
+
+
+<!----------------region--->
+### region
+
+```
+English
+```
+
+```
+Farsi
+```
+
+```python
+name=poolback_4x
+```
+
+
 
 This is the region
 ```
