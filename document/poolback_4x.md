@@ -8,13 +8,12 @@
 
 <!----------------name--->
 ### name
-```
-```
-
+Description
 ```
 این پارامتر برای تعیین نام استراتژی می‌باشد
 ```
 
+Python
 ```python
 name=poolback_4x
 ```
@@ -125,6 +124,9 @@ action_1:
 
 ### switch_down_1: 
 ```
+```
+
+```python
 #sa1 | sb1 
 action_1: loop 10 ta 1
 action_1: if sa1[1] < average(count["count_sb_1"])
