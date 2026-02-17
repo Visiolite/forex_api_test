@@ -20,7 +20,7 @@ Ichimoku Dual Cloud Switch Backtest
 ## Parameters
 
 <!----------------name--->
-### name
+#### name
 ```
 این پارامتر برای تعیین نام استراتژی می‌باشد
 ```
@@ -28,7 +28,7 @@ Ichimoku Dual Cloud Switch Backtest
 name='poolback_4x'
 ```
 <!----------------time_frame--->
-### time_frame
+#### time_frame
 ```
 تایم‌فریم
 ```
@@ -36,15 +36,15 @@ name='poolback_4x'
 time_frame='1min'
 ```
 <!----------------region--->
-### region
+#### region
 ```
-این پارامتر برای تعیین نام استراتژی می‌باشد
+برای تعیین نوع تایم می‌باشد
 ```
 ```python
 region='UTC'
 ```
 <!----------------time_from--->
-### time_from
+#### time_from
 ```
 زمان شروع مجاز معامله
 ```
@@ -52,7 +52,7 @@ region='UTC'
 time_from='00:00:00'
 ```
 <!----------------time_to--->
-### time_to
+#### time_to
 ```
 زمان پایان مجاز معامله
 ```
@@ -60,7 +60,7 @@ time_from='00:00:00'
 time_to='21:00:00'
 ```
 <!----------------max_order--->
-### max_order
+#### max_order
 ```
 حداکثر پوزیشن همزمان
 ```
