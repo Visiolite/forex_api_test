@@ -1,0 +1,200 @@
+<!--------------------------------------------------------------------------------- Description --->
+# Poolback 4x
+```
+Ichimoku Dual Cloud Switch Backtest
+```
+```
+استراتژی پولبک ۴ برابر  
+مبتنی بر دو ابر ایچیموکو – تریگر سویچ کومو در تنظیمات استاندارد + فیلتر روند در تنظیمات بزرگ‌تر
+```
+```
+ جهت‌گیری اصلی: دنباله‌رو روند بزرگ (ابر Ichi2) + پولبک کوتاه‌مدت (سویچ ابر Ichi1)
+```
+```
+واحد محاسبه pnl: تفاوت قیمت خام (بدون در نظر گرفتن حجم معامله، اسپرد، کمیسیون یا اسلیپیج)
+```
+
+<!--------------------------------------------------------------------------------- Parameters --->
+<br><br>
+
+## Parameters
+
+<!----------------name--->
+#### name
+```
+این پارامتر برای تعیین نام استراتژی می‌باشد
+```
+```python
+name='poolback_4x'
+```
+<!----------------time_frame--->
+#### time_frame
+```
+تایم‌فریم
+```
+```python
+time_frame='1min'
+```
+<!----------------region--->
+#### region
+```
+برای تعیین نوع تایم می‌باشد
+```
+```python
+region='UTC'
+```
+<!----------------time_from--->
+#### time_from
+```
+زمان شروع مجاز معامله
+```
+```python
+time_from='00:00:00'
+```
+<!----------------time_to--->
+#### time_to
+```
+زمان پایان مجاز معامله
+```
+```python
+time_to='21:00:00'
+```
+<!----------------max_order--->
+#### max_order
+```
+حداکثر پوزیشن همزمان
+```
+```python
+max_order=1
+```
+
+
+<!--------------------------------------------------------------------------------- Actions --->
+<br><br>
+
+## Actions
+
+<!----------------data--->
+#### Step 01 : data 
+```
+سسسسس
+```
+```
+action_1: gereftane dataye  tamame item haye count
+action_2: mohasebeye average bar ase high va low 
+action_3 : average[10] = {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234 }
+```
+
+<!----------------average--->
+#### Step 02 : average 
+```
+سسسسس
+```
+```
+action_1: sa1[10]:average = (count_t_1 + count_k_1)/2
+action_2: sa2[10]:average = (count_t_2 + count_k_2)/2
+```
+
+<!----------------candel_close--->
+#### Step 03 : candel_close 
+```
+سسسسس
+```
+```
+action_1: candel_close : price shoro minute
+```
+
+<!----------------switch_up_1--->
+#### Step 04 : switch_up_1
+```
+سسسسس
+```
+``` 
+#sa1 | sb1 
+action_1: loop 10 ta 1
+action_1: if sa1[1] > average(count["count_sb_1"])
+action_1: 
+          if sa1[i-1] < average(count["count_sb_1"])
+            javab
+          else == 
+            sa1[i-2] < average(count["count_sb_1"])
+```
+
+<!----------------switch_down_1--->
+#### Step 05 : switch_down_1
+```
+سسسسس
+```
+```python
+#sa1 | sb1 
+action_1: loop 10 ta 1
+action_1: if sa1[1] < average(count["count_sb_1"])
+action_1: 
+          if sa1[i-1] > average(count["count_sb_1"])
+            javab
+          else == 
+            sa1[i-2] > average(count["count_sb_1"])
+```
+
+<!----------------tk_up--->
+#### Step 06 : tk_up
+```
+سسسسس
+```
+```
+action_1: if average(count["count_t_2"]) > average(count["count_k_2"]) 
+```
+
+<!----------------tk_down--->
+#### Step 07 : tk_down 
+```
+سسسسس
+```
+```
+action_1: if average(count["count_t_2"]) < average(count["count_k_2"]) 
+```
+
+<!----------------switch_up_2--->
+#### Step 08 : switch_up_2
+```
+سسسسس
+```
+```
+#sa2 | sb2
+action_1: loop 10 ta 1
+action_1: if sa2[1] > average(count["count_sb_1"])
+action_1: 
+          if sa1[i-1] < average(count["count_sb_1"])
+            javab
+          else == 
+            sa1[i-2] < average(count["count_sb_1"])
+```
+
+<!----------------switch_down_2--->
+#### Step 09 : switch_down_2
+```
+سسسسس
+```
+```
+#sa2 | sb2
+action_1: switch_down_2
+action_1: loop 10 ta 1
+action_1: if sa1[1] < average(count["count_sb_1"])
+action_1: 
+          if sa1[i-1] > average(count["count_sb_1"])
+            javab
+          else == 
+            sa1[i-2] > average(count["count_sb_1"])
+```
+
+<!----------------enter--->
+#### Step 10 : enter
+```
+سسسسس
+```
+```
+action_1: if switch_up_2 ** tk_up_2 && switch_down_1
+action_2: buy
+action_3: if switch_down_2 ** tk_down_2 && switch_up_1
+action_4: sell
+```
