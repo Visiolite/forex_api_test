@@ -1,5 +1,5 @@
 <!--------------------------------------------------------------------------------- Description --->
-# Poolback 4x4
+# Poolback 4x
 ```
 Ichimoku Dual Cloud Switch Backtest
 ```
