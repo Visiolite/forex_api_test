@@ -1,5 +1,5 @@
 <!--------------------------------------------------------------------------------- Description --->
-# Poolback 4x
+# Poolback 4x4
 ```
 Ichimoku Dual Cloud Switch Backtest
 ```
@@ -9,10 +9,20 @@ Ichimoku Dual Cloud Switch Backtest
 ```
 ```
  جهت‌گیری اصلی: دنباله‌رو روند بزرگ (ابر Ichi2) + پولبک کوتاه‌مدت (سویچ ابر Ichi1)
+
+```
+```
+اجزای ایچیموکو
+تنکن: t
+کیجن: k
+اسپن بی: sb
+اسپن آ: sa
 ```
 ```
 واحد محاسبه pnl: تفاوت قیمت خام (بدون در نظر گرفتن حجم معامله، اسپرد، کمیسیون یا اسلیپیج)
 ```
+
+
 
 <!--------------------------------------------------------------------------------- Parameters --->
 <br><br>
@@ -33,7 +43,7 @@ name='poolback_4x'
 تایم‌فریم
 ```
 ```python
-time_frame='1min'
+time_frame='m1'
 ```
 <!----------------region--->
 #### region
@@ -54,10 +64,7 @@ time_from='00:00:00'
 <!----------------time_to--->
 #### time_to
 ```
-زمان پایان مجاز معامله 
-```
-```
-پوزیشن جدید باز نمیشود. اگر پوزیشنی باز بود بسته نمی شود ( مدیریت میشود)
+زمان پایان مجاز معامله
 ```
 ```python
 time_to='21:00:00'
@@ -70,14 +77,18 @@ time_to='21:00:00'
 ```python
 max_order=1
 ```
+<!----------------domain--->
+#### domain
+```
+گرفتن های و لو همه آیتم‌های داخل متغیر پریود برای دومین دامنه گذشته
+```
+```python
+domain=10
+```
 <!----------------period--->
 #### period
 ```
-میانگین ھای و لول های مختلف کندل
-```
-```
-دوره های اجزای ایچیموکو 1:(9,26,78)
-دوره های اجزای ایچیموکو 2:(36,104,234) 
+تعداد کندل دوره‌های مختلف که کندل بر اساس متغیر تایم فریم تعیین می‌شود
 ```
 ```python
 period = {
@@ -89,18 +100,10 @@ period = {
     "sb2": 234
 }
 ```
-<!----------------sa--->
-#### sa
-```
-میانگین ھای و لول های مختلف کندل
-```
-```
-محاسبه sa1 وsa2
-میانگن t1 , k1
-```
+<!----------------python--->
+#### python
 ```python
-sa1 = (t1 + k1)/2
-sa2 = (t2 + k2)/2
+params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
 ```
 
 
@@ -110,52 +113,107 @@ sa2 = (t2 + k2)/2
 
 ## Actions
 
-<!----------------data--->
-#### Step 01 | data 
+<!----------------average--->
+#### average
 ```
-1: از زمان شروع استراتژی گرفتن دیتای 234 کندل گذشته
-2: محاسبه ی نقاط ایچیموکو 1 و 2
-t1: میانگین های و لوی 9 دوره ی گذشته
-k1: میانگین های و لوی 26 دوره ی گذشته
-sb1: میانگین های و لوی 78 دوره ی گذشته
-t2: میانگین های و لوی 36 دوره ی گذشته
-k2: میانگین های و لوی 104 دوره ی گذشته
-sb2:میانگین های و لوی 234 دوره ی گذشته
+گرفتن های و لوی همه آیتم‌های داخل متغیر پریود
 ```
-```
-action_1: gereftane dataye  tamame item haye count
-action_2: mohasebeye average bar ase high va low 
-action_3 | average[10] = {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234 }
+```python
+average = {}
+for key, value in self.period.items():
+    high, low = self.box(date=date, count=value, time_frame=self.time_frame)
+    average[key] = {"high": high, "low": low , "average": (high+low)/2}
 ```
 
-<!----------------average--->
-#### Step 02 | average 
+<!----------------sa--->
+<br>
+
+#### sa
 ```
-: محاسبه ی sa1 و sa2
-sa1: میانگین t1 و k1
-sa2: میانگین t2 و k2
+محاسبه میانگین تی و کا
 ```
+```python
+sa1 = (average['t1']['average'] + average['k1']['average']) / 2
+sa2 = (average['t2']['average'] + average['k2']['average']) / 2
 ```
-action_1: sa1[10]:average = (count_t_1 + count_k_1)/2
-action_2: sa2[10]:average = (count_t_2 + count_k_2)/2
+
+<!----------------tk--->
+<br>
+
+#### tk
 ```
+تنکن و کیجن صعودی ایچی 2
+وقتی تنکن بالای کیجن قرار دارد
+```
+```python
+if average['t2']['average'] > average['k2']['average'] :
+    tk_up = True
+    tk_down = False
+else:
+    tk_up = False
+    tk_down = True
+```
+
+<!----------------kumo--->
+<br>
+
+#### kumo
+```
+کوموی نزولی ایچی2
+وقتی sa2 بالای sb2 قرار دارد
+```
+```python
+if sa2 > average['sb2']['average'] :
+    kumo_up = True
+    kumo_down = False
+else:
+    kumo_up = False
+    kumo_down = True
+```
+
+<!----------------switch_down--->
+<br>
+
+#### switch_down
+```
+سویچ نزولی کوموی ایچی 1
+کلوز قیمت زیر اسپن آ و اسپن بی
+بررسی sa1 و sb1 در کندل لایو و کندل گذشته. وقتی در کندل لایو اسپن آ زیر اسپن بی قرار گرفته و در کندل قبل از لایو اسپن آ بالای اسپن بی قرار داشته است. 
+اگر در کندل قبل از لایو اسپن آ برابر با اسپن بی بود به کندل قبل از آن یا - 2 می رویم اگر باز هم برابر بود به - 3 و - 4 و... باید به کندلی برسیم که اسپن آ بالای اسپن بی باشد
+```
+```python
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!----------------candel_close--->
-#### Step 03 | candel_close 
+<br>
+
+#### candel_close 
 ```
-کلوز کندل 1 دقیقه | شروع دقیقه جدید 00:00:00
+سسسسس
 ```
 ```
 action_1: candel_close | price shoro minute
 ```
 
 <!----------------switch_up_1--->
-#### Step 04 | switch_up_1
+<br>
+
+#### switch_up_1
 ```
-سویچ صعودی کوموی ایچی 1
-کلوز قیمت بالای اسپن آ و اسپن بی و
-بررسی sa1 و sb1 در کندل لایو و کندل گذشته. وقتی در کندل لایو اسپن آ بالای اسپن بی قرار گرفته و در کندل قبل از لایو اسپن آ زیر اسپن بی قرار داشته است. 
-اگر در کندل قبل از لایو اسپن آ برابر با اسپن بی بود به کندل قبل از آن یا - 2 می رویم اگر باز هم برابر بود به - 3 و - 4 و... باید به کندلی برسیم که اسپن آ زیر اسپن بی باشد
+سسسسس
 ```
 ``` 
 #sa1 | sb1 
@@ -169,12 +227,11 @@ action_1:
 ```
 
 <!----------------switch_down_1--->
-#### Step 05 | switch_down_1
+<br>
+
+#### switch_down_1
 ```
-سویچ نزولی کوموی ایچی 1
-کلوز قیمت زیر اسپن آ و اسپن بی
-بررسی sa1 و sb1 در کندل لایو و کندل گذشته. وقتی در کندل لایو اسپن آ زیر اسپن بی قرار گرفته و در کندل قبل از لایو اسپن آ بالای اسپن بی قرار داشته است. 
-اگر در کندل قبل از لایو اسپن آ برابر با اسپن بی بود به کندل قبل از آن یا - 2 می رویم اگر باز هم برابر بود به - 3 و - 4 و... باید به کندلی برسیم که اسپن آ بالای اسپن بی باشد
+سسسسس
 ```
 ```python
 #sa1 | sb1 
@@ -187,62 +244,99 @@ action_1:
             sa1[i-2] > average(count["count_sb_1"])
 ```
 
-<!----------------tk_up--->
-#### Step 06 | tk_up
-```
-تنکن و کیجن صعودی ایچی 2
-وقتی تنکن بالای کیجن قرار دارد
-```
-```
-action_1: if average(count["count_t_2"]) > average(count["count_k_2"]) 
-```
+
 
 <!----------------tk_down--->
-#### Step 07 | tk_down 
+<br>
+
+#### tk_down 
 ```
-تنکن و کیجن نزولی ایچی 2
-وقتی تنکن زیر کیجن قرار دارد
+سسسسس
 ```
 ```
 action_1: if average(count["count_t_2"]) < average(count["count_k_2"]) 
 ```
 
 <!----------------switch_up_2--->
-#### Step 08 | kumo_up_2
+<br>
+
+#### switch_up_2
 ```
-کوموی صعودی ایچی2
-وقتی sa2 بالای sb2 قرار دارد
+سسسسس
 ```
 ```
 #sa2 | sb2
-action_1: if average(count["count_sa_2"]) > average(count["count_sb_2"])
+action_1: loop 10 ta 1
+action_1: if sa2[1] > average(count["count_sb_1"])
+action_1: 
+          if sa1[i-1] < average(count["count_sb_1"])
+            javab
+          else == 
+            sa1[i-2] < average(count["count_sb_1"])
 ```
 
 <!----------------switch_down_2--->
-#### Step 09 | kumo_down_2
+<br>
+
+#### switch_down_2
 ```
-کوموی نزولی ایچی2
-وقتی sa2 بالای sb2 قرار دارد
+سسسسس
 ```
 ```
 #sa2 | sb2
-action_1: if average(count["count_sa_2"]) < average(count["count_sb_2"])
+action_1: switch_down_2
+action_1: loop 10 ta 1
+action_1: if sa1[1] < average(count["count_sb_1"])
+action_1: 
+          if sa1[i-1] > average(count["count_sb_1"])
+            javab
+          else == 
+            sa1[i-2] > average(count["count_sb_1"])
 ```
 
 <!----------------enter--->
-#### Step 10 | enter
+<br>
+
+#### enter
 ```
-ورود
-وقتی در ایچی دو کومو صعودی و تنکن کیجن هم صعودی
-و در ایچی 1 سویچ نزولی کومو اتفاق افتاد
-با کلوز کندل وارد خرید میشویم
-وقتی در ایچی دو کومو نزولی و تنکن کیجن هم نزولی
-و در ایچی 1 سویچ صعودی کومو اتفاق افتاد
-با کلوز کندل وارد فروش میشویم
+سسسسس
 ```
 ```
-action_1: if kumo_up_2 ** tk_up_2 && switch_down_1
+action_1: if switch_up_2 ** tk_up_2 && switch_down_1
 action_2: buy
-action_3: if kumo_down_2 ** tk_down_2 && switch_up_1
+action_3: if switch_down_2 ** tk_down_2 && switch_up_1
 action_4: sell
+```
+
+
+<!--------------------------------------------------------------------------------- Methods --->
+<br><br>
+
+## Methods
+<!----------------box--->
+
+#### box
+```
+این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
+```
+```python
+  def box(
+          self,
+          date:int, 
+          count:int,
+          time_frame:str,
+      ):
+      #--------------Description
+      # IN     : date | count | time_frame
+      # OUT    : high | low
+      # Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
+      #--------------Action
+      table = get_tbl_name(self.symbol, self.time_frame)
+      date_to = date
+      date_from = date - timedelta(minutes=count)
+      cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
+      result = self.data_sql.db.item(cmd=cmd).data
+      high = result[0]
+      low = result[1]
+      return high, low
 ```
